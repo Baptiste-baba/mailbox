@@ -41,3 +41,7 @@ on `http://127.0.0.1:3000` with live reload. Development and test settings live 
 | `pnpm lint:fix`  | Apply formatting and safe lint fixes                                   |
 | `pnpm test`      | Start the local database, then run unit and integration tests (Vitest) |
 | `pnpm db:start`  | Start the local database only                                          |
+
+## License
+
+[GNU Affero General Public License v3.0](LICENSE).
