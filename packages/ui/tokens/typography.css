@@ -1,0 +1,20 @@
+/* Scale from the design handoff (direction E): Geist only, 13 px base. */
+
+@theme {
+  --font-*: initial;
+  --font-sans: "Geist Variable", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+
+  --text-*: initial;
+  --text-micro: 11px;
+  --text-label: 11.5px;
+  --text-meta: 12px;
+  --text-base: 13px;
+  --text-base--line-height: 1.42;
+  --text-mail: 14.5px;
+  --text-mail--line-height: 1.65;
+  --text-compose: 15px;
+  --text-compose--line-height: 1.7;
+  --text-title: 24px;
+  --text-title--letter-spacing: -0.02em;
+  --text-greeting: 27px;
+}

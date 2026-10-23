@@ -1,0 +1,7 @@
+/* Imported right after Tailwind: the tokens replace Tailwind's default theme. */
+@import "../tokens/colors.css";
+@import "../tokens/shadows.css";
+@import "../tokens/typography.css";
+@import "../tokens/radii.css";
+@import "./base.css";
+@import "./ai.css";

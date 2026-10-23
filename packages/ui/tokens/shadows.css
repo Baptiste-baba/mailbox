@@ -1,0 +1,38 @@
+/* Values from the design handoff (direction E). */
+
+.light {
+  --lift: 0 0 0 0.5px rgba(11, 21, 48, 0.14), 0 1px 1.5px rgba(11, 21, 48, 0.07);
+  --card:
+    0 0 0 0.5px rgba(11, 21, 48, 0.09), 0 1px 2px rgba(11, 21, 48, 0.05),
+    0 6px 16px -8px rgba(11, 21, 48, 0.14);
+  --cardon:
+    0 0 0 1.75px #1f3fd1, 0 1px 2px rgba(11, 21, 48, 0.06),
+    0 10px 24px -12px rgba(31, 63, 209, 0.45);
+  --float:
+    0 0 0 0.5px rgba(11, 21, 48, 0.12), 0 18px 40px -12px rgba(11, 21, 48, 0.28),
+    0 2px 6px rgba(11, 21, 48, 0.06);
+  --press:
+    inset 0 0.5px 0 rgba(255, 255, 255, 0.28), 0 0 0 0.5px rgba(10, 20, 90, 0.5),
+    0 1px 2px rgba(11, 21, 48, 0.22);
+}
+
+.dark {
+  --lift: 0 0 0 0.5px rgba(255, 255, 255, 0.1), 0 1px 2px rgba(0, 0, 0, 0.5);
+  --card:
+    0 0 0 0.5px rgba(255, 255, 255, 0.08), inset 0 0.5px 0 rgba(255, 255, 255, 0.06),
+    0 8px 20px -10px rgba(0, 0, 0, 0.7);
+  --cardon:
+    0 0 0 1.75px #7d97ff, inset 0 0.5px 0 rgba(255, 255, 255, 0.08),
+    0 10px 24px -10px rgba(0, 0, 0, 0.8);
+  --float: 0 0 0 0.5px rgba(255, 255, 255, 0.12), 0 20px 48px -12px rgba(0, 0, 0, 0.75);
+  --press: inset 0 0.5px 0 rgba(255, 255, 255, 0.35), 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+@theme inline {
+  --shadow-*: initial;
+  --shadow-lift: var(--lift);
+  --shadow-card: var(--card);
+  --shadow-cardon: var(--cardon);
+  --shadow-float: var(--float);
+  --shadow-press: var(--press);
+}

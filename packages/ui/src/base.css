@@ -1,0 +1,20 @@
+@import "@fontsource-variable/geist";
+
+@layer base {
+  body {
+    background-color: var(--paper);
+    color: var(--ink);
+    font-size: var(--text-base);
+    line-height: var(--text-base--line-height);
+    letter-spacing: -0.003em;
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "ss01", "cv11";
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* An outline follows the corner radius and leaves the element's own shadow intact. */
+  :focus-visible {
+    outline: 3px solid var(--ring);
+    outline-offset: 0;
+  }
+}

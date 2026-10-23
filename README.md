@@ -49,10 +49,13 @@ pnpm install
 pnpm dev
 ```
 
-`pnpm dev` starts a local PostgreSQL in Docker (port `5433`, see `compose.dev.yaml`), then the api
-on `http://127.0.0.1:3000` and the worker (health check on port `3001`) with live reload. Local
-backups land in `.backups/`. Development and test settings live in
-`.env.development` and `.env.test`; they only hold local values.
+`pnpm dev` starts a local PostgreSQL in Docker (port `5433`, see `compose.dev.yaml`), then with live
+reload the web app on `http://localhost:5173`, the api on `http://127.0.0.1:3000` and the worker
+(health check on port `3001`). Local backups land in `.backups/`. Development and test settings
+live in `.env.development` and `.env.test`; they only hold local values.
+
+`http://localhost:5173/design.html` shows every design token in both themes. It exists in
+development only.
 
 | Command          | Purpose                                                                |
 | ---------------- | ---------------------------------------------------------------------- |

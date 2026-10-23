@@ -7,7 +7,7 @@
   },
   "files": {
     "ignoreUnknown": true,
-    "includes": ["**", "!pnpm-lock.yaml"]
+    "includes": ["**", "!pnpm-lock.yaml", "!apps/web/src/routeTree.gen.ts"]
   },
   "formatter": {
     "indentStyle": "space",
@@ -87,5 +87,10 @@
         }
       }
     }
-  ]
+  ],
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
+    }
+  }
 }

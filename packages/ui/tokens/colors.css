@@ -1,0 +1,96 @@
+/* Values from the design handoff (direction E). The theme is the `light` or `dark` class of an ancestor. */
+
+.light {
+  --paper: #ffffff;
+  --mist: #f3f5fa;
+  --mist2: #e9edf5;
+  --well: #f6f7fb;
+  --raise: #ffffff;
+  --tint: #f0f3fd;
+  --frost: #e2e7f0;
+  --frost2: #cdd4e2;
+  --tintln: rgba(31, 63, 209, 0.13);
+  --ink: #0b1530;
+  --ink2: #53607c;
+  --ink3: #646e89;
+  --aitx: #2c3f86;
+  --klein: #1f3fd1;
+  --kleinbg: #e8edfd;
+  --kleintx: #1a35ae;
+  --onk: #ffffff;
+  --ring: rgba(31, 63, 209, 0.28);
+  --verm: #b9301b;
+  --vermbg: #fbebe7;
+  --navy: #12245e;
+  --azur: #2f6fe0;
+  --ciel: #5c93e6;
+  --glacier: #9db5dc;
+  --slate: #7a859d;
+  --g1: #1f3fd1;
+  --g2: #2f7bea;
+  --g3: #2fb0e4;
+}
+
+.dark {
+  --paper: #121826;
+  --mist: #0c111c;
+  --mist2: #1a2133;
+  --well: #0e131e;
+  --raise: #1a2235;
+  --tint: #151e3a;
+  --frost: #242c3e;
+  --frost2: #353f56;
+  --tintln: rgba(125, 151, 255, 0.18);
+  --ink: #e9edf6;
+  --ink2: #a7b1c7;
+  --ink3: #8d97ae;
+  --aitx: #b3c1f2;
+  --klein: #7d97ff;
+  --kleinbg: #1d2853;
+  --kleintx: #bcc9ff;
+  --onk: #0a1240;
+  --ring: rgba(125, 151, 255, 0.38);
+  --verm: #ff8a75;
+  --vermbg: #3b1813;
+  --navy: #a9baf2;
+  --azur: #6f9df2;
+  --ciel: #8db6ee;
+  --glacier: #5f7499;
+  --slate: #8792a9;
+  --g1: #7d97ff;
+  --g2: #6faeff;
+  --g3: #63d0ec;
+}
+
+/* `inline` makes utilities read the variable where they apply, so a `.dark` block inside a light page stays dark. */
+@theme inline {
+  --color-*: initial;
+  --color-paper: var(--paper);
+  --color-mist: var(--mist);
+  --color-mist2: var(--mist2);
+  --color-well: var(--well);
+  --color-raise: var(--raise);
+  --color-tint: var(--tint);
+  --color-frost: var(--frost);
+  --color-frost2: var(--frost2);
+  --color-tintln: var(--tintln);
+  --color-ink: var(--ink);
+  --color-ink2: var(--ink2);
+  --color-ink3: var(--ink3);
+  --color-aitx: var(--aitx);
+  --color-klein: var(--klein);
+  --color-kleinbg: var(--kleinbg);
+  --color-kleintx: var(--kleintx);
+  --color-onk: var(--onk);
+  --color-ring: var(--ring);
+  --color-verm: var(--verm);
+  --color-vermbg: var(--vermbg);
+  --color-navy: var(--navy);
+  --color-azur: var(--azur);
+  --color-ciel: var(--ciel);
+  --color-glacier: var(--glacier);
+  --color-slate: var(--slate);
+  --color-g1: var(--g1);
+  --color-g2: var(--g2);
+  --color-g3: var(--g3);
+}

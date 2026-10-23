@@ -6,3 +6,5 @@ dist/
 # Local instructions for Claude Code, kept out of the public repository.
 CLAUDE.md
 .backups/
+# Design handoff with personal data in mockups, kept local.
+docs/design/
