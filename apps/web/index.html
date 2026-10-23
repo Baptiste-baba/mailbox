@@ -5,6 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <!-- Lets the browser paint its own light or dark background until the app applies the theme. -->
     <meta name="color-scheme" content="light dark" />
+    <!-- The --paper token of each theme: meta tags cannot read CSS variables. -->
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#121826" media="(prefers-color-scheme: dark)" />
+    <meta name="apple-mobile-web-app-title" content="MailBox" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
     <title>MailBox</title>
   </head>
   <body>

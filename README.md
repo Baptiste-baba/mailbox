@@ -14,12 +14,20 @@ invalid variable stops the service with an explicit message. `.env.example` list
 | `DATABASE_URL`       | api, worker | yes      |             | PostgreSQL connection string (`postgres://…`)                  |
 | `API_HOST`           | api         | no       | `127.0.0.1` | Address the api listens on (`0.0.0.0` inside a container)      |
 | `API_PORT`           | api         | no       | `3000`      | Port the api listens on                                        |
+| `WEB_DIRECTORY`      | api         | no       |             | Built web app (`apps/web/dist`) to serve; unset, API only      |
 | `BACKUP_DIRECTORY`   | worker      | yes      |             | Folder receiving the nightly database backups                  |
 | `WORKER_HEALTH_PORT` | worker      | no       | `3001`      | Port of the worker health check, bound to loopback only        |
 | `LOG_LEVEL`          | api, worker | no       | `info`      | `fatal`, `error`, `warn`, `info`, `debug`, `trace` or `silent` |
 | `TZ`                 | worker      | no       | `UTC`       | Time zone, e.g. `Europe/Paris`; sets the hour of the backup    |
 
 Both services answer `GET /health` with `200` when they can reach the database, `503` otherwise.
+
+## Web app
+
+With `WEB_DIRECTORY` set, the api serves the web app on every address outside `/api` and `/health`,
+under a strict Content Security Policy. The app installs as a PWA (home screen on a phone, app
+window on a computer) and opens offline; browsers only allow this over HTTPS, so put the api behind
+an HTTPS endpoint such as `tailscale serve`. A new version applies the next time the app is opened.
 
 ## Backups
 
