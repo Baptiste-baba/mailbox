@@ -1,12 +1,11 @@
+import { databaseUrlSchema, logLevelSchema, portSchema } from '@mailbox/config';
 import * as z from 'zod';
-
-const logLevelSchema = z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent']);
 
 const apiEnvironmentSchema = z
   .object({
-    DATABASE_URL: z.url({ protocol: /^postgres(ql)?$/ }),
+    DATABASE_URL: databaseUrlSchema,
     API_HOST: z.string().min(1).default('127.0.0.1'),
-    API_PORT: z.coerce.number().int().min(1).max(65_535).default(3000),
+    API_PORT: portSchema.default(3000),
     LOG_LEVEL: logLevelSchema.default('info'),
   })
   .transform((environment) => ({

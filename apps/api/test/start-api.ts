@@ -1,5 +1,5 @@
-import { parseApiConfig } from '../src/config/api-config.js';
-import { createApp } from '../src/create-app.js';
+import { parseApiConfig } from '../src/config/api-config.ts';
+import { createApp } from '../src/create-app.ts';
 
 export interface RunningApi {
   url: string;

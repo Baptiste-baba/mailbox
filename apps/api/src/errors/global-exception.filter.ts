@@ -2,7 +2,7 @@ import { AppError } from '@mailbox/shared';
 import { type ArgumentsHost, Catch, type ExceptionFilter, HttpStatus } from '@nestjs/common';
 import { HttpAdapterHost } from '@nestjs/core';
 import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
-import { toHttpError } from './to-http-error.js';
+import { toHttpError } from './to-http-error.ts';
 
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {

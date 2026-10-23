@@ -1,8 +1,8 @@
 import type { INestApplication } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { Logger } from 'nestjs-pino';
-import { createAppModule } from './app.module.js';
-import type { ApiConfig } from './config/api-config.js';
+import { createAppModule } from './app.module.ts';
+import type { ApiConfig } from './config/api-config.ts';
 
 export async function createApp(config: ApiConfig): Promise<INestApplication> {
   const app = await NestFactory.create(createAppModule(config), { bufferLogs: true });

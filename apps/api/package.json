@@ -6,17 +6,17 @@
   "scripts": {
     "build": "nest build",
     "dev": "nest start --watch --preserveWatchOutput --env-file ../../.env.development",
-    "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@mailbox/config": "workspace:*",
     "@mailbox/db": "workspace:*",
     "@mailbox/shared": "workspace:*",
     "@nestjs/common": "12.2.0",
     "@nestjs/core": "12.2.0",
     "@nestjs/platform-express": "12.2.0",
     "nestjs-pino": "5.3.1",
-    "pino": "10.4.0",
+    "pino": "catalog:",
     "pino-http": "11.0.0",
     "reflect-metadata": "0.2.2",
     "rxjs": "7.8.2",

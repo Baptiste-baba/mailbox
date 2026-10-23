@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { parseApiConfig } from './api-config.js';
+import { parseApiConfig } from './api-config.ts';
 
 const databaseUrl = 'postgres://mailbox:secret@localhost:5432/mailbox';
 

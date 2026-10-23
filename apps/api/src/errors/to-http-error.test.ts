@@ -1,7 +1,7 @@
 import { AppError } from '@mailbox/shared';
 import { NotFoundException } from '@nestjs/common';
 import { describe, expect, it } from 'vitest';
-import { toHttpError } from './to-http-error.js';
+import { toHttpError } from './to-http-error.ts';
 
 describe('toHttpError', () => {
   it('exposes an expected error with its code, message and details', () => {

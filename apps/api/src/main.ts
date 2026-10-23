@@ -1,7 +1,7 @@
 import { pino } from 'pino';
 import * as z from 'zod';
-import { type ApiConfig, parseApiConfig } from './config/api-config.js';
-import { createApp } from './create-app.js';
+import { type ApiConfig, parseApiConfig } from './config/api-config.ts';
+import { createApp } from './create-app.ts';
 
 // The configured logger only exists once the app is up: this one reports why startup failed.
 const bootstrapLogger = pino();

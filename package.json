@@ -12,11 +12,12 @@
     "typecheck": "turbo run typecheck",
     "lint": "biome check --error-on-warnings .",
     "lint:fix": "biome check --write .",
-    "test": "pnpm db:start && turbo run test",
+    "test": "pnpm db:start && turbo run build && vitest run",
     "db:start": "docker compose --file compose.dev.yaml up --detach --wait"
   },
   "devDependencies": {
     "@biomejs/biome": "2.6.2",
-    "turbo": "2.11.10"
+    "turbo": "2.11.10",
+    "vitest": "catalog:"
   }
 }

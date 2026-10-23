@@ -1,11 +1,11 @@
 import { type DynamicModule, Module } from '@nestjs/common';
 import { APP_FILTER } from '@nestjs/core';
 import { LoggerModule } from 'nestjs-pino';
-import type { ApiConfig } from './config/api-config.js';
-import { DatabaseModule } from './database/database.module.js';
-import { GlobalExceptionFilter } from './errors/global-exception.filter.js';
-import { HealthModule } from './health/health.module.js';
-import { createLoggerOptions } from './logging/logger-options.js';
+import type { ApiConfig } from './config/api-config.ts';
+import { DatabaseModule } from './database/database.module.ts';
+import { GlobalExceptionFilter } from './errors/global-exception.filter.ts';
+import { HealthModule } from './health/health.module.ts';
+import { createLoggerOptions } from './logging/logger-options.ts';
 
 @Module({})
 class AppModule {}

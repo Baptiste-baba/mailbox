@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { errorResponseSchema } from './error-response.js';
+import { errorResponseSchema } from './error-response.ts';
 
 describe('errorResponseSchema', () => {
   it('accepts a response without details', () => {

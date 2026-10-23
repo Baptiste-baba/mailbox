@@ -1,5 +1,5 @@
 import * as z from 'zod';
-import { errorCodeSchema } from './error-code.js';
+import { errorCodeSchema } from './error-code.ts';
 
 export const errorResponseSchema = z.object({
   code: errorCodeSchema,

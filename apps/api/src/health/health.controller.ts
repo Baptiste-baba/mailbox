@@ -1,7 +1,7 @@
 import { type Database, pingDatabase } from '@mailbox/db';
 import { AppError } from '@mailbox/shared';
 import { Controller, Get, Inject } from '@nestjs/common';
-import { DATABASE } from '../database/database.module.js';
+import { DATABASE } from '../database/database.module.ts';
 
 @Controller('health')
 export class HealthController {

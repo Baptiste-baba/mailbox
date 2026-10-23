@@ -1,6 +1,6 @@
 import { errorResponseSchema } from '@mailbox/shared';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { type RunningApi, startApi } from './start-api.js';
+import { type RunningApi, startApi } from './start-api.ts';
 
 describe('GET /health', () => {
   describe('when the database is reachable', () => {

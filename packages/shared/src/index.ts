@@ -1,3 +1,3 @@
-export { AppError } from './errors/app-error.js';
-export { type ErrorCode, errorCodeSchema } from './errors/error-code.js';
-export { type ErrorResponse, errorResponseSchema } from './errors/error-response.js';
+export { AppError } from './errors/app-error.ts';
+export { type ErrorCode, errorCodeSchema } from './errors/error-code.ts';
+export { type ErrorResponse, errorResponseSchema } from './errors/error-response.ts';

@@ -1,5 +1,5 @@
 import type { Params } from 'nestjs-pino';
-import type { ApiConfig } from '../config/api-config.js';
+import type { ApiConfig } from '../config/api-config.ts';
 
 interface SerializedRequest {
   id: unknown;

@@ -1,1 +1,1 @@
-export { createDatabase, type Database, pingDatabase } from './database.js';
+export { createDatabase, type Database, pingDatabase } from './database.ts';
