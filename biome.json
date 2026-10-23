@@ -26,19 +26,38 @@
         "noExcessiveCognitiveComplexity": "error",
         "noExcessiveLinesPerFunction": {
           "level": "error",
-          "options": { "maxLines": 40 }
+          "options": {
+            "maxLines": 40
+          }
         }
       },
       "style": {
         "noExcessiveLinesPerFile": {
           "level": "error",
-          "options": { "maxLines": 300 }
+          "options": {
+            "maxLines": 300
+          }
         },
         "useFilenamingConvention": {
           "level": "error",
-          "options": { "filenameCases": ["kebab-case"], "requireAscii": true }
+          "options": {
+            "filenameCases": ["kebab-case"],
+            "requireAscii": true
+          }
         },
-        "useNamingConvention": "error"
+        "useNamingConvention": {
+          "level": "error",
+          "options": {
+            "conventions": [
+              {
+                "selector": {
+                  "kind": "objectLiteralProperty"
+                },
+                "formats": ["camelCase", "CONSTANT_CASE"]
+              }
+            ]
+          }
+        }
       },
       "suspicious": {
         "noConsole": "error"
@@ -51,5 +70,22 @@
         "organizeImports": "on"
       }
     }
-  }
+  },
+  "overrides": [
+    {
+      "includes": ["apps/api/**"],
+      "javascript": {
+        "parser": {
+          "unsafeParameterDecoratorsEnabled": true
+        }
+      },
+      "linter": {
+        "rules": {
+          "style": {
+            "useImportType": "off"
+          }
+        }
+      }
+    }
+  ]
 }

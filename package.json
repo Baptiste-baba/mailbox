@@ -7,11 +7,13 @@
     "node": ">=26.12.1 <27"
   },
   "scripts": {
+    "dev": "pnpm db:start && turbo run dev",
     "build": "turbo run build",
     "typecheck": "turbo run typecheck",
     "lint": "biome check --error-on-warnings .",
     "lint:fix": "biome check --write .",
-    "test": "turbo run test"
+    "test": "pnpm db:start && turbo run test",
+    "db:start": "docker compose --file compose.dev.yaml up --detach --wait"
   },
   "devDependencies": {
     "@biomejs/biome": "2.6.2",
