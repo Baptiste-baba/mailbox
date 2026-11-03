@@ -8,3 +8,4 @@ CLAUDE.md
 .backups/
 # Design handoff with personal data in mockups, kept local.
 docs/design/
+dist-desktop/

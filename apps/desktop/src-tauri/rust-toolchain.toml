@@ -1,0 +1,4 @@
+# Pinned for this project only: rustup installs it on first use, other projects keep their own.
+[toolchain]
+channel = "1.99.1"
+components = ["clippy", "rustfmt"]

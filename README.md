@@ -29,6 +29,16 @@ under a strict Content Security Policy. The app installs as a PWA (home screen o
 window on a computer) and opens offline; browsers only allow this over HTTPS, so put the api behind
 an HTTPS endpoint such as `tailscale serve`. A new version applies the next time the app is opened.
 
+## Mac app
+
+The Mac app (macOS 13.3 or later) carries the web app inside itself. It is not signed yet: open it
+the first time with right-click, then Open.
+
+Building it needs Rust through rustup (the version, pinned in
+`apps/desktop/src-tauri/rust-toolchain.toml`, installs itself on first use) and the Xcode command
+line tools. `pnpm desktop:build` produces
+`apps/desktop/src-tauri/target/release/bundle/macos/MailBox.app`, to copy into Applications.
+
 ## Backups
 
 Every night at 3 a.m. (in the `TZ` time zone), the worker dumps the database into
@@ -65,15 +75,17 @@ live in `.env.development` and `.env.test`; they only hold local values.
 `http://localhost:5173/design.html` shows every design token in both themes. It exists in
 development only.
 
-| Command          | Purpose                                                                |
-| ---------------- | ---------------------------------------------------------------------- |
-| `pnpm dev`       | Start the local database and every service in watch mode               |
-| `pnpm build`     | Build every package                                                    |
-| `pnpm typecheck` | Type-check every package                                               |
-| `pnpm lint`      | Lint and check formatting (Biome)                                      |
-| `pnpm lint:fix`  | Apply formatting and safe lint fixes                                   |
-| `pnpm test`      | Start the local database, then run unit and integration tests (Vitest) |
-| `pnpm db:start`  | Start the local database only                                          |
+| Command              | Purpose                                                                |
+| -------------------- | ---------------------------------------------------------------------- |
+| `pnpm dev`           | Start the local database and every service in watch mode               |
+| `pnpm build`         | Build every package, the Mac app excepted                              |
+| `pnpm typecheck`     | Type-check every package                                               |
+| `pnpm lint`          | Lint and check formatting (Biome)                                      |
+| `pnpm lint:fix`      | Apply formatting and safe lint fixes                                   |
+| `pnpm test`          | Start the local database, then run unit and integration tests (Vitest) |
+| `pnpm db:start`      | Start the local database only                                          |
+| `pnpm desktop:dev`   | Start the Mac app on the development web app, with live reload         |
+| `pnpm desktop:build` | Build the Mac app                                                      |
 
 ## License
 

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- Merged by Tauri into the app's Info.plist: the app speaks French, so do the menu items and
+     panels macOS adds by itself (dictation, emoji, writing tools). -->
+<plist version="1.0">
+  <dict>
+    <key>CFBundleDevelopmentRegion</key>
+    <string>fr</string>
+    <key>CFBundleLocalizations</key>
+    <array>
+      <string>fr</string>
+    </array>
+  </dict>
+</plist>

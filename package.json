@@ -13,7 +13,9 @@
     "lint": "biome check --error-on-warnings .",
     "lint:fix": "biome check --write .",
     "test": "pnpm db:start && turbo run build && vitest run",
-    "db:start": "docker compose --file compose.dev.yaml up --detach --wait"
+    "db:start": "docker compose --file compose.dev.yaml up --detach --wait",
+    "desktop:dev": "pnpm --filter @mailbox/desktop exec tauri dev",
+    "desktop:build": "pnpm --filter @mailbox/desktop exec tauri build"
   },
   "devDependencies": {
     "@biomejs/biome": "2.6.2",

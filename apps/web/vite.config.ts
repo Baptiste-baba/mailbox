@@ -4,13 +4,15 @@ import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   plugins: [
     // Generates the route tree and splits each route into its own chunk; must run before React.
     tanstackRouter({ target: 'react', autoCodeSplitting: true }),
     react(),
     tailwindcss(),
     VitePWA({
+      // The Mac app (build mode `desktop`) carries the interface inside itself: nothing to cache.
+      disable: mode === 'desktop',
       // An external registration script: the Content Security Policy forbids inline scripts.
       injectRegister: 'script-defer',
       // No skipWaiting: a new version waits until every window of the app is closed, so nothing is
@@ -27,4 +29,4 @@ export default defineConfig({
       },
     }),
   ],
-});
+}));

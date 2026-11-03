@@ -1,0 +1,35 @@
+{
+  "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
+  "productName": "MailBox",
+  "version": "0.0.0",
+  "identifier": "io.github.baptiste-baba.mailbox",
+  "build": {
+    "frontendDist": "../../web/dist-desktop",
+    "devUrl": "http://localhost:5173",
+    "beforeDevCommand": "pnpm --filter @mailbox/web dev",
+    "beforeBuildCommand": "pnpm --filter @mailbox/web build --mode desktop --outDir dist-desktop"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "MailBox",
+        "width": 1280,
+        "height": 820,
+        "minWidth": 760,
+        "minHeight": 520
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["app"],
+    "category": "public.app-category.productivity",
+    "icon": ["icons/32x32.png", "icons/128x128.png", "icons/128x128@2x.png", "icons/icon.icns"],
+    "macOS": {
+      "minimumSystemVersion": "13.3"
+    }
+  }
+}
