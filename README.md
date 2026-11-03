@@ -1,5 +1,7 @@
 # MailBox
 
+[![CI](https://github.com/Baptiste-baba/mailbox/actions/workflows/ci.yml/badge.svg)](https://github.com/Baptiste-baba/mailbox/actions/workflows/ci.yml)
+
 Self-hosted, AI-first email client for Gmail and Outlook. One instance serves one user.
 
 > Under construction: not usable yet.

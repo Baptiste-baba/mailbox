@@ -1,0 +1,37 @@
+name: Mac app
+
+on:
+  push:
+    branches: [main]
+    paths: [apps/desktop/**, .github/workflows/mac-app.yml]
+  pull_request:
+    paths: [apps/desktop/**, .github/workflows/mac-app.yml]
+
+# Reads the repository and nothing else: no secret, no write access.
+permissions:
+  contents: read
+
+concurrency:
+  group: mac-app-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  rust:
+    runs-on: macos-26
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: apps/desktop/src-tauri
+    steps:
+      # Third-party actions are pinned by commit, so that a compromised tag cannot run here.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Install the Rust toolchain pinned in rust-toolchain.toml
+        run: rustup toolchain install
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: |
+            ~/.cargo/registry
+            apps/desktop/src-tauri/target
+          key: cargo-${{ runner.os }}-${{ hashFiles('apps/desktop/src-tauri/Cargo.lock', 'apps/desktop/src-tauri/rust-toolchain.toml') }}
+      - run: cargo fmt --check
+      - run: cargo clippy --locked -- -D warnings
