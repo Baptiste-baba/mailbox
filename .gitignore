@@ -9,3 +9,5 @@ CLAUDE.md
 # Design handoff with personal data in mockups, kept local.
 docs/design/
 dist-desktop/
+# Default data folders of compose.yaml when run from the repository.
+data/

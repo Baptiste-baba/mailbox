@@ -4,10 +4,32 @@ Self-hosted, AI-first email client for Gmail and Outlook. One instance serves on
 
 > Under construction: not usable yet.
 
+## Installation
+
+MailBox runs with Docker Compose: PostgreSQL, the api (which also serves the web app) and the worker.
+1. Next to `compose.yaml`, copy `.env.example` to `.env` and fill it in. Generate the database
+   password with `openssl rand -hex 32`. Keep the database folder on an SSD, and the backup folder
+   on another disk when the machine has one.
+2. Create both folders, and give the backup folder to the user the worker runs as:
+
+   ```bash
+   mkdir -p data/database data/backups
+   sudo chown 1000:1000 data/backups
+   ```
+
+3. Start everything with `docker compose up --detach`.
+
+The app then listens on `127.0.0.1:3000` (or `MAILBOX_PORT`), reachable from the machine itself
+only. Put an HTTPS endpoint in front of it, such as `tailscale serve`, to reach it from other devices.
+
+Each service has a memory and CPU limit (1.4 GB of memory in total), restarts on its own after a
+failure, and, for the api and the worker, runs without any Linux privilege on a read-only filesystem.
+
 ## Configuration
 
 Services read their configuration from environment variables, validated at startup: a missing or
-invalid variable stops the service with an explicit message. `.env.example` lists every variable.
+invalid variable stops the service with an explicit message. With Docker Compose, `compose.yaml`
+sets them from `.env`; the table below matters to run a service on its own.
 
 | Variable             | Used by     | Required | Default     | Purpose                                                        |
 | -------------------- | ----------- | -------- | ----------- | -------------------------------------------------------------- |

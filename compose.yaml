@@ -1,0 +1,117 @@
+# Production. Copy .env.example to .env next to this file, fill it in, then: docker compose up --detach
+name: mailbox
+
+# The api and the worker run Node only: nothing to write outside their volumes, no Linux privilege.
+x-hardened-service: &hardened-service
+  restart: unless-stopped
+  read_only: true
+  tmpfs:
+    - /tmp
+  cap_drop:
+    - ALL
+  security_opt:
+    - no-new-privileges:true
+  depends_on:
+    postgres:
+      condition: service_healthy
+
+services:
+  postgres:
+    image: pgvector/pgvector:0.8.7-pg18-trixie@sha256:5895949dfcdf308eb0cd31c950c93c14895c77f33fbedfecf1fa511ab1d4bcd2
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: mailbox
+      POSTGRES_DB: mailbox
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+    # Sized for the 768 MB limit below, on a small machine shared with other services.
+    command:
+      - postgres
+      - -c
+      - shared_buffers=192MB
+      - -c
+      - effective_cache_size=512MB
+      - -c
+      - work_mem=8MB
+      - -c
+      - maintenance_work_mem=64MB
+      - -c
+      - max_connections=30
+      # The database is expected on an SSD, where random reads cost about as much as sequential ones.
+      - -c
+      - random_page_cost=1.1
+      - -c
+      - effective_io_concurrency=200
+    # Parallel queries share memory through /dev/shm, which Docker limits to 64 MB by default.
+    shm_size: 128mb
+    volumes:
+      - ${MAILBOX_DATABASE_DIRECTORY:-./data/database}:/var/lib/postgresql
+    healthcheck:
+      test: [CMD, pg_isready, --username=mailbox, --dbname=mailbox]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: 768M
+
+  api:
+    <<: *hardened-service
+    image: mailbox-api
+    build:
+      context: .
+      target: api
+    environment:
+      DATABASE_URL: postgres://mailbox:${POSTGRES_PASSWORD}@postgres:5432/mailbox
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    # Reachable from this machine only: an HTTPS endpoint on it, such as `tailscale serve`, exposes the app.
+    ports:
+      - 127.0.0.1:${MAILBOX_PORT:-3000}:3000
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - --eval
+        - "fetch('http://127.0.0.1:3000/health').then((response) => process.exit(response.ok ? 0 : 1), () => process.exit(1))"
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 384M
+
+  worker:
+    <<: *hardened-service
+    image: mailbox-worker
+    build:
+      context: .
+      target: worker
+    environment:
+      DATABASE_URL: postgres://mailbox:${POSTGRES_PASSWORD}@postgres:5432/mailbox
+      BACKUP_DIRECTORY: /backups
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      TZ: ${TZ:-UTC}
+    volumes:
+      - ${MAILBOX_BACKUP_DIRECTORY:-./data/backups}:/backups
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - --eval
+        - "fetch('http://127.0.0.1:3001/health').then((response) => process.exit(response.ok ? 0 : 1), () => process.exit(1))"
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    # Longer than the worker's own 30 s shutdown timeout, so that a running backup can finish.
+    stop_grace_period: 45s
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 256M
