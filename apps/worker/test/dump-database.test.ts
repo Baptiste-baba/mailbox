@@ -38,7 +38,8 @@ describe('dumpDatabase', () => {
     expect(await readdir(directory)).toEqual([]);
   });
 
-  it('stops pg_dump and leaves no file when aborted', async () => {
+  // An early abort once left a file on some runs only: 25 runs make such a regression show.
+  it('stops pg_dump and leaves no file when aborted', { repeats: 24 }, async () => {
     const controller = new AbortController();
     const dump = dumpDatabase(databaseUrl, directory, controller.signal);
     controller.abort();

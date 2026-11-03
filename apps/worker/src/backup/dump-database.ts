@@ -1,11 +1,9 @@
 import { spawn } from 'node:child_process';
 import { once } from 'node:events';
-import { createWriteStream } from 'node:fs';
-import { mkdir, rename, rm } from 'node:fs/promises';
+import { type FileHandle, mkdir, open, rename, rm } from 'node:fs/promises';
 import { constants, setPriority } from 'node:os';
 import { join } from 'node:path';
 import type { Readable } from 'node:stream';
-import { pipeline } from 'node:stream/promises';
 import { backupFileName, PARTIAL_BACKUP_SUFFIX } from './backup-files.ts';
 
 const ERROR_OUTPUT_LIMIT = 2_000;
@@ -20,32 +18,34 @@ export async function dumpDatabase(
   const path = join(directory, backupFileName(new Date()));
   // Written under another name until complete, so an interrupted dump never passes for a backup.
   const partialPath = `${path}${PARTIAL_BACKUP_SUFFIX}`;
+  // Created before pg_dump starts, and outside the try: a failure only ever deletes a file this
+  // dump created. The dump holds every mail, so only its owner may read it.
+  const output = await open(partialPath, 'wx', 0o600);
   try {
-    await runPgDump(databaseUrl, partialPath, signal);
+    await runPgDump(databaseUrl, output, signal);
     await rename(partialPath, path);
     return path;
   } catch (error) {
     await rm(partialPath, { force: true });
     throw error;
+  } finally {
+    await output.close();
   }
 }
 
-async function runPgDump(databaseUrl: string, outputPath: string, signal: AbortSignal) {
+async function runPgDump(databaseUrl: string, output: FileHandle, signal: AbortSignal) {
   const { connectionUrl, password } = splitPassword(databaseUrl);
   const pgDump = spawn('pg_dump', ['--format=custom', `--dbname=${connectionUrl}`], {
     // Only what pg_dump needs: the password stays off the command line, other secrets out of reach.
     env: { PATH: process.env.PATH, PGPASSWORD: password },
     signal,
-    stdio: ['ignore', 'pipe', 'pipe'],
+    // pg_dump writes straight into the backup file: the dump never goes through the worker.
+    stdio: ['ignore', output.fd, 'pipe'],
   });
   lowerPriority(pgDump.pid);
-  const errorOutput = keepTail(pgDump.stderr);
-  // The dump holds every mail: only its owner may read it.
-  const output = createWriteStream(outputPath, { flags: 'wx', mode: 0o600 });
-  const [, [exitCode]] = await Promise.all([
-    pipeline(pgDump.stdout, output),
-    once(pgDump, 'close'),
-  ]);
+  // stdio requests a stderr pipe, but @types/node cannot infer it once stdout is a file descriptor.
+  const errorOutput = keepTail(pgDump.stderr as Readable);
+  const [exitCode] = await once(pgDump, 'close');
   if (exitCode !== 0) {
     throw new Error(`pg_dump exited with code ${exitCode}: ${errorOutput()}`);
   }
