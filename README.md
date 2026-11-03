@@ -29,6 +29,19 @@ under a strict Content Security Policy. The app installs as a PWA (home screen o
 window on a computer) and opens offline; browsers only allow this over HTTPS, so put the api behind
 an HTTPS endpoint such as `tailscale serve`. A new version applies the next time the app is opened.
 
+## Docker images
+
+One `Dockerfile` builds both services:
+
+```bash
+docker build --target api --tag mailbox-api .
+docker build --target worker --tag mailbox-worker .
+```
+
+The api image also serves the web app. The worker image includes `pg_dump` 18 for the backups. Both
+run as the unprivileged `node` user (uid 1000): the backup folder mounted into the worker must be
+writable by that user.
+
 ## Mac app
 
 The Mac app (macOS 13.3 or later) carries the web app inside itself. It is not signed yet: open it

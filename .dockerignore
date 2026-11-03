@@ -1,0 +1,13 @@
+**/node_modules
+**/dist
+**/dist-desktop
+**/.turbo
+**/.DS_Store
+.git
+.env
+.env.*
+.backups
+docs
+CLAUDE.md
+# Rust sources and their 2+ GB of compilation output: the Mac app is not part of the images.
+apps/desktop/src-tauri

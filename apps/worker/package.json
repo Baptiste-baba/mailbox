@@ -3,6 +3,10 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
+  "files": [
+    "src",
+    "!src/**/*.test.ts"
+  ],
   "scripts": {
     "dev": "node --watch --env-file=../../.env.development src/main.ts",
     "typecheck": "tsc --noEmit"
