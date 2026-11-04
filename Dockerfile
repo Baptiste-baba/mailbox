@@ -33,11 +33,13 @@ CMD ["node", "dist/main.js"]
 
 FROM ${NODE_IMAGE} AS worker
 # pg_dump must be at least as recent as the server: Debian ships 17, the PostgreSQL repository has 18.
+# The key goes into the existing keyrings folder: a folder created by ADD may not be traversable by
+# apt's unprivileged signature check, depending on the BuildKit version.
 ADD --chmod=644 --checksum=sha256:0144068502a1eddd2a0280ede10ef607d1ec592ce819940991203941564e8e76 \
-  https://www.postgresql.org/media/keys/ACCC4CF8.asc /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc
+  https://www.postgresql.org/media/keys/ACCC4CF8.asc /etc/apt/keyrings/apt.postgresql.org.asc
 RUN apt-get update \
   && apt-get install --yes --no-install-recommends ca-certificates \
-  && echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt trixie-pgdg main" \
+  && echo "deb [signed-by=/etc/apt/keyrings/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt trixie-pgdg main" \
     > /etc/apt/sources.list.d/pgdg.list \
   && apt-get update \
   && apt-get install --yes --no-install-recommends postgresql-client-18 \
