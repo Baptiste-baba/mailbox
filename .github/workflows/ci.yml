@@ -59,6 +59,8 @@ jobs:
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 20
     strategy:
+      # Each architecture reports its own result; publishing still needs both.
+      fail-fast: false
       matrix:
         include:
           - arch: amd64
