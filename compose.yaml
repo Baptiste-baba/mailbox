@@ -1,4 +1,5 @@
 # Production. Copy .env.example to .env next to this file, fill it in, then: docker compose up --detach
+# The images come from the GitHub container registry; compose.build.yaml builds them from the sources instead.
 name: mailbox
 
 # The api and the worker run Node only: nothing to write outside their volumes, no Linux privilege.
@@ -59,10 +60,7 @@ services:
 
   api:
     <<: *hardened-service
-    image: mailbox-api
-    build:
-      context: .
-      target: api
+    image: ghcr.io/baptiste-baba/mailbox-api:${MAILBOX_VERSION:-main}
     environment:
       DATABASE_URL: postgres://mailbox:${POSTGRES_PASSWORD}@postgres:5432/mailbox
       LOG_LEVEL: ${LOG_LEVEL:-info}
@@ -87,10 +85,7 @@ services:
 
   worker:
     <<: *hardened-service
-    image: mailbox-worker
-    build:
-      context: .
-      target: worker
+    image: ghcr.io/baptiste-baba/mailbox-worker:${MAILBOX_VERSION:-main}
     environment:
       DATABASE_URL: postgres://mailbox:${POSTGRES_PASSWORD}@postgres:5432/mailbox
       BACKUP_DIRECTORY: /backups

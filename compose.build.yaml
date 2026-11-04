@@ -1,0 +1,13 @@
+# Builds the images from the sources instead of pulling the published ones, to try a change locally:
+#   docker compose --file compose.yaml --file compose.build.yaml up --build
+services:
+  api:
+    image: mailbox-api:local
+    build:
+      context: .
+      target: api
+  worker:
+    image: mailbox-worker:local
+    build:
+      context: .
+      target: worker
