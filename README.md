@@ -9,23 +9,44 @@ Self-hosted, AI-first email client for Gmail and Outlook. One instance serves on
 ## Installation
 
 MailBox runs with Docker Compose: PostgreSQL, the api (which also serves the web app) and the worker.
-1. Next to `compose.yaml`, copy `.env.example` to `.env` and fill it in. Generate the database
-   password with `openssl rand -hex 32`. Keep the database folder on an SSD, and the backup folder
-   on another disk when the machine has one.
-2. Create both folders, and give the backup folder to the user the worker runs as:
+The images are published on the GitHub container registry, for amd64 and arm64; the source code is
+not needed.
+1. In an empty folder, download `compose.yaml` and the configuration template:
+
+   ```bash
+   curl -fsSLO https://raw.githubusercontent.com/Baptiste-baba/mailbox/main/compose.yaml
+   curl -fsSL -o .env https://raw.githubusercontent.com/Baptiste-baba/mailbox/main/.env.example
+   ```
+
+2. Fill in `.env`. Generate the database password with `openssl rand -hex 32`. Keep the database
+   folder on an SSD, and the backup folder on another disk when the machine has one.
+3. Create both folders, and give the backup folder to the user the worker runs as:
 
    ```bash
    mkdir -p data/database data/backups
    sudo chown 1000:1000 data/backups
    ```
 
-3. Start everything with `docker compose up --detach`.
+4. Start everything with `docker compose up --detach`.
 
 The app then listens on `127.0.0.1:3000` (or `MAILBOX_PORT`), reachable from the machine itself
 only. Put an HTTPS endpoint in front of it, such as `tailscale serve`, to reach it from other devices.
 
 Each service has a memory and CPU limit (1.4 GB of memory in total), restarts on its own after a
 failure, and, for the api and the worker, runs without any Linux privilege on a read-only filesystem.
+
+### Updating
+
+`MAILBOX_VERSION` chooses what to run: `main` follows every validated change, a version number such
+as `0.1.0` stays on that release. To update, pull the new images and recreate the containers, either
+with the update button of a Docker interface or with:
+
+```bash
+docker compose pull && docker compose up --detach
+```
+
+Database migrations run on their own when the api starts. Every image is also tagged
+`sha-<commit>`, to go back to an exact earlier version.
 
 ## Configuration
 
@@ -55,11 +76,11 @@ an HTTPS endpoint such as `tailscale serve`. A new version applies the next time
 
 ## Docker images
 
-One `Dockerfile` builds both services:
+One `Dockerfile` builds both services. CI publishes them on every change to `main` and on every
+version tag. To try a change locally, `compose.build.yaml` builds them from the sources:
 
 ```bash
-docker build --target api --tag mailbox-api .
-docker build --target worker --tag mailbox-worker .
+docker compose --file compose.yaml --file compose.build.yaml up --build
 ```
 
 The api image also serves the web app. The worker image includes `pg_dump` 18 for the backups. Both
