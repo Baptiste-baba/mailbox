@@ -31,6 +31,8 @@
   --g3: #2fb0e4;
   /* End of a gradient fill under text: white on cyan would fall below AA contrast. */
   --g-fill-end: var(--g2);
+  /* Background of an avatar: one step above the surface it sits on in each theme. */
+  --avatar: var(--mist2);
 }
 
 .dark {
@@ -63,6 +65,7 @@
   --g2: #6faeff;
   --g3: #63d0ec;
   --g-fill-end: var(--g3);
+  --avatar: var(--frost);
 }
 
 /* `inline` makes utilities read the variable where they apply, so a `.dark` block inside a light page stays dark. */
@@ -97,4 +100,5 @@
   --color-g2: var(--g2);
   --color-g3: var(--g3);
   --color-g-fill-end: var(--g-fill-end);
+  --color-avatar: var(--avatar);
 }

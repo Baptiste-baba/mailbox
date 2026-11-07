@@ -8,6 +8,13 @@
   stroke-width: 2;
 }
 
+@utility icon-15 {
+  flex-shrink: 0;
+  width: 15px;
+  height: 15px;
+  stroke-width: 1.9;
+}
+
 @utility icon-16 {
   flex-shrink: 0;
   width: 16px;

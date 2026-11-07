@@ -11,6 +11,7 @@ const colorGroups = [
       { token: 'well', className: 'bg-well' },
       { token: 'raise', className: 'bg-raise' },
       { token: 'tint', className: 'bg-tint' },
+      { token: 'avatar', className: 'bg-avatar' },
     ],
   },
   {
