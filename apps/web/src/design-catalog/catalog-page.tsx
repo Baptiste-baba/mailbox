@@ -1,4 +1,5 @@
 import { AiSection } from './ai-section.tsx';
+import { AvatarSection } from './avatar-section.tsx';
 import { ButtonSection } from './button-section.tsx';
 import { CatalogPart } from './catalog-section.tsx';
 import { ColorSection } from './color-section.tsx';
@@ -34,6 +35,7 @@ export function CatalogPage() {
             <KbdSection />
             <ButtonSection />
             <IconButtonSection />
+            <AvatarSection />
           </CatalogPart>
         </section>
       ))}
