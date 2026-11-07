@@ -5,6 +5,11 @@ import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig(({ mode }) => ({
+  server: {
+    // In development the api runs on its own port (API_PORT, 3000 by default); in production it
+    // serves the web app itself, on the same origin.
+    proxy: { '/api': 'http://127.0.0.1:3000' },
+  },
   plugins: [
     // Generates the route tree and splits each route into its own chunk; must run before React.
     tanstackRouter({ target: 'react', autoCodeSplitting: true }),

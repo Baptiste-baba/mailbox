@@ -9,11 +9,14 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@mailbox/shared": "workspace:*",
     "@mailbox/ui": "workspace:*",
+    "@tanstack/react-query": "5.107.1",
     "@tanstack/react-router": "1.170.45",
     "lucide-react": "catalog:",
     "react": "catalog:",
-    "react-dom": "catalog:"
+    "react-dom": "catalog:",
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@tailwindcss/vite": "4.3.3",

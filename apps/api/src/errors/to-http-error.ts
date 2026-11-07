@@ -4,6 +4,7 @@ import { HttpStatus, NotFoundException } from '@nestjs/common';
 const httpStatusByErrorCode: Record<ErrorCode, HttpStatus> = {
   VALIDATION_FAILED: HttpStatus.BAD_REQUEST,
   ROUTE_NOT_FOUND: HttpStatus.NOT_FOUND,
+  THREAD_NOT_FOUND: HttpStatus.NOT_FOUND,
   DATABASE_UNAVAILABLE: HttpStatus.SERVICE_UNAVAILABLE,
   INTERNAL_ERROR: HttpStatus.INTERNAL_SERVER_ERROR,
 };
