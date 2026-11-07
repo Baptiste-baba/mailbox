@@ -1,4 +1,4 @@
-import { CatalogSection, TokenName } from './catalog-section.tsx';
+import { CatalogSection, SampleName } from './catalog-section.tsx';
 
 const shadows = [
   { token: 'lift', className: 'shadow-lift', usage: 'Boutons secondaires' },
@@ -15,7 +15,7 @@ export function ShadowSection() {
         {shadows.map((shadow) => (
           <div key={shadow.token} className="flex w-28 flex-col gap-2">
             <span className={`h-16 rounded-card bg-raise ${shadow.className}`} />
-            <TokenName name={`--${shadow.token} · ${shadow.usage}`} />
+            <SampleName name={`--${shadow.token} · ${shadow.usage}`} />
           </div>
         ))}
       </div>

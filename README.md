@@ -130,8 +130,8 @@ reload the web app on `http://localhost:5173`, the api on `http://127.0.0.1:3000
 (health check on port `3001`). Local backups land in `.backups/`. Development and test settings
 live in `.env.development` and `.env.test`; they only hold local values.
 
-`http://localhost:5173/design.html` shows every design token in both themes. It exists in
-development only.
+`http://localhost:5173/design.html` shows every design token and interface component in both
+themes. It exists in development only.
 
 | Command              | Purpose                                                                |
 | -------------------- | ---------------------------------------------------------------------- |

@@ -1,4 +1,4 @@
-import { CatalogSection, TokenName } from './catalog-section.tsx';
+import { CatalogSection, SampleName } from './catalog-section.tsx';
 
 // Class names written in full so that Tailwind generates them, which also checks each token mapping.
 const colorGroups = [
@@ -72,12 +72,12 @@ export function ColorSection() {
     <CatalogSection title="Couleurs">
       {colorGroups.map((group) => (
         <div key={group.label} className="flex flex-col gap-2">
-          <h3 className="text-meta text-ink2">{group.label}</h3>
+          <h4 className="text-meta text-ink2">{group.label}</h4>
           <div className="flex flex-wrap gap-4">
             {group.swatches.map((swatch) => (
               <div key={swatch.token} className="flex w-16 flex-col gap-1">
                 <span className={`h-10 rounded-md shadow-lift ${swatch.className}`} />
-                <TokenName name={`--${swatch.token}`} />
+                <SampleName name={`--${swatch.token}`} />
               </div>
             ))}
           </div>
