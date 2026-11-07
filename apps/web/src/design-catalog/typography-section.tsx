@@ -1,4 +1,4 @@
-import { CatalogSection, TokenName } from './catalog-section.tsx';
+import { CatalogSection, SampleName } from './catalog-section.tsx';
 
 const textStyles = [
   {
@@ -46,7 +46,7 @@ export function TypographySection() {
       {textStyles.map((style) => (
         <div key={style.name} className="flex flex-col gap-1">
           <p className={style.className}>{style.sample}</p>
-          <TokenName name={style.name} />
+          <SampleName name={style.name} />
         </div>
       ))}
     </CatalogSection>

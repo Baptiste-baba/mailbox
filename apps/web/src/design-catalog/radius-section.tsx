@@ -1,4 +1,4 @@
-import { CatalogSection, TokenName } from './catalog-section.tsx';
+import { CatalogSection, SampleName } from './catalog-section.tsx';
 
 const radii = [
   { name: 'rounded-2xs · 4 px', className: 'rounded-2xs' },
@@ -16,7 +16,7 @@ export function RadiusSection() {
         {radii.map((radius) => (
           <div key={radius.name} className="flex w-20 flex-col gap-2">
             <span className={`size-14 bg-mist2 ${radius.className}`} />
-            <TokenName name={radius.name} />
+            <SampleName name={radius.name} />
           </div>
         ))}
       </div>

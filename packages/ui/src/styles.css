@@ -5,3 +5,6 @@
 @import "../tokens/radii.css";
 @import "./base.css";
 @import "./ai.css";
+
+/* Lets Tailwind find the classes of the components, whichever app imports this file. */
+@source "./components";

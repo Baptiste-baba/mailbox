@@ -4,9 +4,21 @@
   "private": true,
   "type": "module",
   "exports": {
+    ".": "./src/index.ts",
     "./styles.css": "./src/styles.css"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@fontsource-variable/geist": "5.3.0"
+  },
+  "peerDependencies": {
+    "react": "catalog:"
+  },
+  "devDependencies": {
+    "@types/react": "catalog:",
+    "react": "catalog:",
+    "typescript": "catalog:"
   }
 }
