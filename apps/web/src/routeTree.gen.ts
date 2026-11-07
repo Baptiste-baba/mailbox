@@ -9,27 +9,143 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as IndexRouteImport } from './routes/index'
+import { Route as ShellRouteImport } from './routes/_shell'
+import { Route as ShellViewRouteRouteImport } from './routes/_shell/$view/route'
+import { Route as ShellViewIndexRouteImport } from './routes/_shell/$view/index'
+import { Route as ShellViewIdRouteImport } from './routes/_shell/$view/$id'
 
-export interface FileRoutesByFullPath {}
-export interface FileRoutesByTo {}
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShellRoute = ShellRouteImport.update({
+  id: '/_shell',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShellViewRouteRoute = ShellViewRouteRouteImport.update({
+  id: '/$view',
+  path: '/$view',
+  getParentRoute: () => ShellRoute,
+} as any)
+const ShellViewIndexRoute = ShellViewIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ShellViewRouteRoute,
+} as any)
+const ShellViewIdRoute = ShellViewIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => ShellViewRouteRoute,
+} as any)
+
+export interface FileRoutesByFullPath {
+  '/': typeof IndexRoute
+  '/$view': typeof ShellViewRouteRouteWithChildren
+  '/$view/$id': typeof ShellViewIdRoute
+  '/$view/': typeof ShellViewIndexRoute
+}
+export interface FileRoutesByTo {
+  '/': typeof IndexRoute
+  '/$view/$id': typeof ShellViewIdRoute
+  '/$view': typeof ShellViewIndexRoute
+}
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
+  '/': typeof IndexRoute
+  '/_shell': typeof ShellRouteWithChildren
+  '/_shell/$view': typeof ShellViewRouteRouteWithChildren
+  '/_shell/$view/$id': typeof ShellViewIdRoute
+  '/_shell/$view/': typeof ShellViewIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: never
+  fullPaths: '/' | '/$view' | '/$view/$id' | '/$view/'
   fileRoutesByTo: FileRoutesByTo
-  to: never
-  id: '__root__'
+  to: '/' | '/$view/$id' | '/$view'
+  id:
+    | '__root__'
+    | '/'
+    | '/_shell'
+    | '/_shell/$view'
+    | '/_shell/$view/$id'
+    | '/_shell/$view/'
   fileRoutesById: FileRoutesById
 }
-export interface RootRouteChildren {}
-
-declare module '@tanstack/react-router' {
-  interface FileRoutesByPath {}
+export interface RootRouteChildren {
+  IndexRoute: typeof IndexRoute
+  ShellRoute: typeof ShellRouteWithChildren
 }
 
-const rootRouteChildren: RootRouteChildren = {}
+declare module '@tanstack/react-router' {
+  interface FileRoutesByPath {
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_shell': {
+      id: '/_shell'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof ShellRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_shell/$view': {
+      id: '/_shell/$view'
+      path: '/$view'
+      fullPath: '/$view'
+      preLoaderRoute: typeof ShellViewRouteRouteImport
+      parentRoute: typeof ShellRoute
+    }
+    '/_shell/$view/': {
+      id: '/_shell/$view/'
+      path: '/'
+      fullPath: '/$view/'
+      preLoaderRoute: typeof ShellViewIndexRouteImport
+      parentRoute: typeof ShellViewRouteRoute
+    }
+    '/_shell/$view/$id': {
+      id: '/_shell/$view/$id'
+      path: '/$id'
+      fullPath: '/$view/$id'
+      preLoaderRoute: typeof ShellViewIdRouteImport
+      parentRoute: typeof ShellViewRouteRoute
+    }
+  }
+}
+
+interface ShellViewRouteRouteChildren {
+  ShellViewIdRoute: typeof ShellViewIdRoute
+  ShellViewIndexRoute: typeof ShellViewIndexRoute
+}
+
+const ShellViewRouteRouteChildren: ShellViewRouteRouteChildren = {
+  ShellViewIdRoute: ShellViewIdRoute,
+  ShellViewIndexRoute: ShellViewIndexRoute,
+}
+
+const ShellViewRouteRouteWithChildren = ShellViewRouteRoute._addFileChildren(
+  ShellViewRouteRouteChildren,
+)
+
+interface ShellRouteChildren {
+  ShellViewRouteRoute: typeof ShellViewRouteRouteWithChildren
+}
+
+const ShellRouteChildren: ShellRouteChildren = {
+  ShellViewRouteRoute: ShellViewRouteRouteWithChildren,
+}
+
+const ShellRouteWithChildren = ShellRoute._addFileChildren(ShellRouteChildren)
+
+const rootRouteChildren: RootRouteChildren = {
+  IndexRoute: IndexRoute,
+  ShellRoute: ShellRouteWithChildren,
+}
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()

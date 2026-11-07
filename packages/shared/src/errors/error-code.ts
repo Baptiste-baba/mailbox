@@ -4,6 +4,7 @@ import * as z from 'zod';
 export const errorCodeSchema = z.enum([
   'VALIDATION_FAILED',
   'ROUTE_NOT_FOUND',
+  'THREAD_NOT_FOUND',
   'DATABASE_UNAVAILABLE',
   'INTERNAL_ERROR',
 ]);
