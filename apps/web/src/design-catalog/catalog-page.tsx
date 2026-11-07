@@ -2,6 +2,7 @@ import { AiSection } from './ai-section.tsx';
 import { ButtonSection } from './button-section.tsx';
 import { CatalogPart } from './catalog-section.tsx';
 import { ColorSection } from './color-section.tsx';
+import { IconButtonSection } from './icon-button-section.tsx';
 import { KbdSection } from './kbd-section.tsx';
 import { RadiusSection } from './radius-section.tsx';
 import { ShadowSection } from './shadow-section.tsx';
@@ -32,6 +33,7 @@ export function CatalogPage() {
           <CatalogPart title="Composants">
             <KbdSection />
             <ButtonSection />
+            <IconButtonSection />
           </CatalogPart>
         </section>
       ))}

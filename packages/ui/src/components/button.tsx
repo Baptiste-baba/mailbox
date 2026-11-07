@@ -1,11 +1,12 @@
 import type { ComponentProps } from 'react';
 import { joinClassNames } from '../join-class-names.ts';
+import { pressableClassNames } from '../pressable-class-names.ts';
 import { Kbd } from './kbd.tsx';
 
 type ButtonVariant = 'primary' | 'secondary' | 'text' | 'neutralText' | 'gradient';
 type ButtonSize = 'lg' | 'md' | 'sm' | 'xs';
 
-// The design handoff has no hover, press or disabled state: these reuse its own tokens.
+// The design handoff has no hover state: these reuse its own tokens.
 const variantClassNames: Record<ButtonVariant, string> = {
   primary: 'bg-klein font-semibold text-onk shadow-press enabled:hover:bg-kleintx',
   secondary: 'bg-paper font-medium text-ink shadow-lift enabled:hover:bg-mist2',
@@ -33,10 +34,13 @@ interface ButtonProps extends ComponentProps<'button'> {
   variant: ButtonVariant;
   size?: ButtonSize;
   /** Keyboard shortcut shown at the end of the button, such as ⌘↵. */
-  shortcut?: string;
+  shortcut?: string | undefined;
 }
 
-/** A button with a text label. Its type defaults to `button`, so that it never submits a form by accident. */
+/**
+ * A button with a text label, after an optional icon. Its type defaults to `button`, so that it never
+ * submits a form by accident.
+ */
 export function Button({
   variant,
   size = 'md',
@@ -51,7 +55,8 @@ export function Button({
     <button
       type={type}
       className={joinClassNames(
-        'inline-flex flex-none items-center justify-center gap-1.75 whitespace-nowrap text-base touch:h-11 disabled:cursor-not-allowed disabled:opacity-55 motion-safe:enabled:active:scale-98',
+        'inline-flex flex-none items-center justify-center gap-1.75 whitespace-nowrap text-base touch:h-11 [&>svg]:icon-14',
+        pressableClassNames,
         variantClassNames[variant],
         sizeClassNames[size],
         paddingClassName(variant, size),
