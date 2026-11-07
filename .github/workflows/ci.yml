@@ -49,6 +49,9 @@ jobs:
           sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y
           sudo apt-get install --yes --no-install-recommends postgresql-client-18
           echo /usr/lib/postgresql/18/bin >> "$GITHUB_PATH"
+      # The interface components are tested in Chromium, at the version Playwright pins.
+      - name: Install Chromium for the component tests
+        run: pnpm --filter @mailbox/ui exec playwright install --with-deps --only-shell chromium
       - run: pnpm test
 
   # Each architecture builds on a native runner. A pull request only builds, which catches a broken

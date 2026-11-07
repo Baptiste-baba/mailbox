@@ -1,4 +1,5 @@
 import { AiSection } from './ai-section.tsx';
+import { ButtonSection } from './button-section.tsx';
 import { CatalogPart } from './catalog-section.tsx';
 import { ColorSection } from './color-section.tsx';
 import { KbdSection } from './kbd-section.tsx';
@@ -30,6 +31,7 @@ export function CatalogPage() {
           </CatalogPart>
           <CatalogPart title="Composants">
             <KbdSection />
+            <ButtonSection />
           </CatalogPart>
         </section>
       ))}

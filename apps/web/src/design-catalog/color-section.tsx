@@ -63,6 +63,7 @@ const colorGroups = [
       { token: 'g1', className: 'bg-g1' },
       { token: 'g2', className: 'bg-g2' },
       { token: 'g3', className: 'bg-g3' },
+      { token: 'g-fill-end', className: 'bg-g-fill-end' },
     ],
   },
 ];
