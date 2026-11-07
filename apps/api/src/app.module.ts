@@ -1,11 +1,15 @@
 import { type DynamicModule, Module } from '@nestjs/common';
-import { APP_FILTER } from '@nestjs/core';
+import { APP_FILTER, APP_PIPE } from '@nestjs/core';
 import { LoggerModule } from 'nestjs-pino';
 import type { ApiConfig } from './config/api-config.ts';
 import { DatabaseModule } from './database/database.module.ts';
+import { createValidationPipe } from './errors/create-validation-pipe.ts';
 import { GlobalExceptionFilter } from './errors/global-exception.filter.ts';
+import { FoldersModule } from './folders/folders.module.ts';
 import { HealthModule } from './health/health.module.ts';
 import { createLoggerOptions } from './logging/logger-options.ts';
+import { MailboxesModule } from './mailboxes/mailboxes.module.ts';
+import { ThreadsModule } from './threads/threads.module.ts';
 
 @Module({})
 class AppModule {}
@@ -17,7 +21,13 @@ export function createAppModule(config: ApiConfig): DynamicModule {
       LoggerModule.forRoot(createLoggerOptions(config.logLevel)),
       DatabaseModule.register(config.databaseUrl),
       HealthModule,
+      MailboxesModule,
+      FoldersModule,
+      ThreadsModule,
     ],
-    providers: [{ provide: APP_FILTER, useClass: GlobalExceptionFilter }],
+    providers: [
+      { provide: APP_FILTER, useClass: GlobalExceptionFilter },
+      { provide: APP_PIPE, useValue: createValidationPipe() },
+    ],
   };
 }
