@@ -11,7 +11,7 @@
   "dependencies": {
     "@mailbox/ui": "workspace:*",
     "@tanstack/react-router": "1.170.45",
-    "lucide-react": "1.70.0",
+    "lucide-react": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:"
   },
