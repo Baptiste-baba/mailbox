@@ -122,8 +122,12 @@ client tools (`pg_dump`, `pg_restore`; on macOS: `brew install libpq`).
 ```bash
 nvm use
 pnpm install
+pnpm --filter @mailbox/ui exec playwright install --only-shell chromium
 pnpm dev
 ```
+
+The third command downloads the Chromium in which the interface components are tested; run it
+again after an upgrade of Playwright.
 
 `pnpm dev` starts a local PostgreSQL in Docker (port `5433`, see `compose.dev.yaml`), then with live
 reload the web app on `http://localhost:5173`, the api on `http://127.0.0.1:3000` and the worker
@@ -133,17 +137,17 @@ live in `.env.development` and `.env.test`; they only hold local values.
 `http://localhost:5173/design.html` shows every design token and interface component in both
 themes. It exists in development only.
 
-| Command              | Purpose                                                                |
-| -------------------- | ---------------------------------------------------------------------- |
-| `pnpm dev`           | Start the local database and every service in watch mode               |
-| `pnpm build`         | Build every package, the Mac app excepted                              |
-| `pnpm typecheck`     | Type-check every package                                               |
-| `pnpm lint`          | Lint and check formatting (Biome)                                      |
-| `pnpm lint:fix`      | Apply formatting and safe lint fixes                                   |
-| `pnpm test`          | Start the local database, then run unit and integration tests (Vitest) |
-| `pnpm db:start`      | Start the local database only                                          |
-| `pnpm desktop:dev`   | Start the Mac app on the development web app, with live reload         |
-| `pnpm desktop:build` | Build the Mac app                                                      |
+| Command              | Purpose                                                                               |
+| -------------------- | ------------------------------------------------------------------------------------- |
+| `pnpm dev`           | Start the local database and every service in watch mode                              |
+| `pnpm build`         | Build every package, the Mac app excepted                                             |
+| `pnpm typecheck`     | Type-check every package                                                              |
+| `pnpm lint`          | Lint and check formatting (Biome)                                                     |
+| `pnpm lint:fix`      | Apply formatting and safe lint fixes                                                  |
+| `pnpm test`          | Start the local database, then run the unit, integration and component tests (Vitest) |
+| `pnpm db:start`      | Start the local database only                                                         |
+| `pnpm desktop:dev`   | Start the Mac app on the development web app, with live reload                        |
+| `pnpm desktop:build` | Build the Mac app                                                                     |
 
 ## License
 

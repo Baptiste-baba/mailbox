@@ -1,0 +1,2 @@
+/* `touch:` applies on screens driven by a finger, where every control needs a 44 px target. */
+@custom-variant touch (@media (pointer: coarse));

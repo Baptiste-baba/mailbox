@@ -38,4 +38,6 @@
   /* Hairline ring drawn inside the element, so that it never changes its size. */
   --shadow-hairline: inset 0 0 0 0.5px var(--frost2);
   --shadow-hairline-on-accent: inset 0 0 0 0.5px color-mix(in srgb, var(--onk) 50%, transparent);
+  /* Coloured halo under a gradient button. */
+  --shadow-glow: 0 4px 12px -6px color-mix(in srgb, var(--g2) 80%, transparent);
 }

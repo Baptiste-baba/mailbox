@@ -29,6 +29,8 @@
   --g1: #1f3fd1;
   --g2: #2f7bea;
   --g3: #2fb0e4;
+  /* End of a gradient fill under text: white on cyan would fall below AA contrast. */
+  --g-fill-end: var(--g2);
 }
 
 .dark {
@@ -60,6 +62,7 @@
   --g1: #7d97ff;
   --g2: #6faeff;
   --g3: #63d0ec;
+  --g-fill-end: var(--g3);
 }
 
 /* `inline` makes utilities read the variable where they apply, so a `.dark` block inside a light page stays dark. */
@@ -93,4 +96,5 @@
   --color-g1: var(--g1);
   --color-g2: var(--g2);
   --color-g3: var(--g3);
+  --color-g-fill-end: var(--g-fill-end);
 }

@@ -18,7 +18,13 @@
   },
   "devDependencies": {
     "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "@vitest/browser-playwright": "5.0.5",
+    "playwright": "1.65.0",
     "react": "catalog:",
-    "typescript": "catalog:"
+    "react-dom": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:",
+    "vitest-browser-react": "2.3.0"
   }
 }
