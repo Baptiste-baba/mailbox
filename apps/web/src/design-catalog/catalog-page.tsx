@@ -6,6 +6,7 @@ import { ColorSection } from './color-section.tsx';
 import { IconButtonSection } from './icon-button-section.tsx';
 import { KbdSection } from './kbd-section.tsx';
 import { RadiusSection } from './radius-section.tsx';
+import { SegmentedControlSection } from './segmented-control-section.tsx';
 import { ShadowSection } from './shadow-section.tsx';
 import { TypographySection } from './typography-section.tsx';
 
@@ -36,6 +37,7 @@ export function CatalogPage() {
             <ButtonSection />
             <IconButtonSection />
             <AvatarSection />
+            <SegmentedControlSection />
           </CatalogPart>
         </section>
       ))}
