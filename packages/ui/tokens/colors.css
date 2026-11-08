@@ -1,6 +1,8 @@
 /* Values from the design handoff (direction E). The theme is the `light` or `dark` class of an ancestor. */
 
 .light {
+  /* Native controls (check boxes, scroll bars) follow the theme. */
+  color-scheme: light;
   --paper: #ffffff;
   --mist: #f3f5fa;
   --mist2: #e9edf5;
@@ -36,6 +38,7 @@
 }
 
 .dark {
+  color-scheme: dark;
   --paper: #121826;
   --mist: #0c111c;
   --mist2: #1a2133;
@@ -101,4 +104,7 @@
   --color-g3: var(--g3);
   --color-g-fill-end: var(--g-fill-end);
   --color-avatar: var(--avatar);
+  /* A QR code stays dark on light in both themes: some scanners cannot read it inverted. */
+  --color-qr-module: #0b1530;
+  --color-qr-background: #ffffff;
 }
