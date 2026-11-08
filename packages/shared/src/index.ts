@@ -8,7 +8,6 @@ export {
   type MailboxSummary,
   mailboxListSchema,
 } from './mail/mailbox-summary.ts';
-export { type PaletteColor, paletteColorSchema } from './mail/palette-color.ts';
 export {
   type Attachment,
   type Message,
@@ -16,7 +15,6 @@ export {
   threadSchema,
 } from './mail/thread.ts';
 export {
-  THREAD_PAGE_MAX_SIZE,
   type ThreadListQuery,
   type ThreadView,
   threadListQuerySchema,

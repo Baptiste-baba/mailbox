@@ -1,21 +1,16 @@
-import { Button, Skeleton } from '@mailbox/ui';
+import { Skeleton, StateMessage } from '@mailbox/ui';
 import type { ErrorComponentProps } from '@tanstack/react-router';
 import { fr } from '../i18n/fr.ts';
 
-interface SidebarErrorProps {
-  message: string;
-  onRetry: () => void;
-}
-
 /** What a part of the sidebar shows when its data could not be loaded. */
-export function SidebarError({ message, onRetry }: SidebarErrorProps) {
+export function SidebarError({ message, onRetry }: { message: string; onRetry: () => void }) {
   return (
-    <div className="flex flex-col items-start gap-1 px-2 py-1 text-meta text-ink3">
-      <p>{message}</p>
-      <Button variant="text" size="xs" onClick={onRetry} className="-ml-1.5">
-        {fr.common.retry}
-      </Button>
-    </div>
+    <StateMessage
+      message={message}
+      action={{ label: fr.common.retry, onClick: onRetry }}
+      layout="inline"
+      className="px-2 py-1"
+    />
   );
 }
 

@@ -1,12 +1,12 @@
 import { Button } from '@mailbox/ui';
 import { PencilIcon } from 'lucide-react';
+import { comingSoonHint } from '../hint.ts';
 import { fr } from '../i18n/fr.ts';
 import { shortcuts } from '../shortcuts.ts';
-import { hint } from './hint.ts';
 
 /** "Nouveau mail", at full width in the sidebar, or as its icon alone once the sidebar is reduced. */
 export function NewMailButton() {
-  const title = hint(fr.sidebar.newMail, shortcuts.newMail.label, fr.common.comingSoon);
+  const title = comingSoonHint(fr.sidebar.newMail, shortcuts.newMail.label);
   return (
     <>
       <div className="@max-rail:hidden">

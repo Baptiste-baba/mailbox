@@ -12,11 +12,11 @@ import {
   TextIcon,
 } from 'lucide-react';
 import { mailboxesQuery, selectInboxUnreadCount } from '../api/mailboxes-query.ts';
+import { hint } from '../hint.ts';
 import { fr } from '../i18n/fr.ts';
 import { shortcuts } from '../shortcuts.ts';
 import { ComingSoonNavItem } from './coming-soon-nav-item.tsx';
 import { FolderNavGroup } from './folder-nav-group.tsx';
-import { hint } from './hint.ts';
 import { MailboxNavGroup } from './mailbox-nav-group.tsx';
 import { NewMailButton } from './new-mail-button.tsx';
 import { SidebarNavLink } from './sidebar-nav-link.tsx';

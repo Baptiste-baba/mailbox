@@ -1,6 +1,7 @@
 import { NavGroup, NavGroupAction, Swatch } from '@mailbox/ui';
 import { useQuery } from '@tanstack/react-query';
 import { foldersQuery } from '../api/folders-query.ts';
+import { comingSoonHint } from '../hint.ts';
 import { fr } from '../i18n/fr.ts';
 import { ComingSoonNavItem } from './coming-soon-nav-item.tsx';
 import { NavItemSkeletons, SidebarError } from './sidebar-message.tsx';
@@ -13,7 +14,7 @@ export function FolderNavGroup() {
       action={
         <NavGroupAction
           disabled
-          title={fr.common.comingSoon}
+          title={comingSoonHint(fr.sidebar.newFolderLabel)}
           aria-label={fr.sidebar.newFolderLabel}
         >
           {fr.sidebar.newFolder}

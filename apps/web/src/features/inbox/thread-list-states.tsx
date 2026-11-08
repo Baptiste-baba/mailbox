@@ -1,4 +1,4 @@
-import { Button, Skeleton } from '@mailbox/ui';
+import { Skeleton, StateMessage } from '@mailbox/ui';
 import type { ErrorComponentProps } from '@tanstack/react-router';
 import { fr } from '../../i18n/fr.ts';
 
@@ -23,34 +23,26 @@ export function ThreadListSkeleton() {
   );
 }
 
-interface ThreadListMessageProps {
-  message: string;
-  onRetry?: () => void;
-}
-
 /** What the list shows instead of threads: why there is none, and what to do about it. */
-export function ThreadListMessage({ message, onRetry }: ThreadListMessageProps) {
+export function ThreadListMessage({ message, onRetry }: { message: string; onRetry?: () => void }) {
   return (
-    <div className="flex flex-col items-center gap-3 px-8 pt-16 text-center text-ink3">
-      <p>{message}</p>
-      {onRetry !== undefined && (
-        <Button variant="secondary" size="sm" onClick={onRetry}>
-          {fr.common.retry}
-        </Button>
-      )}
-    </div>
+    <StateMessage
+      message={message}
+      action={onRetry === undefined ? undefined : { label: fr.common.retry, onClick: onRetry }}
+      className="px-8 pt-16"
+    />
   );
 }
 
 /** The end of a list whose next page failed to load, with the way to ask for it again. */
 export function LoadMoreError({ onRetry }: { onRetry: () => void }) {
   return (
-    <div className="flex items-center justify-center gap-2 py-3 text-meta text-ink3">
-      <span>{fr.inbox.loadMoreError}</span>
-      <Button variant="text" size="xs" onClick={onRetry}>
-        {fr.common.retry}
-      </Button>
-    </div>
+    <StateMessage
+      message={fr.inbox.loadMoreError}
+      action={{ label: fr.common.retry, onClick: onRetry }}
+      layout="inline"
+      className="justify-center py-3"
+    />
   );
 }
 

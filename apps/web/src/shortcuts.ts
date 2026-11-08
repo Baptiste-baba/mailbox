@@ -8,7 +8,8 @@ export type ShortcutId =
   | 'archive'
   | 'snooze'
   | 'translate'
-  | 'reply';
+  | 'reply'
+  | 'aiSearch';
 
 interface Shortcut {
   /** As shown next to its action. */
@@ -29,4 +30,5 @@ export const shortcuts: Record<ShortcutId, Shortcut> = {
   snooze: { label: 'H' },
   translate: { label: 'T' },
   reply: { label: 'R' },
+  aiSearch: { label: '⌘I' },
 };

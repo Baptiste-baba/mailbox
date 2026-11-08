@@ -12,5 +12,6 @@ export { RowLink } from './components/row-link.tsx';
 export { SearchField } from './components/search-field.tsx';
 export { SegmentedControl } from './components/segmented-control.tsx';
 export { Skeleton } from './components/skeleton.tsx';
+export { StateMessage } from './components/state-message.tsx';
 export { Swatch } from './components/swatch.tsx';
 export { ToggleChip } from './components/toggle-chip.tsx';

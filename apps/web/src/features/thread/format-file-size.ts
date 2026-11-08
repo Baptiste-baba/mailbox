@@ -1,4 +1,4 @@
-const LOCALE = 'fr-FR';
+import { LOCALE } from '../../locale.ts';
 
 const kilobytes = new Intl.NumberFormat(LOCALE, {
   style: 'unit',

@@ -9,31 +9,24 @@ const colorClassNames: Record<SwatchColor, string> = {
   slate: 'bg-slate',
 };
 
-type SwatchSize = 'regular' | 'small';
-
 const shapeClassNames: Record<SwatchShape, string> = {
-  circle: 'rounded-full',
-  square: 'rounded-3xs',
-};
-
-const sizeClassNames: Record<SwatchShape, Record<SwatchSize, string>> = {
-  circle: { regular: 'size-2', small: 'size-1.5' },
-  square: { regular: 'size-2.25', small: 'size-1.5' },
+  circle: 'size-2 rounded-full',
+  square: 'size-2.25 rounded-3xs',
 };
 
 interface SwatchProps {
   color: SwatchColor;
   shape: SwatchShape;
-  /** Small inside a line of small text, such as the footer of a list row. */
-  size?: SwatchSize;
+  /** Smaller, to sit in a line of small text, such as the footer of a list row. */
+  small?: boolean;
 }
 
 /** A small mark in one of the palette colours, the colour the user gave to something. */
-export function Swatch({ color, shape, size = 'regular' }: SwatchProps) {
+export function Swatch({ color, shape, small = false }: SwatchProps) {
   return (
     <span
       aria-hidden="true"
-      className={`block flex-none ${shapeClassNames[shape]} ${sizeClassNames[shape][size]} ${colorClassNames[color]}`}
+      className={`block flex-none ${shapeClassNames[shape]} ${small ? 'size-1.5' : ''} ${colorClassNames[color]}`}
     />
   );
 }

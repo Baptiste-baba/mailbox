@@ -1,5 +1,7 @@
 import { SearchField, ToggleChip } from '@mailbox/ui';
+import { comingSoonHint } from '../../hint.ts';
 import { fr } from '../../i18n/fr.ts';
+import { shortcuts } from '../../shortcuts.ts';
 
 /** The search field of the list, shown before search exists. */
 export function MailSearchField() {
@@ -9,13 +11,13 @@ export function MailSearchField() {
         label={fr.inbox.searchLabel}
         placeholder={fr.inbox.searchPlaceholder}
         disabled
-        title={fr.common.comingSoon}
+        title={comingSoonHint(fr.inbox.searchLabel)}
         trailing={
           <ToggleChip
             variant="gradient"
             pressed={false}
             disabled
-            title={`${fr.inbox.aiSearch} · ${fr.common.comingSoon}`}
+            title={comingSoonHint(fr.inbox.aiSearch, shortcuts.aiSearch.label)}
           >
             IA
           </ToggleChip>

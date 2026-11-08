@@ -4,6 +4,7 @@ import { useNavigate } from '@tanstack/react-router';
 import { CircleSmallIcon, PanelRightIcon } from 'lucide-react';
 import { mailboxesQuery, selectInboxUnreadCount } from '../../api/mailboxes-query.ts';
 import type { ThreadFilters } from '../../api/thread-pages-query.ts';
+import { comingSoonHint } from '../../hint.ts';
 import { fr } from '../../i18n/fr.ts';
 import { shortcuts } from '../../shortcuts.ts';
 import { useShortcut } from '../../use-shortcut.ts';
@@ -33,7 +34,7 @@ export function MailListHeader({ filters }: { filters: ThreadFilters }) {
         >
           <CircleSmallIcon />
         </IconButton>
-        <IconButton label={`${fr.inbox.layout} · ${fr.common.comingSoon}`} disabled>
+        <IconButton label={comingSoonHint(fr.inbox.layout)} disabled>
           <PanelRightIcon />
         </IconButton>
       </div>
