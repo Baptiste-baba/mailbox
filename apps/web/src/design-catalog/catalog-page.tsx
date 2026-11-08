@@ -5,6 +5,7 @@ import { CatalogPart } from './catalog-section.tsx';
 import { ColorSection } from './color-section.tsx';
 import { IconButtonSection } from './icon-button-section.tsx';
 import { KbdSection } from './kbd-section.tsx';
+import { NavigationSection } from './navigation-section.tsx';
 import { RadiusSection } from './radius-section.tsx';
 import { SearchFieldSection } from './search-field-section.tsx';
 import { SegmentedControlSection } from './segmented-control-section.tsx';
@@ -42,6 +43,7 @@ export function CatalogPage() {
             <SegmentedControlSection />
             <ToggleChipSection />
             <SearchFieldSection />
+            <NavigationSection />
           </CatalogPart>
         </section>
       ))}

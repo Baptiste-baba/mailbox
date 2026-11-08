@@ -1,0 +1,68 @@
+import type { MailboxSummary } from '@mailbox/shared';
+import { NavGroup, NavGroupAction, Swatch } from '@mailbox/ui';
+import { useQuery } from '@tanstack/react-query';
+import { LayoutGridIcon } from 'lucide-react';
+import { mailboxesQuery } from '../api/mailboxes-query.ts';
+import { fr } from '../i18n/fr.ts';
+import { NavItemSkeletons, SidebarError } from './sidebar-message.tsx';
+import { SidebarNavLink } from './sidebar-nav-link.tsx';
+
+/** "Boîtes": every mail of every mailbox, then the inbox of each mailbox. */
+export function MailboxNavGroup() {
+  return (
+    <NavGroup
+      title={fr.sidebar.mailboxes}
+      action={
+        <NavGroupAction disabled title={fr.common.comingSoon}>
+          {fr.sidebar.manageMailboxes}
+        </NavGroupAction>
+      }
+    >
+      <SidebarNavLink
+        to="/$view"
+        params={{ view: 'all' }}
+        search={{}}
+        icon={<LayoutGridIcon />}
+        label={fr.sidebar.allMailboxes}
+      />
+      <MailboxLinks />
+    </NavGroup>
+  );
+}
+
+function MailboxLinks() {
+  const mailboxes = useQuery(mailboxesQuery);
+  if (mailboxes.isPending) {
+    return <NavItemSkeletons count={3} />;
+  }
+  if (mailboxes.isError) {
+    return <SidebarError message={fr.sidebar.mailboxesError} onRetry={() => mailboxes.refetch()} />;
+  }
+  if (mailboxes.data.mailboxes.length === 0) {
+    return <p className="px-2 py-1 text-meta text-ink3">{fr.sidebar.noMailbox}</p>;
+  }
+  return mailboxes.data.mailboxes.map((mailbox) => (
+    <MailboxLink key={mailbox.id} mailbox={mailbox} />
+  ));
+}
+
+function MailboxLink({ mailbox }: { mailbox: MailboxSummary }) {
+  return (
+    <SidebarNavLink
+      to="/$view"
+      params={{ view: 'inbox' }}
+      search={{ mailbox: mailbox.id }}
+      icon={<Swatch color={mailbox.color} shape="circle" />}
+      label={mailbox.name}
+      description={mailbox.address}
+      title={mailbox.address}
+      trailing={
+        mailbox.status === 'reconnectRequired' ? (
+          <span className="font-semibold text-verm">{fr.sidebar.reconnect}</span>
+        ) : (
+          mailbox.unreadCount || undefined
+        )
+      }
+    />
+  );
+}

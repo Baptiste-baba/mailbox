@@ -1,6 +1,6 @@
 import { threadViewSchema } from '@mailbox/shared';
 import { createFileRoute, notFound } from '@tanstack/react-router';
-import { mailListSearchSchema } from '../../../features/inbox/index.ts';
+import { MailView, mailListSearchSchema } from '../../../features/inbox/index.ts';
 
 export const Route = createFileRoute('/_shell/$view')({
   params: {
@@ -13,4 +13,5 @@ export const Route = createFileRoute('/_shell/$view')({
     },
   },
   validateSearch: mailListSearchSchema,
+  component: MailView,
 });
