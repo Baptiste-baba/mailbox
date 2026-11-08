@@ -1,9 +1,11 @@
 import type { MailAddress, Message } from '@mailbox/shared';
 import { fr } from '../../i18n/fr.ts';
+import { LOCALE } from '../../locale.ts';
 
-const nameList = new Intl.ListFormat('fr-FR', { style: 'long', type: 'conjunction' });
+const nameList = new Intl.ListFormat(LOCALE, { style: 'long', type: 'conjunction' });
 
-function isOwn(person: MailAddress, ownAddress: string | undefined): boolean {
+/** Whether a person is the owner of the mailbox, whatever the case of the address. */
+export function isOwn(person: MailAddress, ownAddress: string | undefined): boolean {
   return person.address.toLowerCase() === ownAddress?.toLowerCase();
 }
 

@@ -7,7 +7,7 @@ export const threadViewSchema = z.enum([
   'all',
 ]);
 
-export const THREAD_PAGE_MAX_SIZE = 100;
+const THREAD_PAGE_MAX_SIZE = 100;
 
 // Query string values arrive as text: booleans and numbers are parsed from it.
 export const threadListQuerySchema = z.object({

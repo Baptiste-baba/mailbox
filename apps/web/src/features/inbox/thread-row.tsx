@@ -37,7 +37,7 @@ export function ThreadRow({ thread, view, mailbox, now }: ThreadRowProps) {
         <span className="flex items-center gap-2.5 pt-0.75 text-label text-ink3">
           {mailbox !== undefined && (
             <span className="flex items-center gap-1.25">
-              <Swatch color={mailbox.color} shape="circle" size="small" />
+              <Swatch color={mailbox.color} shape="circle" small />
               {mailbox.name}
             </span>
           )}

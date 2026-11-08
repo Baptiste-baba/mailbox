@@ -1,23 +1,15 @@
-import { Button, Card, Skeleton } from '@mailbox/ui';
+import { Card, Skeleton, StateMessage } from '@mailbox/ui';
 import type { ErrorComponentProps } from '@tanstack/react-router';
 import { fr } from '../../i18n/fr.ts';
 
-interface ThreadMessageProps {
-  message: string;
-  onRetry?: () => void;
-}
-
-/** What the thread pane shows instead of a thread: why, and what to do about it. */
-export function ThreadMessage({ message, onRetry }: ThreadMessageProps) {
+/** Why the thread pane shows no thread, centred in it, with what to do about it. */
+export function ThreadMessage({ message, onRetry }: { message: string; onRetry?: () => void }) {
   return (
-    <div className="flex flex-1 flex-col items-center justify-center gap-3 px-10 text-center text-ink3">
-      <p className="max-w-sm">{message}</p>
-      {onRetry !== undefined && (
-        <Button variant="secondary" size="sm" onClick={onRetry}>
-          {fr.common.retry}
-        </Button>
-      )}
-    </div>
+    <StateMessage
+      message={message}
+      action={onRetry === undefined ? undefined : { label: fr.common.retry, onClick: onRetry }}
+      className="flex-1 justify-center px-10"
+    />
   );
 }
 

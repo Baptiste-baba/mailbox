@@ -1,8 +1,8 @@
-import type { MailboxSummary, ThreadSummary } from '@mailbox/shared';
+import type { ThreadSummary } from '@mailbox/shared';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { useEffect, useRef } from 'react';
-import { mailboxesQuery } from '../../api/mailboxes-query.ts';
+import { mailboxesQuery, selectMailboxesById } from '../../api/mailboxes-query.ts';
 import { type ThreadFilters, threadPagesQuery } from '../../api/thread-pages-query.ts';
 import { fr } from '../../i18n/fr.ts';
 import { LoadMoreError, ThreadListMessage, ThreadListSkeleton } from './thread-list-states.tsx';
@@ -68,7 +68,7 @@ function VirtualThreadList({
   onRetryLoadMore,
 }: VirtualThreadListProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
-  const mailboxes = useMailboxesById();
+  const mailboxes = useQuery({ ...mailboxesQuery, select: selectMailboxesById }).data;
   const virtualizer = useVirtualizer({
     count: threads.length,
     getScrollElement: () => scrollRef.current,
@@ -106,7 +106,7 @@ function VirtualThreadList({
                 <ThreadRow
                   thread={thread}
                   view={filters.view}
-                  mailbox={mailboxes.get(thread.mailboxId)}
+                  mailbox={mailboxes?.get(thread.mailboxId)}
                   now={now}
                 />
               </li>
@@ -117,9 +117,4 @@ function VirtualThreadList({
       {onRetryLoadMore !== undefined && <LoadMoreError onRetry={onRetryLoadMore} />}
     </div>
   );
-}
-
-function useMailboxesById(): Map<string, MailboxSummary> {
-  const mailboxes = useQuery(mailboxesQuery).data?.mailboxes ?? [];
-  return new Map(mailboxes.map((mailbox) => [mailbox.id, mailbox]));
 }

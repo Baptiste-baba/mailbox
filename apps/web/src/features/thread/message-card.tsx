@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 import { formatMessageDate } from '../../dates/format-mail-date.ts';
 import { fr } from '../../i18n/fr.ts';
 import { MessageBody } from './message-body.tsx';
-import { recipientsLine } from './participants.ts';
+import { isOwn, recipientsLine } from './participants.ts';
 
 interface MessageCardProps {
   message: Message;
@@ -25,7 +25,7 @@ export function MessageCard({
   now,
   footer,
 }: MessageCardProps) {
-  const own = message.from.address.toLowerCase() === ownAddress?.toLowerCase();
+  const own = isOwn(message.from, ownAddress);
   const name = message.from.name || message.from.address;
   const sender = own ? fr.thread.me : name;
   return (

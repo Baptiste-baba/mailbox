@@ -19,7 +19,7 @@ export function ThreadHeader({ thread, mailbox }: ThreadHeaderProps) {
         <span>{participantsLine(thread.messages, mailbox?.address)}</span>
         {mailbox !== undefined && (
           <span className="flex items-center gap-1.25" title={mailbox.address}>
-            <Swatch color={mailbox.color} shape="circle" size="small" />
+            <Swatch color={mailbox.color} shape="circle" small />
             {mailbox.name}
           </span>
         )}

@@ -22,7 +22,8 @@ export default defineProject({
   test: {
     browser: {
       enabled: true,
-      provider: playwright(),
+      // Dates and lists are formatted for a French user in Paris, whatever machine runs the tests.
+      provider: playwright({ contextOptions: { locale: 'fr-FR', timezoneId: 'Europe/Paris' } }),
       headless: true,
       instances: [{ browser: 'chromium' }],
       viewport: { width: 1440, height: 900 },
