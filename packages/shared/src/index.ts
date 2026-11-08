@@ -1,3 +1,26 @@
+export { type AuthStatus, authStatusSchema } from './auth/auth-status.ts';
+export {
+  type LoginRequest,
+  type LoginResponse,
+  loginRequestSchema,
+  loginResponseSchema,
+  type SecondFactor,
+} from './auth/login.ts';
+export {
+  RECOVERY_CODE_COUNT,
+  type SetupCodeRequest,
+  type SetupRequest,
+  type SetupResponse,
+  setupCodeRequestSchema,
+  setupRequestSchema,
+  setupResponseSchema,
+} from './auth/setup.ts';
+export {
+  type TotpConfirmation,
+  type TotpEnrollment,
+  totpConfirmationSchema,
+  totpEnrollmentSchema,
+} from './auth/totp-enrollment.ts';
 export { AppError } from './errors/app-error.ts';
 export { type ErrorCode, errorCodeSchema } from './errors/error-code.ts';
 export { type ErrorResponse, errorResponseSchema } from './errors/error-response.ts';
