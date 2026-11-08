@@ -28,7 +28,7 @@ export function NavItemSkeletons({ count }: { count: number }) {
 /** Stands in for the whole sidebar when it fails to render, so that the rest of the app stays usable. */
 export function SidebarCrash({ reset }: ErrorComponentProps) {
   return (
-    <div className="w-57 flex-none bg-mist px-2.5 pt-13 shadow-hairline-end">
+    <div className="px-2.5 pt-13">
       <SidebarError message={fr.sidebar.crash} onRetry={reset} />
     </div>
   );
