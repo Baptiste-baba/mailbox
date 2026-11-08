@@ -16,7 +16,7 @@ async function startApiWithWebApp(): Promise<RunningApi> {
   await writeFile(join(webDirectory, 'sw.js'), 'self.skipWaiting;');
   const api = await startApi({ WEB_DIRECTORY: webDirectory });
   return {
-    url: api.url,
+    ...api,
     close: async () => {
       await api.close();
       await rm(webDirectory, { recursive: true, force: true });

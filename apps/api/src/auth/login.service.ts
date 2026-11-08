@@ -1,11 +1,19 @@
 import { AppError, type AuthStatus, type LoginRequest, type LoginResponse } from '@mailbox/shared';
 import { Injectable } from '@nestjs/common';
+import { SetupService } from './setup.service.ts';
 
 /** Who is signed in, and signing in with the password and a second factor. */
 @Injectable()
 export class LoginService {
-  // Answers of the contract while the logic is not written: replaced in the next layer.
+  constructor(private readonly setup: SetupService) {}
+
   async status(sessionToken: string | undefined): Promise<AuthStatus> {
+    if (await this.setup.isSetupRequired()) {
+      // The setup screen asks for the status: a code that expired meanwhile is replaced at once.
+      await this.setup.issueCodeIfNeeded();
+      return { state: 'setupRequired' };
+    }
+    // Answers of the contract while sessions are not written: replaced in the next layer.
     return sessionToken === undefined
       ? { state: 'signedOut' }
       : { state: 'signedIn', username: 'alex' };

@@ -4,11 +4,14 @@ import { totpConfirmationSchema } from './totp-enrollment.ts';
 
 export const RECOVERY_CODE_COUNT = 10;
 
-export const setupCodeRequestSchema = z.object({ setupCode: groupedCodeSchema });
-
-export const setupRequestSchema = totpConfirmationSchema.extend({
+/** Asks for the secret of the authenticator app; the username names the entry in that app. */
+export const setupEnrollmentRequestSchema = z.object({
   setupCode: groupedCodeSchema,
   username: usernameSchema,
+});
+
+export const setupRequestSchema = setupEnrollmentRequestSchema.extend({
+  ...totpConfirmationSchema.shape,
   password: newPasswordSchema,
 });
 
@@ -17,6 +20,6 @@ export const setupResponseSchema = z.object({
   recoveryCodes: z.array(z.string()).length(RECOVERY_CODE_COUNT),
 });
 
-export type SetupCodeRequest = z.infer<typeof setupCodeRequestSchema>;
+export type SetupEnrollmentRequest = z.infer<typeof setupEnrollmentRequestSchema>;
 export type SetupRequest = z.infer<typeof setupRequestSchema>;
 export type SetupResponse = z.infer<typeof setupResponseSchema>;

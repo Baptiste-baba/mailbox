@@ -1,40 +1,134 @@
+import { account, type Database, setupCode } from '@mailbox/db';
 import {
   AppError,
-  RECOVERY_CODE_COUNT,
+  type SetupEnrollmentRequest,
   type SetupRequest,
   type SetupResponse,
   type TotpEnrollment,
 } from '@mailbox/shared';
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
+import { and, eq, gt } from 'drizzle-orm';
+import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
+import { DATABASE } from '../database/database.module.ts';
+import { AttemptThrottleService } from './attempt-throttle.service.ts';
+import { generateGroupedCode } from './grouped-code.ts';
+import { hashPassword } from './password-hash.ts';
+import { RecoveryCodesService } from './recovery-codes.service.ts';
+import { SecretBox } from './secret-box.ts';
+import { hashToken } from './token-hash.ts';
+import { TotpService } from './totp.service.ts';
 
-// Answers of the contract while the logic is not written: replaced in the next layer.
-const FAKE_ENROLLMENT: TotpEnrollment = {
-  secret: 'GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ',
-  otpauthUri: 'otpauth://totp/MailBox:alex?secret=GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ&issuer=MailBox',
-};
+const SETUP_CODE_LIFETIME_MS = 60 * 60 * 1_000;
 
 /** The creation of the account, once, guarded by the one-time setup code from the server logs. */
 @Injectable()
 export class SetupService {
-  /** Issues a setup code and logs it, when no account exists and no valid code does. */
-  async issueCodeIfNeeded(): Promise<void> {}
+  constructor(
+    @Inject(DATABASE) private readonly database: Database,
+    @InjectPinoLogger(SetupService.name) private readonly logger: PinoLogger,
+    private readonly throttle: AttemptThrottleService,
+    private readonly totp: TotpService,
+    private readonly secretBox: SecretBox,
+    private readonly recoveryCodes: RecoveryCodesService,
+  ) {}
 
-  /** @throws AppError SETUP_NOT_AVAILABLE, INVALID_SETUP_CODE */
-  async startTotpEnrollment(setupCode: string): Promise<TotpEnrollment> {
-    if (setupCode !== 'AAAA-AAAA-AAAA') {
-      throw new AppError('INVALID_SETUP_CODE', 'Invalid setup code');
-    }
-    return FAKE_ENROLLMENT;
+  async isSetupRequired(): Promise<boolean> {
+    const accounts = await this.database.select({ id: account.id }).from(account).limit(1);
+    return accounts.length === 0;
   }
 
-  /** @throws AppError SETUP_NOT_AVAILABLE, INVALID_SETUP_CODE, INVALID_SECOND_FACTOR */
-  async createAccount(request: SetupRequest): Promise<SetupResponse> {
-    await this.startTotpEnrollment(request.setupCode);
-    return {
-      recoveryCodes: Array.from(
-        { length: RECOVERY_CODE_COUNT },
-        (_, index) => `ABCD-EFGH-JKL${String.fromCharCode(65 + index)}`,
-      ),
-    };
+  /**
+   * At startup, while no account exists: a fresh code in these logs, replacing the earlier ones,
+   * which only their hashes could tell and which are in older logs, if anywhere.
+   */
+  async issueNewCode(): Promise<void> {
+    if (!(await this.isSetupRequired())) {
+      return;
+    }
+    const code = generateGroupedCode();
+    const expiresAt = new Date(Date.now() + SETUP_CODE_LIFETIME_MS);
+    await this.database.transaction(async (transaction) => {
+      await transaction.delete(setupCode);
+      await transaction.insert(setupCode).values({ codeHash: hashToken(code), expiresAt });
+    });
+    // The one secret written to the logs: only whoever runs the server can read them.
+    this.logger.warn(
+      `No account yet: open MailBox and enter the setup code ${code}, valid for an hour`,
+    );
+  }
+
+  /** Issues a setup code and logs it, when no account exists and no valid code does. */
+  async issueCodeIfNeeded(): Promise<void> {
+    if (!(await this.hasValidCode())) {
+      await this.issueNewCode();
+    }
+  }
+
+  /** @throws AppError SETUP_NOT_AVAILABLE, INVALID_SETUP_CODE, TOO_MANY_ATTEMPTS */
+  startTotpEnrollment(request: SetupEnrollmentRequest): Promise<TotpEnrollment> {
+    return this.throttle.attempt('setup', async () => {
+      await this.ensureValidSetupCode(request.setupCode);
+      return this.totp.createEnrollment(request.username);
+    });
+  }
+
+  /**
+   * @throws AppError SETUP_NOT_AVAILABLE, INVALID_SETUP_CODE, INVALID_SECOND_FACTOR,
+   * TOO_MANY_ATTEMPTS
+   */
+  createAccount(request: SetupRequest): Promise<SetupResponse> {
+    return this.throttle.attempt('setup', async () => {
+      await this.ensureValidSetupCode(request.setupCode);
+      const step = this.totp.matchingStep(request.totpSecret, request.totpCode);
+      if (step === undefined) {
+        throw new AppError(
+          'INVALID_SECOND_FACTOR',
+          'The code does not match the authenticator app',
+        );
+      }
+      const passwordHash = await hashPassword(request.password);
+      const recoveryCodes = await this.database.transaction(async (transaction) => {
+        const created = await transaction
+          .insert(account)
+          .values({
+            username: request.username,
+            passwordHash,
+            totpSecretEncrypted: this.secretBox.seal(request.totpSecret),
+            // The code that confirmed the app must not open a session afterwards.
+            totpLastUsedStep: step,
+          })
+          .onConflictDoNothing()
+          .returning({ id: account.id });
+        if (created.length === 0) {
+          throw new AppError('SETUP_NOT_AVAILABLE', 'The account already exists');
+        }
+        await transaction.delete(setupCode);
+        return this.recoveryCodes.regenerate(transaction);
+      });
+      return { recoveryCodes };
+    });
+  }
+
+  private async ensureValidSetupCode(code: string): Promise<void> {
+    if (!(await this.isSetupRequired())) {
+      throw new AppError('SETUP_NOT_AVAILABLE', 'The account already exists');
+    }
+    const matches = await this.database
+      .select({ id: setupCode.id })
+      .from(setupCode)
+      .where(and(eq(setupCode.codeHash, hashToken(code)), gt(setupCode.expiresAt, new Date())))
+      .limit(1);
+    if (matches.length === 0) {
+      throw new AppError('INVALID_SETUP_CODE', 'Unknown or expired setup code');
+    }
+  }
+
+  private async hasValidCode(): Promise<boolean> {
+    const codes = await this.database
+      .select({ id: setupCode.id })
+      .from(setupCode)
+      .where(gt(setupCode.expiresAt, new Date()))
+      .limit(1);
+    return codes.length > 0;
   }
 }
