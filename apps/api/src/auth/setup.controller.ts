@@ -1,8 +1,8 @@
 import {
-  type SetupCodeRequest,
+  type SetupEnrollmentRequest,
   type SetupRequest,
   type SetupResponse,
-  setupCodeRequestSchema,
+  setupEnrollmentRequestSchema,
   setupRequestSchema,
   type TotpEnrollment,
 } from '@mailbox/shared';
@@ -19,9 +19,9 @@ export class SetupController {
   @Post('totp-secret')
   @HttpCode(HttpStatus.OK)
   startTotpEnrollment(
-    @Body({ schema: setupCodeRequestSchema }) request: SetupCodeRequest,
+    @Body({ schema: setupEnrollmentRequestSchema }) request: SetupEnrollmentRequest,
   ): Promise<TotpEnrollment> {
-    return this.setup.startTotpEnrollment(request.setupCode);
+    return this.setup.startTotpEnrollment(request);
   }
 
   @Public()

@@ -21,6 +21,9 @@ export function createDatabase(databaseUrl: string, onIdleClientError: (error: E
 
 export type Database = ReturnType<typeof createDatabase>;
 
+/** What `database.transaction` hands its callback: queries that commit or roll back together. */
+export type Transaction = Parameters<Parameters<Database['transaction']>[0]>[0];
+
 export async function pingDatabase(database: Database): Promise<void> {
   await database.execute(sql`select 1`);
 }

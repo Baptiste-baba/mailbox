@@ -1,10 +1,4 @@
-import {
-  authStatusSchema,
-  errorResponseSchema,
-  loginResponseSchema,
-  setupResponseSchema,
-  totpEnrollmentSchema,
-} from '@mailbox/shared';
+import { errorResponseSchema, loginResponseSchema, totpEnrollmentSchema } from '@mailbox/shared';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { type RunningApi, startApi } from './start-api.ts';
 
@@ -30,14 +24,8 @@ async function errorCode(response: Response): Promise<string> {
   return errorResponseSchema.parse(await response.json()).code;
 }
 
+// Setup has its real logic: see auth-setup.test.ts. Sign-in and sessions still answer placeholders.
 describe('authentication routes, sign-in', () => {
-  it('reports the authentication status', async () => {
-    const response = await fetch(`${api.url}/api/auth/status`);
-
-    expect(response.status).toBe(200);
-    expect(authStatusSchema.safeParse(await response.json()).success).toBe(true);
-  });
-
   it('asks for the second factor, then answers the sign-in', async () => {
     const credentials = { username: 'alex', password: 'correct horse battery' };
 
@@ -54,23 +42,7 @@ describe('authentication routes, sign-in', () => {
   });
 });
 
-describe('authentication routes, setup and second factor', () => {
-  it('gives an authenticator secret, then creates the account with its recovery codes', async () => {
-    const enrollment = await send('POST', '/setup/totp-secret', { setupCode: 'aaaa-aaaa-aaaa' });
-    expect(enrollment.status).toBe(200);
-    const { secret } = totpEnrollmentSchema.parse(await enrollment.json());
-
-    const setup = await send('POST', '/setup', {
-      setupCode: 'AAAA-AAAA-AAAA',
-      username: 'alex',
-      password: 'correct horse battery',
-      totpSecret: secret,
-      totpCode: '123456',
-    });
-    expect(setup.status).toBe(201);
-    expect(setupResponseSchema.parse(await setup.json()).recoveryCodes).toHaveLength(10);
-  });
-
+describe('authentication routes, second factor and sign-out', () => {
   it('replaces the authenticator app and signs out', async () => {
     const enrollment = await send('POST', '/totp/secret');
     const { secret } = totpEnrollmentSchema.parse(await enrollment.json());
@@ -91,7 +63,7 @@ describe('authentication routes, refused requests', () => {
         setupCode: 'AAAA-AAAA-AAAA',
         username: 'alex',
         password: 'short',
-        totpSecret: 'X',
+        totpSecret: 'GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ',
         totpCode: '123456',
       },
     ],
@@ -100,7 +72,11 @@ describe('authentication routes, refused requests', () => {
       '/login',
       { username: 'alex', password: 'x', secondFactor: { kind: 'totp', code: '12345' } },
     ],
-    ['a setup code in the wrong format', '/setup/totp-secret', { setupCode: '1234' }],
+    [
+      'a setup code in the wrong format',
+      '/setup/totp-secret',
+      { setupCode: '1234', username: 'alex' },
+    ],
     ['a body that is not JSON', '/login', '{"username": '],
   ])('answers 400 VALIDATION_FAILED for %s', async (_case, path, body) => {
     const response = await send('POST', path, body);
@@ -117,12 +93,5 @@ describe('authentication routes, refused requests', () => {
 
     expect(response.status).toBe(413);
     expect(await errorCode(response)).toBe('PAYLOAD_TOO_LARGE');
-  });
-
-  it('answers 401 INVALID_SETUP_CODE for a wrong setup code', async () => {
-    const response = await send('POST', '/setup/totp-secret', { setupCode: 'ZZZZ-ZZZZ-ZZZZ' });
-
-    expect(response.status).toBe(401);
-    expect(await errorCode(response)).toBe('INVALID_SETUP_CODE');
   });
 });

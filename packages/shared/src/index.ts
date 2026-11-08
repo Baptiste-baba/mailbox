@@ -8,10 +8,10 @@ export {
 } from './auth/login.ts';
 export {
   RECOVERY_CODE_COUNT,
-  type SetupCodeRequest,
+  type SetupEnrollmentRequest,
   type SetupRequest,
   type SetupResponse,
-  setupCodeRequestSchema,
+  setupEnrollmentRequestSchema,
   setupRequestSchema,
   setupResponseSchema,
 } from './auth/setup.ts';
@@ -24,6 +24,10 @@ export {
 export { AppError } from './errors/app-error.ts';
 export { type ErrorCode, errorCodeSchema } from './errors/error-code.ts';
 export { type ErrorResponse, errorResponseSchema } from './errors/error-response.ts';
+export {
+  type TooManyAttemptsDetails,
+  tooManyAttemptsDetailsSchema,
+} from './errors/too-many-attempts-details.ts';
 export { type FolderList, type FolderSummary, folderListSchema } from './mail/folder-summary.ts';
 export { type MailAddress, mailAddressSchema } from './mail/mail-address.ts';
 export {
