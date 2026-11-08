@@ -112,6 +112,23 @@ describe('replacing the authenticator app', () => {
     });
     expect(await errorCode(withFormerApp)).toBe('INVALID_SECOND_FACTOR');
   });
+});
+
+describe('replacing the authenticator app without a session', () => {
+  it.each([
+    ['without a session', undefined],
+    ['with an unknown session', '__Host-mailbox_session=unknown'],
+  ])('refuses to give or replace an app %s', async (_case, cookie) => {
+    const totpSecret = 'GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ';
+    const enrollment = await callAuth(api, 'POST', '/totp/secret', { cookie });
+    const replacement = await callAuth(api, 'PUT', '/totp', {
+      cookie,
+      body: { totpSecret, totpCode: totpCode(totpSecret) },
+    });
+
+    expect([enrollment.status, replacement.status]).toEqual([401, 401]);
+    expect(await errorCode(replacement)).toBe('UNAUTHENTICATED');
+  });
 
   it('keeps the former app when the code does not match the new one', async () => {
     const enrollment = await callAuth(api, 'POST', '/totp/secret', {
