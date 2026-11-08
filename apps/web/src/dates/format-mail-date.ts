@@ -21,6 +21,10 @@ function calendarDay(date: Date, timeZone: string | undefined): number {
   return Date.UTC(part('year'), part('month') - 1, part('day')) / DAY_MS;
 }
 
+function formatTime(date: Date, timeZone: string | undefined): string {
+  return formatter({ hour: '2-digit', minute: '2-digit' }, timeZone).format(date);
+}
+
 /**
  * Date of a mail in a list, as short as it can be read: "08:47" today, "hier", "lun." within the
  * week, "14 oct." this year, "14 oct. 2025" before.
@@ -29,7 +33,7 @@ export function formatListDate(isoDate: string, now: Date, timeZone?: string): s
   const date = new Date(isoDate);
   const daysAgo = calendarDay(now, timeZone) - calendarDay(date, timeZone);
   if (daysAgo <= 0) {
-    return formatter({ hour: '2-digit', minute: '2-digit' }, timeZone).format(date);
+    return formatTime(date, timeZone);
   }
   if (daysAgo === 1) {
     return fr.dates.yesterday;
@@ -44,4 +48,11 @@ export function formatListDate(isoDate: string, now: Date, timeZone?: string): s
     { day: 'numeric', month: 'short', ...(sameYear ? {} : { year: 'numeric' }) },
     timeZone,
   ).format(date);
+}
+
+/** Date of an open message: the list date and the time, "hier, 18:42", or the time alone today. */
+export function formatMessageDate(isoDate: string, now: Date, timeZone?: string): string {
+  const day = formatListDate(isoDate, now, timeZone);
+  const time = formatTime(new Date(isoDate), timeZone);
+  return day === time ? time : fr.dates.dayAndTime(day, time);
 }

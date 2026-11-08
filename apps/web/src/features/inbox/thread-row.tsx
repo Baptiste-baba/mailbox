@@ -2,7 +2,7 @@ import type { MailboxSummary, ThreadSummary, ThreadView } from '@mailbox/shared'
 import { Avatar, RowLink, Swatch } from '@mailbox/ui';
 import { createLink } from '@tanstack/react-router';
 import { PaperclipIcon } from 'lucide-react';
-import { formatListDate } from '../../dates/format-list-date.ts';
+import { formatListDate } from '../../dates/format-mail-date.ts';
 import { fr } from '../../i18n/fr.ts';
 
 const ThreadRowLink = createLink(RowLink);

@@ -1,4 +1,4 @@
-import type { MailboxList, ThreadPage, ThreadSummary } from '@mailbox/shared';
+import type { MailboxList, Thread, ThreadPage, ThreadSummary } from '@mailbox/shared';
 import { vi } from 'vitest';
 
 export const testMailboxes: MailboxList = {
@@ -28,13 +28,24 @@ export function testThread(id: string, unread: boolean): ThreadSummary {
   };
 }
 
+interface FakeApi {
+  threadPages: (url: URL) => ThreadPage | Response;
+  thread?: (threadId: string) => Thread | Response;
+}
+
+const notFound = () =>
+  Response.json({ code: 'THREAD_NOT_FOUND', message: 'Thread not found' }, { status: 404 });
+
 /** Answers the app's requests to the api as the given functions say, and records them. */
-export function fakeApi(threads: (url: URL) => ThreadPage | Response) {
+export function fakeApi({ threadPages, thread = notFound }: FakeApi) {
   const fetchMock = vi.fn(async (input: string) => {
     const url = new URL(input, window.location.origin);
+    const answer = (body: object) => (body instanceof Response ? body : Response.json(body));
     if (url.pathname === '/api/threads') {
-      const page = threads(url);
-      return page instanceof Response ? page : Response.json(page);
+      return answer(threadPages(url));
+    }
+    if (url.pathname.startsWith('/api/threads/')) {
+      return answer(thread(decodeURIComponent(url.pathname.slice('/api/threads/'.length))));
     }
     if (url.pathname === '/api/mailboxes') {
       return Response.json(testMailboxes);

@@ -4,7 +4,11 @@ export type ShortcutId =
   | 'settings'
   | 'nextThread'
   | 'previousThread'
-  | 'unreadOnly';
+  | 'unreadOnly'
+  | 'archive'
+  | 'snooze'
+  | 'translate'
+  | 'reply';
 
 interface Shortcut {
   /** As shown next to its action. */
@@ -21,4 +25,8 @@ export const shortcuts: Record<ShortcutId, Shortcut> = {
   nextThread: { label: 'J', key: 'j' },
   previousThread: { label: 'K', key: 'k' },
   unreadOnly: { label: 'U', key: 'u' },
+  archive: { label: 'E' },
+  snooze: { label: 'H' },
+  translate: { label: 'T' },
+  reply: { label: 'R' },
 };
