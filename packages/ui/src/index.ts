@@ -4,6 +4,8 @@ export { IconButton } from './components/icon-button.tsx';
 export { Kbd } from './components/kbd.tsx';
 export { NavGroup, NavGroupAction } from './components/nav-group.tsx';
 export { NavItem } from './components/nav-item.tsx';
+export { PaneHeader } from './components/pane-header.tsx';
+export { RowLink } from './components/row-link.tsx';
 export { SearchField } from './components/search-field.tsx';
 export { SegmentedControl } from './components/segmented-control.tsx';
 export { Skeleton } from './components/skeleton.tsx';

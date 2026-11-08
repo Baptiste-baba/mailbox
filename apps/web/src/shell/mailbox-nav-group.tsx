@@ -63,7 +63,7 @@ function MailboxLink({ mailbox }: { mailbox: MailboxSummary }) {
         mailbox.address,
         reconnect
           ? fr.sidebar.reconnect
-          : mailbox.unreadCount > 0 && fr.sidebar.unreadCount(mailbox.unreadCount),
+          : mailbox.unreadCount > 0 && fr.common.unreadCount(mailbox.unreadCount),
       )}
       trailing={
         reconnect ? (

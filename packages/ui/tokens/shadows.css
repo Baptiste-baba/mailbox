@@ -41,6 +41,7 @@
   /* Hairline on the end edge of a column, to separate it from the next one. */
   --shadow-hairline-end: inset -0.5px 0 0 var(--frost2);
   --shadow-hairline-top: inset 0 0.5px 0 var(--frost2);
+  --shadow-hairline-bottom: inset 0 -0.5px 0 var(--frost2);
   /* Coloured halo under a gradient button. */
   --shadow-glow: 0 4px 12px -6px color-mix(in srgb, var(--g2) 80%, transparent);
 }

@@ -14,6 +14,8 @@
   --text-mail--line-height: 1.65;
   --text-compose: 15px;
   --text-compose--line-height: 1.7;
+  --text-heading: 15px;
+  --text-heading--letter-spacing: -0.01em;
   /* Text of a field on a touch screen: below 16 px, Safari on iPhone zooms in on focus. */
   --text-touch: 16px;
   --text-title: 24px;
