@@ -1,7 +1,7 @@
 import * as z from 'zod';
 import { mailAddressSchema } from './mail-address.ts';
 
-export const attachmentSchema = z.object({
+const attachmentSchema = z.object({
   id: z.string().min(1),
   fileName: z.string(),
   mimeType: z.string(),
@@ -9,7 +9,7 @@ export const attachmentSchema = z.object({
   size: z.int().nonnegative(),
 });
 
-export const messageSchema = z.object({
+const messageSchema = z.object({
   id: z.string().min(1),
   from: mailAddressSchema,
   to: z.array(mailAddressSchema),

@@ -2,7 +2,7 @@ import * as z from 'zod';
 import { mailAddressSchema } from './mail-address.ts';
 
 /** One line of a mail list: what is needed to show a thread without opening it. */
-export const threadSummarySchema = z.object({
+const threadSummarySchema = z.object({
   id: z.string().min(1),
   mailboxId: z.string().min(1),
   subject: z.string(),
