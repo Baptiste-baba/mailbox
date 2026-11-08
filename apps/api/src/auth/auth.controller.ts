@@ -16,7 +16,7 @@ export class AuthController {
   @Public()
   @Get('status')
   status(@Req() _request: Request): Promise<AuthStatus> {
-    throw new Error('Not implemented yet');
+    return this.login.status(undefined);
   }
 
   @Public()
@@ -31,7 +31,8 @@ export class AuthController {
 
   @Post('logout')
   @HttpCode(HttpStatus.NO_CONTENT)
-  logOut(@Req() _request: Request, @Res({ passthrough: true }) _response: Response): Promise<void> {
-    throw new Error('Not implemented yet');
-  }
+  async logOut(
+    @Req() _request: Request,
+    @Res({ passthrough: true }) _response: Response,
+  ): Promise<void> {}
 }

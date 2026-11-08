@@ -3,6 +3,7 @@ import * as z from 'zod';
 // Codes are part of the API contract: never rename or reuse one, only add new ones.
 export const errorCodeSchema = z.enum([
   'VALIDATION_FAILED',
+  'PAYLOAD_TOO_LARGE',
   'UNAUTHENTICATED',
   'INVALID_CREDENTIALS',
   'SECOND_FACTOR_REQUIRED',

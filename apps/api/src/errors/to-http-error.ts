@@ -1,8 +1,9 @@
 import { AppError, type ErrorCode, type ErrorResponse } from '@mailbox/shared';
-import { HttpStatus, NotFoundException } from '@nestjs/common';
+import { HttpException, HttpStatus } from '@nestjs/common';
 
 const httpStatusByErrorCode: Record<ErrorCode, HttpStatus> = {
   VALIDATION_FAILED: HttpStatus.BAD_REQUEST,
+  PAYLOAD_TOO_LARGE: HttpStatus.PAYLOAD_TOO_LARGE,
   UNAUTHENTICATED: HttpStatus.UNAUTHORIZED,
   INVALID_CREDENTIALS: HttpStatus.UNAUTHORIZED,
   SECOND_FACTOR_REQUIRED: HttpStatus.UNAUTHORIZED,
@@ -25,12 +26,25 @@ export function toHttpError(exception: unknown): HttpError {
   if (exception instanceof AppError) {
     return httpError(exception.code, exception.message, exception.details);
   }
-  // Nest's router raises this for any request that matches no route.
-  if (exception instanceof NotFoundException) {
-    return httpError('ROUTE_NOT_FOUND', exception.message);
-  }
+  const rejectedRequest =
+    exception instanceof HttpException ? frameworkError(exception) : undefined;
   // Anything else is a bug: its message may expose internals, so the client only gets a generic one.
-  return httpError('INTERNAL_ERROR', 'Internal server error');
+  return rejectedRequest ?? httpError('INTERNAL_ERROR', 'Internal server error');
+}
+
+// The api itself only raises AppError: Nest raises these before any handler runs, when no route
+// matches or when Express refuses the body. A JSON parse message may quote the body: never echoed.
+function frameworkError(exception: HttpException): HttpError | undefined {
+  switch (exception.getStatus()) {
+    case HttpStatus.NOT_FOUND:
+      return httpError('ROUTE_NOT_FOUND', exception.message);
+    case HttpStatus.BAD_REQUEST:
+      return httpError('VALIDATION_FAILED', 'Malformed request');
+    case HttpStatus.PAYLOAD_TOO_LARGE:
+      return httpError('PAYLOAD_TOO_LARGE', 'Request body too large');
+    default:
+      return undefined;
+  }
 }
 
 function httpError(code: ErrorCode, message: string, details?: unknown): HttpError {
