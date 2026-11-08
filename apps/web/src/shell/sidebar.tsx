@@ -11,9 +11,9 @@ import {
   SlidersHorizontalIcon,
   TextIcon,
 } from 'lucide-react';
-import { mailboxesQuery } from '../api/mailboxes-query.ts';
+import { mailboxesQuery, selectInboxUnreadCount } from '../api/mailboxes-query.ts';
 import { fr } from '../i18n/fr.ts';
-import { shortcutLabels } from '../shortcuts.ts';
+import { shortcuts } from '../shortcuts.ts';
 import { ComingSoonNavItem } from './coming-soon-nav-item.tsx';
 import { FolderNavGroup } from './folder-nav-group.tsx';
 import { hint } from './hint.ts';
@@ -22,9 +22,8 @@ import { NewMailButton } from './new-mail-button.tsx';
 import { SidebarNavLink } from './sidebar-nav-link.tsx';
 
 export function Sidebar() {
-  const mailboxes = useQuery(mailboxesQuery);
   const inboxUnreadCount =
-    mailboxes.data?.mailboxes.reduce((total, mailbox) => total + mailbox.unreadCount, 0) ?? 0;
+    useQuery({ ...mailboxesQuery, select: selectInboxUnreadCount }).data ?? 0;
   return (
     <nav
       aria-label={fr.sidebar.label}
@@ -44,7 +43,7 @@ export function Sidebar() {
           label={fr.sidebar.inbox}
           title={hint(
             fr.sidebar.inbox,
-            inboxUnreadCount > 0 && fr.sidebar.unreadCount(inboxUnreadCount),
+            inboxUnreadCount > 0 && fr.common.unreadCount(inboxUnreadCount),
           )}
           trailing={inboxUnreadCount || undefined}
           marker={inboxUnreadCount > 0 ? 'accent' : undefined}
@@ -53,7 +52,7 @@ export function Sidebar() {
         <ComingSoonNavItem
           icon={<SearchIcon />}
           label={fr.sidebar.search}
-          shortcut={shortcutLabels.search}
+          shortcut={shortcuts.search.label}
         />
       </NavGroup>
       <MailboxNavGroup />
@@ -68,7 +67,7 @@ export function Sidebar() {
         <ComingSoonNavItem
           icon={<SlidersHorizontalIcon />}
           label={fr.sidebar.settings}
-          shortcut={shortcutLabels.settings}
+          shortcut={shortcuts.settings.label}
         />
       </NavGroup>
     </nav>

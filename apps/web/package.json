@@ -13,6 +13,7 @@
     "@mailbox/ui": "workspace:*",
     "@tanstack/react-query": "5.107.1",
     "@tanstack/react-router": "1.170.45",
+    "@tanstack/react-virtual": "3.14.26",
     "lucide-react": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
@@ -24,9 +25,13 @@
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "@vitejs/plugin-react": "6.1.2",
+    "@vitest/browser-playwright": "catalog:",
+    "playwright": "catalog:",
     "tailwindcss": "4.3.3",
     "typescript": "catalog:",
     "vite": "8.3.5",
-    "vite-plugin-pwa": "2.0.0"
+    "vite-plugin-pwa": "2.0.0",
+    "vitest": "catalog:",
+    "vitest-browser-react": "catalog:"
   }
 }

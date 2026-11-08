@@ -3,6 +3,10 @@ export const fr = {
   common: {
     comingSoon: 'Bientôt disponible',
     retry: 'Réessayer',
+    unreadCount: (count: number) => `${count} non ${count >= 2 ? 'lus' : 'lu'}`,
+  },
+  dates: {
+    yesterday: 'hier',
   },
   sidebar: {
     label: 'Navigation',
@@ -27,10 +31,20 @@ export const fr = {
     security: 'Sécurité',
     settings: 'Réglages',
     crash: 'La navigation n’a pas pu s’afficher.',
-    unreadCount: (count: number) => `${count} non ${count >= 2 ? 'lus' : 'lu'}`,
   },
   inbox: {
     listLabel: 'Liste des mails',
+    unreadOnly: 'Non lus seulement',
+    layout: 'Disposition : mail à droite',
+    searchLabel: 'Rechercher dans tes mails',
+    searchPlaceholder: 'Rechercher',
+    aiSearch: 'Recherche IA',
+    noSubject: '(Sans objet)',
+    hasAttachments: 'Pièce jointe',
+    empty: 'Aucun mail ici.',
+    emptyUnread: 'Aucun mail non lu.',
+    error: 'Impossible de charger les mails. Vérifie que le serveur est joignable, puis réessaie.',
+    crash: 'La liste n’a pas pu s’afficher.',
   },
   notFound: {
     title: 'Page introuvable',
