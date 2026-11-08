@@ -27,11 +27,13 @@ export function FolderNavGroup() {
 
 function FolderItems() {
   const folders = useQuery(foldersQuery);
-  if (folders.isPending) {
-    return <NavItemSkeletons count={4} />;
-  }
-  if (folders.isError) {
-    return <SidebarError message={fr.sidebar.foldersError} onRetry={() => folders.refetch()} />;
+  // What is shown stays when a refresh fails: only a first load that fails shows the error.
+  if (folders.data === undefined) {
+    return folders.isError ? (
+      <SidebarError message={fr.sidebar.foldersError} onRetry={() => folders.refetch()} />
+    ) : (
+      <NavItemSkeletons count={4} />
+    );
   }
   return folders.data.folders.map((folder) => (
     <ComingSoonNavItem

@@ -42,6 +42,18 @@ export function ThreadListMessage({ message, onRetry }: ThreadListMessageProps) 
   );
 }
 
+/** The end of a list whose next page failed to load, with the way to ask for it again. */
+export function LoadMoreError({ onRetry }: { onRetry: () => void }) {
+  return (
+    <div className="flex items-center justify-center gap-2 py-3 text-meta text-ink3">
+      <span>{fr.inbox.loadMoreError}</span>
+      <Button variant="text" size="xs" onClick={onRetry}>
+        {fr.common.retry}
+      </Button>
+    </div>
+  );
+}
+
 /** Stands in for the list when it fails to render, so that the rest of the app stays usable. */
 export function ThreadListCrash({ reset }: ErrorComponentProps) {
   return <ThreadListMessage message={fr.inbox.crash} onRetry={reset} />;

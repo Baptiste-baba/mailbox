@@ -1,6 +1,7 @@
 import type { Thread } from '@mailbox/shared';
 import { afterEach, describe, expect, test, vi } from 'vitest';
-import { fakeApi, testMailboxes, testThread } from '../../testing/fake-api.ts';
+import { fakeApi, serverError, testMailboxes, testThread } from '../../testing/fake-api.ts';
+import { refreshAndFail } from '../../testing/refresh-with-failure.ts';
 import { renderApp } from '../../testing/render-app.tsx';
 
 const own = testMailboxes.mailboxes[0]?.address ?? '';
@@ -60,6 +61,25 @@ describe('thread pane', () => {
     await expect
       .poll(() => screen.getByRole('button', { expanded: true }).elements().length)
       .toBe(2);
+  });
+});
+
+describe('thread pane, when a request fails', () => {
+  // Regression: a refresh failing while a thread was open replaced it with an error.
+  test('keeps the open thread when a refresh fails', async () => {
+    let failing = false;
+    fakeApi({
+      threadPages: () => ({ threads: [testThread('thread-a', false)], nextCursor: null }),
+      thread: () => (failing ? serverError() : contract),
+    });
+    const { screen, queryClient } = await renderApp('/inbox/thread-a');
+    await expect.element(screen.getByText('Voici la version finale.')).toBeVisible();
+
+    failing = true;
+    await refreshAndFail(queryClient);
+
+    await expect.element(screen.getByText('Voici la version finale.')).toBeVisible();
+    expect(screen.getByText(/Impossible de charger ce mail/).query()).toBeNull();
   });
 
   test('says when the thread no longer exists', async () => {

@@ -16,5 +16,5 @@ export async function renderApp(path: string) {
       <RouterProvider router={router} />
     </QueryClientProvider>,
   );
-  return { screen, router };
+  return { screen, router, queryClient };
 }

@@ -45,6 +45,7 @@ export const fr = {
     empty: 'Aucun mail ici.',
     emptyUnread: 'Aucun mail non lu.',
     error: 'Impossible de charger les mails. Vérifie que le serveur est joignable, puis réessaie.',
+    loadMoreError: 'Impossible de charger la suite.',
     crash: 'La liste n’a pas pu s’afficher.',
   },
   thread: {
