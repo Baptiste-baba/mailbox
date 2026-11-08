@@ -12,13 +12,20 @@ interface NavGroupProps {
 }
 
 /**
- * A set of navigation items under an optional heading, which screen readers can jump between.
+ * A set of navigation items under an optional heading, which screen readers can jump between. In a
+ * container narrower than `rail`, a hairline replaces the heading on screen.
  */
 export function NavGroup({ title, action, children, className }: NavGroupProps) {
   return (
-    <div className={joinClassNames('flex flex-col gap-px', className)}>
+    <div
+      className={joinClassNames(
+        'flex flex-col gap-px',
+        title === undefined ? undefined : '@max-rail:pt-2 @max-rail:shadow-hairline-top',
+        className,
+      )}
+    >
       {title !== undefined && (
-        <div className="flex items-center gap-1.5 px-2 pb-1">
+        <div className="flex items-center gap-1.5 px-2 pb-1 @max-rail:sr-only">
           <h2 className="text-micro font-semibold text-ink3">{title}</h2>
           {action}
         </div>
@@ -34,7 +41,7 @@ export function NavGroupAction({ type = 'button', ...props }: ComponentProps<'bu
     <button
       type={type}
       className={joinClassNames(
-        'ml-auto text-micro font-medium text-klein enabled:hover:text-kleintx',
+        'ml-auto text-micro font-medium text-klein enabled:hover:text-kleintx @max-rail:hidden',
         pressableClassNames,
       )}
       {...props}

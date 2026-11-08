@@ -1,16 +1,23 @@
-import { NavItem } from '@mailbox/ui';
+import { Kbd, NavItem } from '@mailbox/ui';
 import type { ReactNode } from 'react';
 import { fr } from '../i18n/fr.ts';
+import { hint } from './hint.ts';
 
 interface ComingSoonNavItemProps {
   icon: ReactNode;
   label: string;
-  trailing?: ReactNode;
+  shortcut?: string;
 }
 
 /** A destination that does not exist yet: shown, but disabled. */
-export function ComingSoonNavItem({ icon, label, trailing }: ComingSoonNavItemProps) {
+export function ComingSoonNavItem({ icon, label, shortcut }: ComingSoonNavItemProps) {
   return (
-    <NavItem icon={icon} label={label} trailing={trailing} disabled title={fr.common.comingSoon} />
+    <NavItem
+      icon={icon}
+      label={label}
+      trailing={shortcut === undefined ? undefined : <Kbd>{shortcut}</Kbd>}
+      disabled
+      title={hint(label, shortcut, fr.common.comingSoon)}
+    />
   );
 }
