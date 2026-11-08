@@ -145,6 +145,8 @@ themes. It exists in development only.
 | `pnpm lint`          | Lint and check formatting (Biome)                                                     |
 | `pnpm lint:fix`      | Apply formatting and safe lint fixes                                                  |
 | `pnpm test`          | Start the local database, then run the unit, integration and component tests (Vitest) |
+| `pnpm db:generate`   | Write a migration from the Drizzle schema (`packages/db/src/schema`)                  |
+| `pnpm db:migrate`    | Apply the migrations to the local database                                            |
 | `pnpm db:start`      | Start the local database only                                                         |
 | `pnpm desktop:dev`   | Start the Mac app on the development web app, with live reload                        |
 | `pnpm desktop:build` | Build the Mac app                                                                     |

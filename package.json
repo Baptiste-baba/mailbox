@@ -14,6 +14,8 @@
     "lint:fix": "biome check --write .",
     "test": "pnpm db:start && turbo run build && vitest run",
     "db:start": "docker compose --file compose.dev.yaml up --detach --wait",
+    "db:generate": "pnpm --filter @mailbox/db generate",
+    "db:migrate": "pnpm db:start && pnpm --filter @mailbox/db migrate",
     "desktop:dev": "pnpm --filter @mailbox/desktop exec tauri dev",
     "desktop:build": "pnpm --filter @mailbox/desktop exec tauri build"
   },

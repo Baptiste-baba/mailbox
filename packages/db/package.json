@@ -4,7 +4,8 @@
   "private": true,
   "type": "module",
   "files": [
-    "dist"
+    "dist",
+    "migrations"
   ],
   "exports": {
     ".": {
@@ -15,7 +16,9 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch --preserveWatchOutput",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "generate": "drizzle-kit generate",
+    "migrate": "node --env-file=../../.env.development node_modules/drizzle-kit/bin.cjs migrate"
   },
   "dependencies": {
     "drizzle-orm": "0.45.4",
@@ -24,6 +27,7 @@
   "devDependencies": {
     "@types/node": "catalog:",
     "@types/pg": "8.23.1",
+    "drizzle-kit": "0.31.11",
     "typescript": "catalog:"
   }
 }
