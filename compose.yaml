@@ -63,6 +63,7 @@ services:
     image: ghcr.io/baptiste-baba/mailbox-api:${MAILBOX_VERSION:-main}
     environment:
       DATABASE_URL: postgres://mailbox:${POSTGRES_PASSWORD}@postgres:5432/mailbox
+      MAILBOX_SECRET_KEY: ${MAILBOX_SECRET_KEY:?Set MAILBOX_SECRET_KEY in .env}
       LOG_LEVEL: ${LOG_LEVEL:-info}
     # Reachable from this machine only: an HTTPS endpoint on it, such as `tailscale serve`, exposes the app.
     ports:

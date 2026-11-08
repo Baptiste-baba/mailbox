@@ -18,7 +18,8 @@ not needed.
    curl -fsSL -o .env https://raw.githubusercontent.com/Baptiste-baba/mailbox/main/.env.example
    ```
 
-2. Fill in `.env`. Generate the database password with `openssl rand -hex 32`. Keep the database
+2. Fill in `.env`. Generate the database password with `openssl rand -hex 32` and the secret key
+   with `openssl rand -base64 32`, and keep a copy of that key outside the machine. Keep the database
    folder on an SSD, and the backup folder on another disk when the machine has one.
 3. Create both folders, and give the backup folder to the user the worker runs as:
 
@@ -57,6 +58,7 @@ sets them from `.env`; the table below matters to run a service on its own.
 | Variable             | Used by     | Required | Default     | Purpose                                                        |
 | -------------------- | ----------- | -------- | ----------- | -------------------------------------------------------------- |
 | `DATABASE_URL`       | api, worker | yes      |             | PostgreSQL connection string (`postgres://…`)                  |
+| `MAILBOX_SECRET_KEY` | api         | yes      |             | 32 bytes in base64 encrypting the secrets kept in the database |
 | `API_HOST`           | api         | no       | `127.0.0.1` | Address the api listens on (`0.0.0.0` inside a container)      |
 | `API_PORT`           | api         | no       | `3000`      | Port the api listens on                                        |
 | `WEB_DIRECTORY`      | api         | no       |             | Built web app (`apps/web/dist`) to serve; unset, API only      |

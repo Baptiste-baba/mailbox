@@ -1,7 +1,7 @@
 import { type DynamicModule, Module } from '@nestjs/common';
 import { APP_FILTER, APP_PIPE } from '@nestjs/core';
 import { LoggerModule } from 'nestjs-pino';
-import { AuthModule } from './auth/auth.module.ts';
+import { createAuthModule } from './auth/auth.module.ts';
 import type { ApiConfig } from './config/api-config.ts';
 import { DatabaseModule } from './database/database.module.ts';
 import { createValidationPipe } from './errors/create-validation-pipe.ts';
@@ -22,7 +22,7 @@ export function createAppModule(config: ApiConfig): DynamicModule {
       LoggerModule.forRoot(createLoggerOptions(config.logLevel)),
       DatabaseModule.register(config.databaseUrl),
       HealthModule,
-      AuthModule,
+      createAuthModule(config.secretKey),
       MailboxesModule,
       FoldersModule,
       ThreadsModule,

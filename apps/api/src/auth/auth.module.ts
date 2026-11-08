@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { type DynamicModule, Module } from '@nestjs/common';
 import { AccountService } from './account.service.ts';
 import { AttemptThrottleService } from './attempt-throttle.service.ts';
 import { AuthController } from './auth.controller.ts';
@@ -11,17 +11,23 @@ import { SetupService } from './setup.service.ts';
 import { TotpController } from './totp.controller.ts';
 import { TotpService } from './totp.service.ts';
 
-@Module({
-  controllers: [AuthController, SetupController, TotpController],
-  providers: [
-    AccountService,
-    AttemptThrottleService,
-    LoginService,
-    RecoveryCodesService,
-    SecretBox,
-    SessionService,
-    SetupService,
-    TotpService,
-  ],
-})
-export class AuthModule {}
+@Module({})
+class AuthModule {}
+
+/** @param secretKey Encrypts the secrets kept in the database, from the configuration. */
+export function createAuthModule(secretKey: Buffer): DynamicModule {
+  return {
+    module: AuthModule,
+    controllers: [AuthController, SetupController, TotpController],
+    providers: [
+      AccountService,
+      AttemptThrottleService,
+      LoginService,
+      RecoveryCodesService,
+      { provide: SecretBox, useFactory: () => new SecretBox(secretKey) },
+      SessionService,
+      SetupService,
+      TotpService,
+    ],
+  };
+}

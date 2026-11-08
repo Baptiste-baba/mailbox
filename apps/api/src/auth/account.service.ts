@@ -7,8 +7,9 @@ export class AccountService {
   // Answers of the contract while the logic is not written: replaced in the next layer.
   async startTotpEnrollment(): Promise<TotpEnrollment> {
     return {
-      secret: 'JBSWY3DPEHPK3PXP',
-      otpauthUri: 'otpauth://totp/MailBox:alex?secret=JBSWY3DPEHPK3PXP&issuer=MailBox',
+      secret: 'GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ',
+      otpauthUri:
+        'otpauth://totp/MailBox:alex?secret=GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ&issuer=MailBox',
     };
   }
 

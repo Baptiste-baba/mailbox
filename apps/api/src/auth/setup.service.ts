@@ -9,8 +9,8 @@ import { Injectable } from '@nestjs/common';
 
 // Answers of the contract while the logic is not written: replaced in the next layer.
 const FAKE_ENROLLMENT: TotpEnrollment = {
-  secret: 'JBSWY3DPEHPK3PXP',
-  otpauthUri: 'otpauth://totp/MailBox:alex?secret=JBSWY3DPEHPK3PXP&issuer=MailBox',
+  secret: 'GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ',
+  otpauthUri: 'otpauth://totp/MailBox:alex?secret=GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ&issuer=MailBox',
 };
 
 /** The creation of the account, once, guarded by the one-time setup code from the server logs. */
