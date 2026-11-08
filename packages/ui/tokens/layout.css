@@ -1,0 +1,8 @@
+/* Layout sizes from the design handoff (direction E). */
+
+@theme {
+  /* Width from which the sidebar, the list and the thread fit side by side at full size. */
+  --breakpoint-wide: 71.25rem;
+  /* A navigation narrower than this reduces its items to their icon. */
+  --container-rail: 7rem;
+}

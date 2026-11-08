@@ -27,6 +27,7 @@ export const fr = {
     security: 'Sécurité',
     settings: 'Réglages',
     crash: 'La navigation n’a pas pu s’afficher.',
+    unreadCount: (count: number) => `${count} non ${count >= 2 ? 'lus' : 'lu'}`,
   },
   inbox: {
     listLabel: 'Liste des mails',

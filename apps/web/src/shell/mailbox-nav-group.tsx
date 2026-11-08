@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { LayoutGridIcon } from 'lucide-react';
 import { mailboxesQuery } from '../api/mailboxes-query.ts';
 import { fr } from '../i18n/fr.ts';
+import { hint } from './hint.ts';
 import { NavItemSkeletons, SidebarError } from './sidebar-message.tsx';
 import { SidebarNavLink } from './sidebar-nav-link.tsx';
 
@@ -24,6 +25,7 @@ export function MailboxNavGroup() {
         search={{}}
         icon={<LayoutGridIcon />}
         label={fr.sidebar.allMailboxes}
+        title={fr.sidebar.allMailboxes}
       />
       <MailboxLinks />
     </NavGroup>
@@ -47,6 +49,7 @@ function MailboxLinks() {
 }
 
 function MailboxLink({ mailbox }: { mailbox: MailboxSummary }) {
+  const reconnect = mailbox.status === 'reconnectRequired';
   return (
     <SidebarNavLink
       to="/$view"
@@ -55,14 +58,21 @@ function MailboxLink({ mailbox }: { mailbox: MailboxSummary }) {
       icon={<Swatch color={mailbox.color} shape="circle" />}
       label={mailbox.name}
       description={mailbox.address}
-      title={mailbox.address}
+      title={hint(
+        mailbox.name,
+        mailbox.address,
+        reconnect
+          ? fr.sidebar.reconnect
+          : mailbox.unreadCount > 0 && fr.sidebar.unreadCount(mailbox.unreadCount),
+      )}
       trailing={
-        mailbox.status === 'reconnectRequired' ? (
+        reconnect ? (
           <span className="font-semibold text-verm">{fr.sidebar.reconnect}</span>
         ) : (
           mailbox.unreadCount || undefined
         )
       }
+      marker={reconnect ? 'danger' : mailbox.unreadCount > 0 ? 'accent' : undefined}
     />
   );
 }
