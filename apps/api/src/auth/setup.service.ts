@@ -64,9 +64,12 @@ export class SetupService {
     }
   }
 
-  /** @throws AppError SETUP_NOT_AVAILABLE, INVALID_SETUP_CODE, TOO_MANY_ATTEMPTS */
-  startTotpEnrollment(request: SetupEnrollmentRequest): Promise<TotpEnrollment> {
-    return this.throttle.attempt('setup', async () => {
+  /**
+   * @param client Address of the device, slowed down on its own after failures.
+   * @throws AppError SETUP_NOT_AVAILABLE, INVALID_SETUP_CODE, TOO_MANY_ATTEMPTS
+   */
+  startTotpEnrollment(request: SetupEnrollmentRequest, client: string): Promise<TotpEnrollment> {
+    return this.throttle.attempt('setup', client, async () => {
       await this.ensureValidSetupCode(request.setupCode);
       return this.totp.createEnrollment(request.username);
     });
@@ -76,8 +79,8 @@ export class SetupService {
    * @throws AppError SETUP_NOT_AVAILABLE, INVALID_SETUP_CODE, INVALID_SECOND_FACTOR,
    * TOO_MANY_ATTEMPTS
    */
-  createAccount(request: SetupRequest): Promise<SetupResponse> {
-    return this.throttle.attempt('setup', async () => {
+  createAccount(request: SetupRequest, client: string): Promise<SetupResponse> {
+    return this.throttle.attempt('setup', client, async () => {
       await this.ensureValidSetupCode(request.setupCode);
       const step = this.totp.matchingStep(request.totpSecret, request.totpCode);
       if (step === undefined) {

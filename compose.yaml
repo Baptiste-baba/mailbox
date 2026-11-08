@@ -65,6 +65,9 @@ services:
       DATABASE_URL: postgres://mailbox:${POSTGRES_PASSWORD}@postgres:5432/mailbox
       MAILBOX_SECRET_KEY: ${MAILBOX_SECRET_KEY:?Set MAILBOX_SECRET_KEY in .env}
       LOG_LEVEL: ${LOG_LEVEL:-info}
+      # The port below only listens on this machine: whatever reaches the api is a local HTTPS endpoint,
+      # through Docker's gateway. Its X-Forwarded-For tells which device signs in.
+      TRUSTED_PROXIES: loopback, uniquelocal
     # Reachable from this machine only: an HTTPS endpoint on it, such as `tailscale serve`, exposes the app.
     ports:
       - 127.0.0.1:${MAILBOX_PORT:-3000}:3000

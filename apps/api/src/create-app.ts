@@ -12,6 +12,9 @@ export async function createApp(config: ApiConfig): Promise<NestExpressApplicati
   });
   app.useLogger(app.get(Logger));
   app.disable('x-powered-by');
+  // Behind these proxies, request.ip is the device they relay for, read from X-Forwarded-For: failed
+  // sign-ins then slow down that device only. A header from anyone else is ignored.
+  app.set('trust proxy', config.trustedProxies);
   app.use(setSecurityHeaders);
   if (config.webDirectory !== undefined) {
     serveWebApp(app, config.webDirectory);

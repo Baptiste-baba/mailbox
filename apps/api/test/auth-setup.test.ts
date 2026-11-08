@@ -7,7 +7,8 @@ import {
 } from '@mailbox/shared';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { SetupService } from '../src/auth/setup.service.ts';
-import { currentTotpCode } from './authenticator-app.ts';
+import { callAuth, errorCode, sessionCookieFrom } from './auth-requests.ts';
+import { totpCode, wrongTotpCode } from './authenticator-app.ts';
 import { type RunningApi, startApi } from './start-api.ts';
 import { insertSetupCode, openTestDatabase, resetAuthTables } from './test-database.ts';
 
@@ -18,15 +19,7 @@ let api: RunningApi;
 let database: Database;
 
 function post(path: string, body: unknown): Promise<Response> {
-  return fetch(`${api.url}/api/auth${path}`, {
-    method: 'POST',
-    headers: { 'content-type': 'application/json' },
-    body: JSON.stringify(body),
-  });
-}
-
-async function errorCode(response: Response): Promise<string> {
-  return errorResponseSchema.parse(await response.json()).code;
+  return callAuth(api, 'POST', path, { body });
 }
 
 async function startEnrollment(setupCodeTyped = SETUP_CODE) {
@@ -37,13 +30,13 @@ async function startEnrollment(setupCodeTyped = SETUP_CODE) {
   return totpEnrollmentSchema.parse(await response.json());
 }
 
-async function createAccount(secret: string, totpCode = currentTotpCode(secret)) {
+async function createAccount(secret: string, code = totpCode(secret)) {
   return post('/setup', {
     setupCode: SETUP_CODE,
     username: 'alex',
     password: PASSWORD,
     totpSecret: secret,
-    totpCode,
+    totpCode: code,
   });
 }
 
@@ -124,6 +117,20 @@ describe('setup', () => {
     expect(storedCodes).toHaveLength(10);
     expect(await database.select().from(setupCode)).toHaveLength(0);
   });
+});
+
+describe('after the setup', () => {
+  it('signs in on the device that created the account', async () => {
+    const { secret } = await startEnrollment();
+    const response = await createAccount(secret);
+
+    const status = await callAuth(api, 'GET', '/status', { cookie: sessionCookieFrom(response) });
+
+    expect(authStatusSchema.parse(await status.json())).toEqual({
+      state: 'signedIn',
+      username: 'alex',
+    });
+  });
 
   it('closes the setup once the account exists', async () => {
     const { secret } = await startEnrollment();
@@ -163,9 +170,8 @@ describe('refused setups', () => {
 
   it('answers 401 INVALID_SECOND_FACTOR when the code is not the app’s, and creates nothing', async () => {
     const { secret } = await startEnrollment();
-    const wrongCode = currentTotpCode(secret) === '000000' ? '111111' : '000000';
 
-    const response = await createAccount(secret, wrongCode);
+    const response = await createAccount(secret, wrongTotpCode(secret));
 
     expect(response.status).toBe(401);
     expect(await errorCode(response)).toBe('INVALID_SECOND_FACTOR');
