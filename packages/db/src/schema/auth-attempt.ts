@@ -1,4 +1,4 @@
-import { index, pgEnum, pgTable, serial, timestamp } from 'drizzle-orm/pg-core';
+import { index, pgEnum, pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core';
 
 export const authAttemptKind = pgEnum('auth_attempt_kind', ['setup', 'password', 'second_factor']);
 
@@ -8,6 +8,8 @@ export const authAttempt = pgTable(
   {
     id: serial().primaryKey(),
     kind: authAttemptKind().notNull(),
+    /** Address of the device that failed: each device is slowed down on its own. */
+    client: text().notNull(),
     attemptedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [index('auth_attempt_attempted_at_idx').on(table.attemptedAt)],

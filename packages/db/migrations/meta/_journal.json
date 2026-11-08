@@ -8,6 +8,13 @@
       "when": 1794159175355,
       "tag": "0000_create_auth_tables",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1794162985588,
+      "tag": "0001_add_auth_attempt_client",
+      "breakpoints": true
     }
   ]
 }

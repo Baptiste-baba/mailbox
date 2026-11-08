@@ -1,4 +1,15 @@
-import { Injectable } from '@nestjs/common';
+import { randomBytes } from 'node:crypto';
+import { type Database, session } from '@mailbox/db';
+import { Inject, Injectable } from '@nestjs/common';
+import { and, eq, gt, lte } from 'drizzle-orm';
+import { DATABASE } from '../database/database.module.ts';
+import { hashToken } from './token-hash.ts';
+
+/** A session lasts this long after its last use: used daily, it never ends on its own. */
+const SESSION_LIFETIME_MS = 30 * 24 * 60 * 60 * 1_000;
+const TOKEN_BYTES = 32;
+/** The user agent is a header anyone can fill: kept bounded. */
+const USER_AGENT_MAX_LENGTH = 512;
 
 export interface StartedSession {
   /** Goes into the cookie; only its hash is stored. */
@@ -6,19 +17,39 @@ export interface StartedSession {
   expiresAt: Date;
 }
 
+function nextExpiry(): Date {
+  return new Date(Date.now() + SESSION_LIFETIME_MS);
+}
+
 /** Signed-in devices: start, resume and end a session. */
 @Injectable()
 export class SessionService {
-  start(_userAgent: string): Promise<StartedSession> {
-    throw new Error('Not implemented yet');
+  constructor(@Inject(DATABASE) private readonly database: Database) {}
+
+  async start(userAgent: string): Promise<StartedSession> {
+    const token = randomBytes(TOKEN_BYTES).toString('base64url');
+    const expiresAt = nextExpiry();
+    await this.database.delete(session).where(lte(session.expiresAt, new Date()));
+    await this.database.insert(session).values({
+      tokenHash: hashToken(token),
+      userAgent: userAgent.slice(0, USER_AGENT_MAX_LENGTH),
+      expiresAt,
+    });
+    return { token, expiresAt };
   }
 
   /** The session of a token, its expiry pushed back, or undefined when it is unknown or expired. */
-  resume(_token: string): Promise<{ id: string; expiresAt: Date } | undefined> {
-    throw new Error('Not implemented yet');
+  async resume(token: string): Promise<StartedSession | undefined> {
+    const now = new Date();
+    const [resumed] = await this.database
+      .update(session)
+      .set({ lastSeenAt: now, expiresAt: nextExpiry() })
+      .where(and(eq(session.tokenHash, hashToken(token)), gt(session.expiresAt, now)))
+      .returning({ expiresAt: session.expiresAt });
+    return resumed === undefined ? undefined : { token, expiresAt: resumed.expiresAt };
   }
 
-  end(_token: string): Promise<void> {
-    throw new Error('Not implemented yet');
+  async end(token: string): Promise<void> {
+    await this.database.delete(session).where(eq(session.tokenHash, hashToken(token)));
   }
 }

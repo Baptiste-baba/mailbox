@@ -2,6 +2,7 @@ import { existsSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { databaseUrlSchema, logLevelSchema, portSchema } from '@mailbox/config';
 import * as z from 'zod';
+import { trustedProxiesSchema } from './trusted-proxies.ts';
 
 const webDirectorySchema = z
   .string()
@@ -29,6 +30,8 @@ const apiEnvironmentSchema = z
     // Unset in development, where Vite serves the web app itself.
     WEB_DIRECTORY: webDirectorySchema.optional(),
     LOG_LEVEL: logLevelSchema.default('info'),
+    // Unset, no X-Forwarded-For header is trusted: every request counts as the proxy's own.
+    TRUSTED_PROXIES: trustedProxiesSchema.optional(),
   })
   .transform((environment) => ({
     databaseUrl: environment.DATABASE_URL,
@@ -37,6 +40,7 @@ const apiEnvironmentSchema = z
     port: environment.API_PORT,
     webDirectory: environment.WEB_DIRECTORY,
     logLevel: environment.LOG_LEVEL,
+    trustedProxies: environment.TRUSTED_PROXIES ?? [],
   }));
 
 export type ApiConfig = z.output<typeof apiEnvironmentSchema>;

@@ -64,8 +64,15 @@ sets them from `.env`; the table below matters to run a service on its own.
 | `WEB_DIRECTORY`      | api         | no       |             | Built web app (`apps/web/dist`) to serve; unset, API only      |
 | `BACKUP_DIRECTORY`   | worker      | yes      |             | Folder receiving the nightly database backups                  |
 | `WORKER_HEALTH_PORT` | worker      | no       | `3001`      | Port of the worker health check, bound to loopback only        |
+| `TRUSTED_PROXIES`    | api         | no       |             | Proxies whose `X-Forwarded-For` names the device (see below)   |
 | `LOG_LEVEL`          | api, worker | no       | `info`      | `fatal`, `error`, `warn`, `info`, `debug`, `trace` or `silent` |
 | `TZ`                 | worker      | no       | `UTC`       | Time zone, e.g. `Europe/Paris`; sets the hour of the backup    |
+
+`TRUSTED_PROXIES` lists addresses, subnets (`172.16.0.0/12`) or the names `loopback`, `linklocal`
+and `uniquelocal`, separated by commas. Failed sign-ins slow down the device that made them, known
+from the `X-Forwarded-For` header of these proxies only; `compose.yaml` trusts the local HTTPS
+endpoint in front of the api. Unset, every request counts as coming from the same device. Never
+trust an address from which anyone else can reach the api: they could pose as any device.
 
 Both services answer `GET /health` with `200` when they can reach the database, `503` otherwise.
 

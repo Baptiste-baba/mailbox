@@ -17,6 +17,8 @@ const invalidEnvironments: [string, Record<string, string>][] = [
   ['a port out of range', { ...required, API_PORT: '70000' }],
   ['an unknown log level', { ...required, LOG_LEVEL: 'verbose' }],
   ['a web folder without index.html', { ...required, WEB_DIRECTORY: tmpdir() }],
+  ['a trusted proxy that is not an address', { ...required, TRUSTED_PROXIES: 'localhost' }],
+  ['a trusted subnet with a wrong prefix', { ...required, TRUSTED_PROXIES: '10.0.0.0/33' }],
 ];
 
 describe('parseApiConfig', () => {
@@ -41,6 +43,7 @@ describe('parseApiConfig', () => {
       port: 3000,
       webDirectory: undefined,
       logLevel: 'info',
+      trustedProxies: [],
     });
   });
 
@@ -48,6 +51,15 @@ describe('parseApiConfig', () => {
     const result = parseApiConfig({ ...required, API_PORT: '8080' });
 
     expect(result.data?.port).toBe(8080);
+  });
+
+  it('reads the trusted proxies as a list of addresses, subnets and range names', () => {
+    const result = parseApiConfig({
+      ...required,
+      TRUSTED_PROXIES: 'loopback, 172.16.0.0/12,fd00::1',
+    });
+
+    expect(result.data?.trustedProxies).toEqual(['loopback', '172.16.0.0/12', 'fd00::1']);
   });
 
   it('accepts a folder holding the built web app', () => {
