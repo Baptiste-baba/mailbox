@@ -4,12 +4,14 @@ import { Injectable } from '@nestjs/common';
 /** Changes to the signed-in account: a new authenticator app, after a recovery code for instance. */
 @Injectable()
 export class AccountService {
-  startTotpEnrollment(): Promise<TotpEnrollment> {
-    throw new Error('Not implemented yet');
+  // Answers of the contract while the logic is not written: replaced in the next layer.
+  async startTotpEnrollment(): Promise<TotpEnrollment> {
+    return {
+      secret: 'JBSWY3DPEHPK3PXP',
+      otpauthUri: 'otpauth://totp/MailBox:alex?secret=JBSWY3DPEHPK3PXP&issuer=MailBox',
+    };
   }
 
   /** @throws AppError INVALID_SECOND_FACTOR when the code does not match the new secret. */
-  replaceTotp(_confirmation: TotpConfirmation): Promise<void> {
-    throw new Error('Not implemented yet');
-  }
+  async replaceTotp(_confirmation: TotpConfirmation): Promise<void> {}
 }

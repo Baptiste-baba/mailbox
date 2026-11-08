@@ -1,5 +1,5 @@
 import { AppError } from '@mailbox/shared';
-import { NotFoundException } from '@nestjs/common';
+import { BadRequestException, HttpException, NotFoundException } from '@nestjs/common';
 import { describe, expect, it } from 'vitest';
 import { toHttpError } from './to-http-error.ts';
 
@@ -21,6 +21,22 @@ describe('toHttpError', () => {
     expect(httpError).toEqual({
       status: 404,
       body: { code: 'ROUTE_NOT_FOUND', message: 'Cannot GET /api/unknown' },
+    });
+  });
+
+  it('reports a body Express refused as the client’s mistake, without echoing it', () => {
+    const malformed = new BadRequestException(
+      'Unexpected token \'p\', "password: hunter2" is not valid JSON',
+    );
+    const tooLarge = new HttpException('request entity too large', 413);
+
+    expect(toHttpError(malformed)).toEqual({
+      status: 400,
+      body: { code: 'VALIDATION_FAILED', message: 'Malformed request' },
+    });
+    expect(toHttpError(tooLarge)).toEqual({
+      status: 413,
+      body: { code: 'PAYLOAD_TOO_LARGE', message: 'Request body too large' },
     });
   });
 
