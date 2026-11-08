@@ -13,18 +13,25 @@ import { ThreadToolbar } from './thread-toolbar.tsx';
 
 const threadRoute = getRouteApi('/_shell/$view/$id');
 
-/** The open thread, or why it cannot be shown. */
+function isNotFound(error: Error | null): boolean {
+  return error instanceof ApiError && error.code === 'THREAD_NOT_FOUND';
+}
+
+/**
+ * The open thread, or why it cannot be shown. A thread on screen stays there when a refresh fails,
+ * unless the server says it no longer exists.
+ */
 export function ThreadPane() {
   const { id } = threadRoute.useParams();
   const thread = useQuery(threadQuery(id));
-  if (thread.isPending) {
-    return <ThreadSkeleton />;
+  if (isNotFound(thread.error)) {
+    return <ThreadMessage message={fr.thread.notFound} />;
   }
-  if (thread.isError) {
-    return thread.error instanceof ApiError && thread.error.code === 'THREAD_NOT_FOUND' ? (
-      <ThreadMessage message={fr.thread.notFound} />
-    ) : (
+  if (thread.data === undefined) {
+    return thread.isError ? (
       <ThreadMessage message={fr.thread.error} onRetry={() => thread.refetch()} />
+    ) : (
+      <ThreadSkeleton />
     );
   }
   // A new thread starts with its own messages folded, whatever was open in the previous one.

@@ -5,7 +5,7 @@ import { useEffect, useRef } from 'react';
 import { mailboxesQuery } from '../../api/mailboxes-query.ts';
 import { type ThreadFilters, threadPagesQuery } from '../../api/thread-pages-query.ts';
 import { fr } from '../../i18n/fr.ts';
-import { ThreadListMessage, ThreadListSkeleton } from './thread-list-states.tsx';
+import { LoadMoreError, ThreadListMessage, ThreadListSkeleton } from './thread-list-states.tsx';
 import { ThreadRow } from './thread-row.tsx';
 import { useThreadKeyboard } from './use-thread-keyboard.ts';
 
@@ -17,14 +17,18 @@ const ROW_GAP = 4;
 /** The next page is asked for while this many rows remain below the visible ones. */
 const LOAD_AHEAD_ROWS = 10;
 
-/** The threads of the current view, or why there is none to show. */
+/**
+ * The threads of the current view, or why there is none to show. Threads already shown stay on
+ * screen when a later request fails: only a first load that fails gives way to the error.
+ */
 export function ThreadList({ filters }: { filters: ThreadFilters }) {
   const pages = useInfiniteQuery(threadPagesQuery(filters));
-  if (pages.isPending) {
-    return <ThreadListSkeleton />;
-  }
-  if (pages.isError) {
-    return <ThreadListMessage message={fr.inbox.error} onRetry={() => pages.refetch()} />;
+  if (pages.data === undefined) {
+    return pages.isError ? (
+      <ThreadListMessage message={fr.inbox.error} onRetry={() => pages.refetch()} />
+    ) : (
+      <ThreadListSkeleton />
+    );
   }
   const threads = pages.data.pages.flatMap((page) => page.threads);
   if (threads.length === 0) {
@@ -36,9 +40,13 @@ export function ThreadList({ filters }: { filters: ThreadFilters }) {
     <VirtualThreadList
       threads={threads}
       filters={filters}
+      // After a failure the next page waits for the user: asking again at once would loop.
       loadMore={
-        pages.hasNextPage && !pages.isFetchingNextPage ? () => pages.fetchNextPage() : undefined
+        pages.hasNextPage && !pages.isFetchingNextPage && !pages.isFetchNextPageError
+          ? () => pages.fetchNextPage()
+          : undefined
       }
+      onRetryLoadMore={pages.isFetchNextPageError ? () => pages.fetchNextPage() : undefined}
     />
   );
 }
@@ -48,10 +56,17 @@ interface VirtualThreadListProps {
   filters: ThreadFilters;
   /** Asks for the next page; absent when there is none, or while it loads. */
   loadMore: (() => void) | undefined;
+  /** Asks again for the next page after it failed to load; absent otherwise. */
+  onRetryLoadMore: (() => void) | undefined;
 }
 
 // Only the rows in view, and a few around, are in the page: the list stays fluid at any length.
-function VirtualThreadList({ threads, filters, loadMore }: VirtualThreadListProps) {
+function VirtualThreadList({
+  threads,
+  filters,
+  loadMore,
+  onRetryLoadMore,
+}: VirtualThreadListProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const mailboxes = useMailboxesById();
   const virtualizer = useVirtualizer({
@@ -99,6 +114,7 @@ function VirtualThreadList({ threads, filters, loadMore }: VirtualThreadListProp
           );
         })}
       </ol>
+      {onRetryLoadMore !== undefined && <LoadMoreError onRetry={onRetryLoadMore} />}
     </div>
   );
 }

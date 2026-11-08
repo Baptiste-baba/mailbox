@@ -34,11 +34,13 @@ export function MailboxNavGroup() {
 
 function MailboxLinks() {
   const mailboxes = useQuery(mailboxesQuery);
-  if (mailboxes.isPending) {
-    return <NavItemSkeletons count={3} />;
-  }
-  if (mailboxes.isError) {
-    return <SidebarError message={fr.sidebar.mailboxesError} onRetry={() => mailboxes.refetch()} />;
+  // What is shown stays when a refresh fails: only a first load that fails shows the error.
+  if (mailboxes.data === undefined) {
+    return mailboxes.isError ? (
+      <SidebarError message={fr.sidebar.mailboxesError} onRetry={() => mailboxes.refetch()} />
+    ) : (
+      <NavItemSkeletons count={3} />
+    );
   }
   if (mailboxes.data.mailboxes.length === 0) {
     return <p className="px-2 py-1 text-meta text-ink3">{fr.sidebar.noMailbox}</p>;

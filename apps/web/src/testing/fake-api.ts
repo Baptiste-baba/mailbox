@@ -31,13 +31,22 @@ export function testThread(id: string, unread: boolean): ThreadSummary {
 interface FakeApi {
   threadPages: (url: URL) => ThreadPage | Response;
   thread?: (threadId: string) => Thread | Response;
+  mailboxes?: () => MailboxList | Response;
 }
+
+/** What the api answers when it fails on its side. */
+export const serverError = () =>
+  Response.json({ code: 'INTERNAL_ERROR', message: 'Internal server error' }, { status: 500 });
 
 const notFound = () =>
   Response.json({ code: 'THREAD_NOT_FOUND', message: 'Thread not found' }, { status: 404 });
 
 /** Answers the app's requests to the api as the given functions say, and records them. */
-export function fakeApi({ threadPages, thread = notFound }: FakeApi) {
+export function fakeApi({
+  threadPages,
+  thread = notFound,
+  mailboxes = () => testMailboxes,
+}: FakeApi) {
   const fetchMock = vi.fn(async (input: string) => {
     const url = new URL(input, window.location.origin);
     const answer = (body: object) => (body instanceof Response ? body : Response.json(body));
@@ -48,7 +57,7 @@ export function fakeApi({ threadPages, thread = notFound }: FakeApi) {
       return answer(thread(decodeURIComponent(url.pathname.slice('/api/threads/'.length))));
     }
     if (url.pathname === '/api/mailboxes') {
-      return Response.json(testMailboxes);
+      return answer(mailboxes());
     }
     return Response.json({ folders: [] });
   });
