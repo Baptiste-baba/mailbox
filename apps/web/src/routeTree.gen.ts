@@ -11,6 +11,8 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ShellRouteImport } from './routes/_shell'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as SetupRouteImport } from './routes/setup'
 import { Route as ShellViewRouteRouteImport } from './routes/_shell/$view/route'
 import { Route as ShellViewIndexRouteImport } from './routes/_shell/$view/index'
 import { Route as ShellViewIdRouteImport } from './routes/_shell/$view/$id'
@@ -22,6 +24,16 @@ const IndexRoute = IndexRouteImport.update({
 } as any)
 const ShellRoute = ShellRouteImport.update({
   id: '/_shell',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SetupRoute = SetupRouteImport.update({
+  id: '/setup',
+  path: '/setup',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ShellViewRouteRoute = ShellViewRouteRouteImport.update({
@@ -42,12 +54,16 @@ const ShellViewIdRoute = ShellViewIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/setup': typeof SetupRoute
   '/$view': typeof ShellViewRouteRouteWithChildren
   '/$view/$id': typeof ShellViewIdRoute
   '/$view/': typeof ShellViewIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/setup': typeof SetupRoute
   '/$view/$id': typeof ShellViewIdRoute
   '/$view': typeof ShellViewIndexRoute
 }
@@ -55,19 +71,23 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_shell': typeof ShellRouteWithChildren
+  '/login': typeof LoginRoute
+  '/setup': typeof SetupRoute
   '/_shell/$view': typeof ShellViewRouteRouteWithChildren
   '/_shell/$view/$id': typeof ShellViewIdRoute
   '/_shell/$view/': typeof ShellViewIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/$view' | '/$view/$id' | '/$view/'
+  fullPaths: '/' | '/login' | '/setup' | '/$view' | '/$view/$id' | '/$view/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/$view/$id' | '/$view'
+  to: '/' | '/login' | '/setup' | '/$view/$id' | '/$view'
   id:
     | '__root__'
     | '/'
     | '/_shell'
+    | '/login'
+    | '/setup'
     | '/_shell/$view'
     | '/_shell/$view/$id'
     | '/_shell/$view/'
@@ -76,6 +96,8 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ShellRoute: typeof ShellRouteWithChildren
+  LoginRoute: typeof LoginRoute
+  SetupRoute: typeof SetupRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -92,6 +114,20 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof ShellRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/setup': {
+      id: '/setup'
+      path: '/setup'
+      fullPath: '/setup'
+      preLoaderRoute: typeof SetupRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_shell/$view': {
@@ -145,6 +181,8 @@ const ShellRouteWithChildren = ShellRoute._addFileChildren(ShellRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ShellRoute: ShellRouteWithChildren,
+  LoginRoute: LoginRoute,
+  SetupRoute: SetupRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
