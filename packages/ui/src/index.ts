@@ -1,5 +1,8 @@
 export { Avatar } from './components/avatar.tsx';
+export { BarButton } from './components/bar-button.tsx';
 export { Button } from './components/button.tsx';
+export { Card } from './components/card.tsx';
+export { FileChip } from './components/file-chip.tsx';
 export { IconButton } from './components/icon-button.tsx';
 export { Kbd } from './components/kbd.tsx';
 export { NavGroup, NavGroupAction } from './components/nav-group.tsx';

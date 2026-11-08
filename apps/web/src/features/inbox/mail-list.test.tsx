@@ -15,7 +15,7 @@ afterEach(() => {
 
 describe('mail list, from the keyboard', () => {
   test('opens the next and the previous thread with J and K', async () => {
-    fakeApi(() => ({ threads, nextCursor: null }));
+    fakeApi({ threadPages: () => ({ threads, nextCursor: null }) });
     const { screen, router } = await renderApp('/inbox');
     await expect.element(screen.getByText('Sujet thread-a')).toBeVisible();
 
@@ -32,10 +32,12 @@ describe('mail list, from the keyboard', () => {
   });
 
   test('shows unread threads only once U is pressed', async () => {
-    const fetchMock = fakeApi((url) => ({
-      threads: url.searchParams.get('unreadOnly') === 'true' ? [] : threads,
-      nextCursor: null,
-    }));
+    const fetchMock = fakeApi({
+      threadPages: (url) => ({
+        threads: url.searchParams.get('unreadOnly') === 'true' ? [] : threads,
+        nextCursor: null,
+      }),
+    });
     const { screen } = await renderApp('/inbox');
     await expect.element(screen.getByText('Sujet thread-a')).toBeVisible();
 
@@ -50,7 +52,7 @@ describe('mail list, selected row', () => {
   // Regression: the outline of the selected row was cut at the top of the list, covered by the
   // row after it on hover, and touched by that row's hover background.
   test('keeps the whole outline of the selected row in view, above its neighbours', async () => {
-    fakeApi(() => ({ threads, nextCursor: null }));
+    fakeApi({ threadPages: () => ({ threads, nextCursor: null }) });
     const { screen } = await renderApp('/inbox/thread-a');
     const selected = screen.getByRole('link', { name: /Sujet thread-a/ });
     await expect.element(selected).toHaveAttribute('aria-current', 'page');
@@ -71,20 +73,25 @@ describe('mail list, selected row', () => {
 
 describe('mail list, while loading', () => {
   test('loads the next page as the end of the list comes into view', async () => {
-    fakeApi((url) =>
-      url.searchParams.get('cursor') === 'after-c'
-        ? { threads: [testThread('thread-d', false)], nextCursor: null }
-        : { threads, nextCursor: 'after-c' },
-    );
+    fakeApi({
+      threadPages: (url) =>
+        url.searchParams.get('cursor') === 'after-c'
+          ? { threads: [testThread('thread-d', false)], nextCursor: null }
+          : { threads, nextCursor: 'after-c' },
+    });
     const { screen } = await renderApp('/inbox');
 
     await expect.element(screen.getByText('Sujet thread-d')).toBeVisible();
   });
 
   test('explains a failure to load and offers to try again', async () => {
-    fakeApi(() =>
-      Response.json({ code: 'INTERNAL_ERROR', message: 'Internal server error' }, { status: 500 }),
-    );
+    fakeApi({
+      threadPages: () =>
+        Response.json(
+          { code: 'INTERNAL_ERROR', message: 'Internal server error' },
+          { status: 500 },
+        ),
+    });
     const { screen } = await renderApp('/inbox');
 
     await expect.element(screen.getByText(/Impossible de charger les mails/)).toBeVisible();

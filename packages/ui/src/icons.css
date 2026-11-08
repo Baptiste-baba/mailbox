@@ -28,3 +28,10 @@
   height: 16px;
   stroke-width: 1.7;
 }
+
+@utility icon-18 {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  stroke-width: 1.6;
+}

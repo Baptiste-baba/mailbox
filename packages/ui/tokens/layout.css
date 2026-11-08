@@ -5,4 +5,6 @@
   --breakpoint-wide: 71.25rem;
   /* A navigation narrower than this reduces its items to their icon. */
   --container-rail: 7rem;
+  /* Widest a running text gets before its lines become hard to follow. */
+  --container-reading: 80ch;
 }

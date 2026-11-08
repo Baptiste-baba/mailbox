@@ -7,6 +7,7 @@ export const fr = {
   },
   dates: {
     yesterday: 'hier',
+    dayAndTime: (day: string, time: string) => `${day}, ${time}`,
   },
   sidebar: {
     label: 'Navigation',
@@ -45,6 +46,24 @@ export const fr = {
     emptyUnread: 'Aucun mail non lu.',
     error: 'Impossible de charger les mails. Vérifie que le serveur est joignable, puis réessaie.',
     crash: 'La liste n’a pas pu s’afficher.',
+  },
+  thread: {
+    archive: 'Archiver',
+    snooze: 'Plus tard',
+    translate: 'Traduire',
+    moreActions: 'Plus d’actions',
+    move: 'Ranger',
+    reply: 'Répondre',
+    replyTo: (names: string) => `Répondre à ${names}`,
+    messagesLabel: 'Messages du fil',
+    me: 'Toi',
+    meInSentence: 'toi',
+    to: (names: string) => `à ${names}`,
+    cc: (names: string) => `cc ${names}`,
+    placeholder: 'Choisis un mail dans la liste, ou parcours-la avec J et K.',
+    notFound: 'Ce mail n’existe plus. Il a peut-être été supprimé ou déplacé.',
+    error: 'Impossible de charger ce mail. Vérifie que le serveur est joignable, puis réessaie.',
+    crash: 'Ce mail n’a pas pu s’afficher.',
   },
   notFound: {
     title: 'Page introuvable',
