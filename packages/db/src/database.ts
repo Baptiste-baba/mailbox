@@ -1,6 +1,7 @@
 import { sql } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import pg from 'pg';
+import * as schema from './schema/index.ts';
 
 // One user only: a few connections cover concurrent requests and keep Postgres memory low on the NAS.
 const MAX_CONNECTIONS = 5;
@@ -14,7 +15,8 @@ export function createDatabase(databaseUrl: string, onIdleClientError: (error: E
   });
   // The pool already discards the broken client; without a listener, a Postgres restart would crash the process.
   pool.on('error', onIdleClientError);
-  return drizzle({ client: pool });
+  // Columns are camelCase in the code, snake_case in Postgres.
+  return drizzle({ client: pool, schema, casing: 'snake_case' });
 }
 
 export type Database = ReturnType<typeof createDatabase>;
