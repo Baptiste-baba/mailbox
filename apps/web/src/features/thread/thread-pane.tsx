@@ -46,7 +46,7 @@ function OpenThread({ thread }: { thread: Thread }) {
   return (
     <>
       <ThreadToolbar />
-      <div className="min-h-0 flex-1 overflow-y-auto">
+      <div className="min-h-0 flex-1 overflow-y-auto overscroll-none">
         {/* At least as tall as the pane, so that the open message can stretch to its bottom. */}
         <article className="flex min-h-full flex-col gap-5.5 px-10 pt-7 pb-6">
           <ThreadHeader thread={thread} mailbox={mailbox} />

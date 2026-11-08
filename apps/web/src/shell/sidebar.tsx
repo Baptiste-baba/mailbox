@@ -27,8 +27,8 @@ export function Sidebar() {
   return (
     <nav
       aria-label={fr.sidebar.label}
-      // Below the `wide` breakpoint the columns no longer fit: the sidebar shrinks to its icons.
-      className="@container flex w-14 flex-none flex-col gap-3.5 overflow-y-auto bg-mist px-2 pt-13 pb-3 shadow-hairline-end wide:w-57 wide:px-2.5"
+      // A container: once the sidebar is folded narrow, its items shrink to their icons.
+      className="@container flex h-full flex-col gap-3.5 overflow-y-auto overscroll-none px-2.5 pt-13 pb-3"
     >
       <NewMailButton />
       <NavGroup>

@@ -2,9 +2,12 @@ import {
   Avatar,
   BarButton,
   Card,
+  ColumnResizeHandle,
   FileChip,
   IconButton,
   PaneHeader,
+  ResizableColumn,
+  ResizableColumns,
   RowLink,
   StateMessage,
 } from '@mailbox/ui';
@@ -61,6 +64,25 @@ export function SurfacesSection() {
           </Card>
         </div>
         <SampleName name="<Card>, <FileChip> et <BarButton> · un message, sa pièce jointe, sa réponse" />
+      </div>
+      <div className="flex flex-col gap-2">
+        <div className="h-24 overflow-hidden rounded-md shadow-lift">
+          <ResizableColumns id="catalog-columns" className="h-full">
+            <ResizableColumn
+              id="catalog-left"
+              defaultSize="35%"
+              minSize={80}
+              className="bg-mist p-3"
+            >
+              Liste
+            </ResizableColumn>
+            <ColumnResizeHandle />
+            <ResizableColumn id="catalog-right" minSize={80} className="bg-well p-3">
+              Fil
+            </ResizableColumn>
+          </ResizableColumns>
+        </div>
+        <SampleName name="<ResizableColumns> · glisser le filet, flèches une fois sélectionné, double-clic pour revenir" />
       </div>
       <div className="flex flex-col gap-2">
         <div className="flex flex-col gap-4 rounded-md bg-paper py-6">

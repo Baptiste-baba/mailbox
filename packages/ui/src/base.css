@@ -1,6 +1,11 @@
 @import "@fontsource-variable/geist";
 
 @layer base {
+  /* An app, not a document: reaching the end of a scroll never bounces the whole page. */
+  html {
+    overscroll-behavior: none;
+  }
+
   body {
     background-color: var(--paper);
     color: var(--ink);

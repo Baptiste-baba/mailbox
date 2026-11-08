@@ -88,7 +88,7 @@ function VirtualThreadList({
   useThreadKeyboard(threads, filters.view, (index) => virtualizer.scrollToIndex(index));
   const now = new Date();
   return (
-    <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto pb-3">
+    <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto overscroll-none pb-3">
       <ol className="relative" style={{ height: virtualizer.getTotalSize() }}>
         {rows.map((row) => {
           const thread = threads[row.index];
