@@ -1,3 +1,4 @@
+import type { Database } from '@mailbox/db';
 import {
   errorResponseSchema,
   type ThreadSummary,
@@ -6,19 +7,31 @@ import {
 } from '@mailbox/shared';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { type RunningApi, startApi } from './start-api.ts';
+import { signInOnFreshInstance } from './test-account.ts';
+import { openTestDatabase } from './test-database.ts';
 
 let api: RunningApi;
+let database: Database;
+let cookie: string;
 
 beforeAll(async () => {
   api = await startApi();
+  database = openTestDatabase();
+  cookie = await signInOnFreshInstance(api, database);
 });
 
 afterAll(async () => {
   await api.close();
+  await database.$client.end();
 });
 
+/** Reads the api as the signed-in user. */
+function get(path: string): Promise<Response> {
+  return fetch(`${api.url}/api${path}`, { headers: { cookie } });
+}
+
 function getThreads(query: string): Promise<Response> {
-  return fetch(`${api.url}/api/threads?${query}`);
+  return get(`/threads?${query}`);
 }
 
 async function walkAllPages(query: string, limit: number): Promise<ThreadSummary[]> {
@@ -80,7 +93,7 @@ describe('GET /api/threads/:threadId', () => {
   it('gives the whole thread, oldest message first', async () => {
     const inbox = await walkAllPages('view=inbox', 100);
     const summary = inbox.find((thread) => thread.messageCount > 1);
-    const response = await fetch(`${api.url}/api/threads/${summary?.id}`);
+    const response = await get(`/threads/${summary?.id}`);
 
     expect(response.status).toBe(200);
     const thread = threadSchema.parse(await response.json());
@@ -89,7 +102,7 @@ describe('GET /api/threads/:threadId', () => {
   });
 
   it('answers 404 THREAD_NOT_FOUND for a thread that does not exist', async () => {
-    const response = await fetch(`${api.url}/api/threads/thread-0`);
+    const response = await get('/threads/thread-0');
 
     expect(response.status).toBe(404);
     expect(errorResponseSchema.parse(await response.json()).code).toBe('THREAD_NOT_FOUND');

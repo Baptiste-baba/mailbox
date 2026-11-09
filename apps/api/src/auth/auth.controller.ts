@@ -53,6 +53,8 @@ export class AuthController {
     return result.response;
   }
 
+  // Public: an expired session still gets its cookie cleared.
+  @Public()
   @Post('logout')
   @HttpCode(HttpStatus.NO_CONTENT)
   async logOut(

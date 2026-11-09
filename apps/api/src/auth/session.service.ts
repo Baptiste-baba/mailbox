@@ -7,6 +7,11 @@ import { hashToken } from './token-hash.ts';
 
 /** A session lasts this long after its last use: used daily, it never ends on its own. */
 const SESSION_LIFETIME_MS = 30 * 24 * 60 * 60 * 1_000;
+/**
+ * A session in use is pushed back at most this often: between two, a request reads the session
+ * without writing it.
+ */
+const RENEWAL_INTERVAL_MS = 60 * 60 * 1_000;
 const TOKEN_BYTES = 32;
 /** The user agent is a header anyone can fill: kept bounded. */
 const USER_AGENT_MAX_LENGTH = 512;
@@ -38,15 +43,29 @@ export class SessionService {
     return { token, expiresAt };
   }
 
-  /** The session of a token, its expiry pushed back, or undefined when it is unknown or expired. */
+  /**
+   * The session of a token, its expiry pushed back when it was last pushed over an hour ago;
+   * undefined when it is unknown or expired.
+   */
   async resume(token: string): Promise<StartedSession | undefined> {
     const now = new Date();
-    const [resumed] = await this.database
-      .update(session)
-      .set({ lastSeenAt: now, expiresAt: nextExpiry() })
+    const [found] = await this.database
+      .select({ id: session.id, expiresAt: session.expiresAt })
+      .from(session)
       .where(and(eq(session.tokenHash, hashToken(token)), gt(session.expiresAt, now)))
-      .returning({ expiresAt: session.expiresAt });
-    return resumed === undefined ? undefined : { token, expiresAt: resumed.expiresAt };
+      .limit(1);
+    if (found === undefined) {
+      return undefined;
+    }
+    if (found.expiresAt.getTime() > now.getTime() + SESSION_LIFETIME_MS - RENEWAL_INTERVAL_MS) {
+      return { token, expiresAt: found.expiresAt };
+    }
+    const expiresAt = nextExpiry();
+    await this.database
+      .update(session)
+      .set({ lastSeenAt: now, expiresAt })
+      .where(eq(session.id, found.id));
+    return { token, expiresAt };
   }
 
   async end(token: string): Promise<void> {
