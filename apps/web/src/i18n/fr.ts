@@ -66,6 +66,17 @@ export const fr = {
     error: 'Impossible de charger ce mail. Vérifie que le serveur est joignable, puis réessaie.',
     crash: 'Ce mail n’a pas pu s’afficher.',
   },
+  auth: {
+    productName: 'MailBox',
+    setupTitle: 'Installation',
+    loginTitle: 'Connexion',
+    sessionExpired: 'Ta session a expiré. Reconnecte-toi.',
+  },
+  loading: 'Chargement…',
+  serverUnreachable: {
+    title: 'Impossible de joindre le serveur',
+    description: 'Vérifie qu’il est démarré et joignable, puis réessaie.',
+  },
   notFound: {
     title: 'Page introuvable',
     description: 'Cette adresse ne mène à aucune page. Vérifie le lien que tu as suivi.',

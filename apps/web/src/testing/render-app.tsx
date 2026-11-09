@@ -6,11 +6,12 @@ import { routeTree } from '../routeTree.gen.ts';
 
 /** Renders the whole app at `path`, with its real routes and a cache of its own. */
 export async function renderApp(path: string) {
+  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   const router = createRouter({
     routeTree,
     history: createMemoryHistory({ initialEntries: [path] }),
+    context: { queryClient },
   });
-  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   const screen = await render(
     <QueryClientProvider client={queryClient}>
       <RouterProvider router={router} />
