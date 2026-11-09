@@ -3,7 +3,7 @@ import { setupResponseSchema, totpEnrollmentSchema } from '@mailbox/shared';
 import { callAuth, sessionCookieFrom } from './auth-requests.ts';
 import { totpCode } from './authenticator-app.ts';
 import type { RunningApi } from './start-api.ts';
-import { insertSetupCode } from './test-database.ts';
+import { insertSetupCode, resetAuthTables } from './test-database.ts';
 
 export const TEST_USERNAME = 'alex';
 export const TEST_PASSWORD = 'correct horse battery staple';
@@ -35,4 +35,10 @@ export async function createTestAccount(api: RunningApi, database: Database): Pr
   });
   const { recoveryCodes } = setupResponseSchema.parse(await setup.json());
   return { totpSecret: secret, recoveryCodes, setupCookie: sessionCookieFrom(setup) };
+}
+
+/** A fresh instance with its account: the `Cookie` header of a signed-in session. */
+export async function signInOnFreshInstance(api: RunningApi, database: Database): Promise<string> {
+  await resetAuthTables(database);
+  return (await createTestAccount(api, database)).setupCookie;
 }
