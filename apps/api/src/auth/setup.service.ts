@@ -11,14 +11,12 @@ import { and, eq, gt } from 'drizzle-orm';
 import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
 import { DATABASE } from '../database/database.module.ts';
 import { AttemptThrottleService } from './attempt-throttle.service.ts';
-import { generateGroupedCode } from './grouped-code.ts';
 import { hashPassword } from './password-hash.ts';
 import { RecoveryCodesService } from './recovery-codes.service.ts';
 import { SecretBox } from './secret-box.ts';
+import { replaceSetupCode } from './setup-code.ts';
 import { hashToken } from './token-hash.ts';
 import { TotpService } from './totp.service.ts';
-
-const SETUP_CODE_LIFETIME_MS = 60 * 60 * 1_000;
 
 /** The creation of the account, once, guarded by the one-time setup code from the server logs. */
 @Injectable()
@@ -45,12 +43,7 @@ export class SetupService {
     if (!(await this.isSetupRequired())) {
       return;
     }
-    const code = generateGroupedCode();
-    const expiresAt = new Date(Date.now() + SETUP_CODE_LIFETIME_MS);
-    await this.database.transaction(async (transaction) => {
-      await transaction.delete(setupCode);
-      await transaction.insert(setupCode).values({ codeHash: hashToken(code), expiresAt });
-    });
+    const code = await this.database.transaction(replaceSetupCode);
     // The one secret written to the logs: only whoever runs the server can read them.
     this.logger.warn(
       `No account yet: open MailBox and enter the setup code ${code}, valid for an hour`,
