@@ -1,0 +1,1 @@
+ALTER TABLE "session" ADD COLUMN "must_replace_authenticator" boolean DEFAULT false NOT NULL;

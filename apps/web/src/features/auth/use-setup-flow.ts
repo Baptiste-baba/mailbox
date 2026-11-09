@@ -1,12 +1,10 @@
 import type { TotpEnrollment } from '@mailbox/shared';
-import { useQueryClient } from '@tanstack/react-query';
-import { useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
 import { ApiError } from '../../api/api-error.ts';
-import { authStatusQuery } from '../../api/auth-status-query.ts';
 import { fr } from '../../i18n/fr.ts';
 import { authErrorMessage } from './auth-error-message.ts';
-import type { SetupAccount } from './use-setup-account-form.ts';
+import type { Credentials } from './credentials.ts';
+import { useContinueTo } from './use-continue-to.ts';
 
 export type SetupStep =
   | { index: 0; rejection: string | undefined }
@@ -38,19 +36,11 @@ function handleSetupFailure(error: unknown, handlers: FailureHandlers): string |
 
 /** Where the setup stands, what was typed so far, and how each step hands over to the next. */
 export function useSetupFlow() {
-  const queryClient = useQueryClient();
-  const navigate = useNavigate();
+  const continueTo = useContinueTo();
   const [step, setStep] = useState<SetupStep>({ index: 0, rejection: undefined });
   const [setupCode, setSetupCode] = useState('');
-  const [account, setAccount] = useState<SetupAccount>({ username: '', password: '' });
+  const [account, setAccount] = useState<Credentials>({ username: '', password: '' });
   const [unavailable, setUnavailable] = useState(false);
-  const leave = (status: 'signedIn' | 'signedOut') => {
-    queryClient.setQueryData(
-      authStatusQuery.queryKey,
-      status === 'signedIn' ? { state: status, username: account.username } : { state: status },
-    );
-    void navigate({ to: status === 'signedIn' ? '/' : '/login' });
-  };
   return {
     step,
     setupCode,
@@ -65,15 +55,16 @@ export function useSetupFlow() {
       setSetupCode(code);
       setStep({ index: 1 });
     },
-    accountEntered: (entered: SetupAccount, enrollment: TotpEnrollment) => {
+    accountEntered: (entered: Credentials, enrollment: TotpEnrollment) => {
       setAccount(entered);
       setStep({ index: 2, enrollment });
     },
     accountCreated: (recoveryCodes: string[]) => setStep({ index: 3, recoveryCodes }),
     backToCode: () => setStep({ index: 0, rejection: undefined }),
     backToAccount: () => setStep({ index: 1 }),
-    enterApp: () => leave('signedIn'),
-    signInInstead: () => leave('signedOut'),
+    // Signed in by the setup, or not if the account was created elsewhere: the app or sign-in.
+    enterApp: () => continueTo('/'),
+    signInInstead: () => continueTo('/'),
   };
 }
 

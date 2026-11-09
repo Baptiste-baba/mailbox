@@ -66,13 +66,14 @@ describe('routes that need a session', () => {
 });
 
 describe('pushing a session back', () => {
-  it('reads a session used within the hour, without writing it', async () => {
+  it('reads a session used within the hour, without writing it nor its cookie', async () => {
     const [before] = await database.select().from(session);
 
-    await get('/api/mailboxes', { cookie });
+    const response = await get('/api/mailboxes', { cookie });
 
     const [after] = await database.select().from(session);
     expect(after?.expiresAt).toEqual(before?.expiresAt);
+    expect(sessionSetCookie(response)).toBeUndefined();
   });
 
   it('pushes back a session not used for an hour, and its cookie with it', async () => {

@@ -68,10 +68,10 @@ export async function postApi<Schema extends z.ZodType>(
 }
 
 /**
- * Sends `body` to `path` as JSON, to replace what is there; the api answers with no content.
+ * Sends `body` to `path` as JSON, for an action the api answers with no content.
  * @throws ApiError when the api answers with an error, ServerUnreachableError when it does not
  * answer.
  */
-export async function putApi(path: string, body: unknown): Promise<void> {
-  await requestApi(path, { method: 'PUT', body });
+export async function sendApi(method: 'POST' | 'PUT', path: string, body: unknown): Promise<void> {
+  await requestApi(path, { method, body });
 }

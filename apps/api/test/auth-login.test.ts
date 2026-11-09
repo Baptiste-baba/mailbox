@@ -1,5 +1,5 @@
 import { authAttempt, type Database, session } from '@mailbox/db';
-import { errorResponseSchema, loginResponseSchema } from '@mailbox/shared';
+import { errorResponseSchema } from '@mailbox/shared';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { callAuth, errorCode, sessionSetCookie } from './auth-requests.ts';
 import { totpCode, wrongTotpCode } from './authenticator-app.ts';
@@ -65,7 +65,7 @@ describe('sign-in with the password', () => {
   it('accepts the username whatever its case, as a phone capitalises it', async () => {
     const response = await logIn({ ...withNextCode(), username: 'Alex' });
 
-    expect(response.status).toBe(200);
+    expect(response.status).toBe(204);
   });
 
   it('makes whoever guesses passwords wait, even once they find the right one', async () => {
@@ -84,11 +84,7 @@ describe('sign-in with the authenticator app', () => {
   it('signs in with a session cookie scripts cannot read, sent to this site only, for 30 days', async () => {
     const response = await logIn(withNextCode());
 
-    expect(response.status).toBe(200);
-    expect(loginResponseSchema.parse(await response.json())).toEqual({
-      usedRecoveryCode: false,
-      recoveryCodesLeft: 10,
-    });
+    expect(response.status).toBe(204);
     const cookie = sessionSetCookie(response) ?? '';
     expect(cookie).toMatch(/; Path=\/; Expires=.+; HttpOnly; Secure; SameSite=Strict$/);
     const expires = new Date(/Expires=([^;]+)/.exec(cookie)?.[1] ?? '');
@@ -122,10 +118,7 @@ describe('sign-in with a recovery code', () => {
     const recoveryCode = { secondFactor: { kind: 'recoveryCode', code: code.toLowerCase() } };
 
     const first = await logIn(recoveryCode);
-    expect(loginResponseSchema.parse(await first.json())).toEqual({
-      usedRecoveryCode: true,
-      recoveryCodesLeft: 9,
-    });
+    expect(first.status).toBe(204);
 
     const again = await logIn(recoveryCode);
     expect(again.status).toBe(401);

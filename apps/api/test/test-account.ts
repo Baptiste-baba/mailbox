@@ -7,6 +7,7 @@ import { insertSetupCode, resetAuthTables } from './test-database.ts';
 
 export const TEST_USERNAME = 'alex';
 export const TEST_PASSWORD = 'correct horse battery staple';
+export const TEST_SETUP_CODE = 'K7QD-M2XA-PT4R';
 
 export interface TestAccount {
   /** Secret of the authenticator app; its current code was spent by the setup. */
@@ -18,7 +19,7 @@ export interface TestAccount {
 
 /** Creates the account through the setup routes, as the user would, on a fresh instance. */
 export async function createTestAccount(api: RunningApi, database: Database): Promise<TestAccount> {
-  const setupCode = 'K7QD-M2XA-PT4R';
+  const setupCode = TEST_SETUP_CODE;
   await insertSetupCode(database, setupCode, new Date(Date.now() + 60_000));
   const enrollment = await callAuth(api, 'POST', '/setup/totp-secret', {
     body: { setupCode, username: TEST_USERNAME },

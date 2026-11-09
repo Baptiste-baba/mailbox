@@ -3,6 +3,7 @@ import { AppError, type TotpConfirmation, type TotpEnrollment } from '@mailbox/s
 import { Inject, Injectable } from '@nestjs/common';
 import { DATABASE } from '../database/database.module.ts';
 import { SecretBox } from './secret-box.ts';
+import { SessionService } from './session.service.ts';
 import { TotpService } from './totp.service.ts';
 
 /** Changes to the signed-in account: a new authenticator app, after a recovery code for instance. */
@@ -12,6 +13,7 @@ export class AccountService {
     @Inject(DATABASE) private readonly database: Database,
     private readonly totp: TotpService,
     private readonly secretBox: SecretBox,
+    private readonly sessions: SessionService,
   ) {}
 
   /** @throws AppError UNAUTHENTICATED while no account exists. */
@@ -47,5 +49,6 @@ export class AccountService {
     if (replaced.length === 0) {
       throw new AppError('UNAUTHENTICATED', 'No account yet');
     }
+    await this.sessions.endAuthenticatorReplacement();
   }
 }

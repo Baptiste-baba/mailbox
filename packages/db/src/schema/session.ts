@@ -1,4 +1,4 @@
-import { index, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
+import { boolean, index, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
 /** A device the user is signed in on. The token itself never reaches the database, only its hash. */
 export const session = pgTable(
@@ -11,6 +11,11 @@ export const session = pgTable(
     createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
     lastSeenAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
     expiresAt: timestamp({ withTimezone: true }).notNull(),
+    /**
+     * Opened with a recovery code: only the replacement of the authenticator app is allowed, until
+     * a new app is set up.
+     */
+    mustReplaceAuthenticator: boolean().notNull().default(false),
   },
   (table) => [index('session_expires_at_idx').on(table.expiresAt)],
 );

@@ -18,4 +18,5 @@ export const loginSearchSchema = z.object({
   reason: z.literal('expired').optional().catch(undefined),
 });
 
-export type LoginSearch = z.infer<typeof loginSearchSchema>;
+/** Where to go once the new authenticator app is set up. */
+export const authenticatorReplacementSearchSchema = loginSearchSchema.pick({ redirect: true });

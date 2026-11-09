@@ -62,7 +62,7 @@ describe('failed sign-ins and devices', () => {
     await guessFrom(behindProxy, INTRUDER);
 
     expect((await logInFrom(behindProxy, INTRUDER)).status).toBe(429);
-    expect((await logInFrom(behindProxy, LAPTOP)).status).toBe(200);
+    expect((await logInFrom(behindProxy, LAPTOP)).status).toBe(204);
   });
 
   it('ignores the device a request claims when no proxy is trusted', async () => {

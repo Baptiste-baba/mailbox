@@ -1,7 +1,6 @@
-import { tooManyAttemptsDetailsSchema } from '@mailbox/shared';
 import { useEffect, useState } from 'react';
-import { ApiError } from '../../api/api-error.ts';
 import { fr } from '../../i18n/fr.ts';
+import { retryAfterSeconds } from './retry-after-seconds.ts';
 
 const TICK_MS = 1_000;
 
@@ -35,15 +34,13 @@ export function useRetryCountdown() {
     message: secondsLeft > 0 ? fr.auth.tooManyAttempts(formatCountdown(secondsLeft)) : undefined,
     /** Starts the countdown when the error is the server asking to wait; says whether it was. */
     startFrom: (error: unknown): boolean => {
-      const details = tooManyAttemptsDetailsSchema.safeParse(
-        error instanceof ApiError && error.code === 'TOO_MANY_ATTEMPTS' ? error.details : undefined,
-      );
-      if (!details.success) {
+      const wait = retryAfterSeconds(error);
+      if (wait === undefined) {
         return false;
       }
       const start = Date.now();
       setNow(start);
-      setUntil(start + details.data.retryAfterSeconds * 1_000);
+      setUntil(start + wait * 1_000);
       return true;
     },
   };

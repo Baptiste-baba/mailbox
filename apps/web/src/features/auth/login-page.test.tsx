@@ -1,28 +1,20 @@
-import {
-  type AuthStatus,
-  type LoginRequest,
-  type LoginResponse,
-  loginRequestSchema,
-  type TotpEnrollment,
-} from '@mailbox/shared';
+import { type AuthStatus, type LoginRequest, loginRequestSchema } from '@mailbox/shared';
 import { afterEach, describe, expect, test, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import { fakeApi } from '../../testing/fake-api.ts';
-import { renderApp } from '../../testing/render-app.tsx';
+import { apiError, fakeApi, testEnrollment } from '../../testing/fake-api.ts';
+import { type AppScreen, renderApp } from '../../testing/render-app.tsx';
 
-const SECRET = 'GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ';
 const PASSWORD = 'plume orage vitrail 42 sous la lune';
 
-function apiError(status: number, code: string, details?: object) {
-  return () => Response.json({ code, message: code, details }, { status });
-}
+const signedIn = () => new Response(null, { status: 204 });
 
 /**
  * The api of a user who signs in: the password alone asks for the second factor, which `answer`
- * judges. Other routes answer as `api` says.
+ * judges. Once signed in, the status follows the factor used, as the server's does. Other routes
+ * answer as `api` says.
  */
 function signInApi(
-  answer: (request: LoginRequest) => LoginResponse | Response,
+  answer: (request: LoginRequest) => Response,
   api: Parameters<typeof fakeApi>[0] = {},
 ) {
   let status: AuthStatus = { state: 'signedOut' };
@@ -35,23 +27,28 @@ function signInApi(
         return apiError(401, 'SECOND_FACTOR_REQUIRED')();
       }
       const response = answer(request);
-      if (!(response instanceof Response)) {
-        status = { state: 'signedIn', username: 'alex' };
+      if (response.ok) {
+        status =
+          request.secondFactor.kind === 'recoveryCode'
+            ? { state: 'authenticatorReplacementRequired', recoveryCodesLeft: 2 }
+            : { state: 'signedIn', username: 'alex' };
       }
       return response;
+    },
+    authenticatorReplacement: (body) => {
+      status = { state: 'signedIn', username: 'alex' };
+      return api.authenticatorReplacement?.(body) ?? signedIn();
     },
   });
 }
 
-type Screen = Awaited<ReturnType<typeof renderApp>>['screen'];
-
-async function enterPassword(screen: Screen, password = PASSWORD) {
+async function enterPassword(screen: AppScreen, password = PASSWORD) {
   await userEvent.fill(screen.getByLabelText('Nom d’utilisateur'), 'alex');
   await userEvent.fill(screen.getByLabelText('Mot de passe', { exact: true }), password);
   await userEvent.click(screen.getByRole('button', { name: 'Continuer' }));
 }
 
-async function enterCode(screen: Screen, code: string) {
+async function enterCode(screen: AppScreen, code: string) {
   await userEvent.fill(screen.getByLabelText(/Code à 6 chiffres/), code);
   await userEvent.click(screen.getByRole('button', { name: 'Se connecter' }));
 }
@@ -62,7 +59,7 @@ afterEach(() => {
 
 describe('sign-in', () => {
   test('signs in with the password then the code, and goes back to the page asked for', async () => {
-    const fetchMock = signInApi(() => ({ usedRecoveryCode: false, recoveryCodesLeft: 10 }));
+    const fetchMock = signInApi(signedIn);
     const { screen, router } = await renderApp('/login?redirect=%2Fall');
 
     await enterPassword(screen);
@@ -154,27 +151,42 @@ describe('sign-in help', () => {
 });
 
 describe('sign-in with a recovery code', () => {
-  test('requires a new authenticator app before the app opens', async () => {
-    const enrollment: TotpEnrollment = {
-      secret: SECRET,
-      otpauthUri: `otpauth://totp/MailBox:alex?secret=${SECRET}&issuer=MailBox`,
-    };
+  test('requires a new authenticator app before the app opens, then goes on', async () => {
     const replacement = vi.fn((_body: unknown) => new Response(null, { status: 204 }));
-    signInApi(() => ({ usedRecoveryCode: true, recoveryCodesLeft: 2 }), {
-      authenticatorSecret: () => enrollment,
+    signInApi(signedIn, {
+      authenticatorSecret: () => testEnrollment,
       authenticatorReplacement: replacement,
     });
-    const { screen } = await renderApp('/login');
+    const { screen, router } = await renderApp('/login');
     await enterPassword(screen);
     await userEvent.click(screen.getByRole('button', { name: 'Utiliser un code de secours' }));
     await userEvent.fill(screen.getByLabelText('Code de secours'), 'abcd-efgh-jklm');
     await userEvent.click(screen.getByRole('button', { name: 'Se connecter' }));
 
     await expect.element(screen.getByText(/Il te reste 2 codes de secours/)).toBeVisible();
+    expect(router.state.location.pathname).toBe('/new-authenticator');
     await userEvent.fill(screen.getByLabelText(/Code à 6 chiffres/), '123456');
     await userEvent.click(screen.getByRole('button', { name: 'Enregistrer et continuer' }));
 
     await expect.element(screen.getByRole('heading', { name: 'Réception' })).toBeVisible();
-    expect(replacement.mock.calls[0]?.[0]).toEqual({ totpSecret: SECRET, totpCode: '123456' });
+    expect(replacement.mock.calls[0]?.[0]).toEqual({
+      totpSecret: testEnrollment.secret,
+      totpCode: '123456',
+    });
+  });
+});
+
+describe('a session opened with a recovery code', () => {
+  test('comes back to the new authenticator app after a reload, wherever it goes', async () => {
+    fakeApi({
+      authStatus: () => ({ state: 'authenticatorReplacementRequired', recoveryCodesLeft: 4 }),
+      authenticatorSecret: () => testEnrollment,
+    });
+
+    const { screen, router } = await renderApp('/all');
+
+    await expect.element(screen.getByText(/Il te reste 4 codes de secours/)).toBeVisible();
+    expect(router.state.location.pathname).toBe('/new-authenticator');
+    expect(router.state.location.search).toEqual({ redirect: '/all' });
   });
 });

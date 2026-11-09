@@ -1,7 +1,8 @@
-import { type ErrorCode, tooManyAttemptsDetailsSchema } from '@mailbox/shared';
+import type { ErrorCode } from '@mailbox/shared';
 import { ApiError } from '../../api/api-error.ts';
 import { ServerUnreachableError } from '../../api/server-unreachable-error.ts';
 import { fr } from '../../i18n/fr.ts';
+import { retryAfterSeconds } from './retry-after-seconds.ts';
 
 function formatWait(seconds: number): string {
   return seconds < 60 ? fr.auth.waitSeconds(seconds) : fr.auth.waitMinutes(Math.ceil(seconds / 60));
@@ -21,9 +22,9 @@ export function authErrorMessage(
   if (!(error instanceof ApiError)) {
     return fr.auth.unexpected;
   }
-  const details = tooManyAttemptsDetailsSchema.safeParse(error.details);
-  if (error.code === 'TOO_MANY_ATTEMPTS' && details.success) {
-    return fr.auth.tooManyAttempts(formatWait(details.data.retryAfterSeconds));
+  const wait = retryAfterSeconds(error);
+  if (wait !== undefined) {
+    return fr.auth.tooManyAttempts(formatWait(wait));
   }
   return expected[error.code] ?? fr.auth.unexpected;
 }

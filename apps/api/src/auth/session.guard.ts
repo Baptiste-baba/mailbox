@@ -2,13 +2,15 @@ import { AppError } from '@mailbox/shared';
 import { type CanActivate, type ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import type { Request, Response } from 'express';
+import { OPEN_DURING_AUTHENTICATOR_REPLACEMENT } from './authenticator-replacement.decorator.ts';
 import { IS_PUBLIC } from './public.decorator.ts';
 import { SessionService } from './session.service.ts';
 import { readSessionToken, writeSessionCookie } from './session-cookie.ts';
 
 /**
  * Refuses every request without a valid session, except on routes marked `@Public()`. A request
- * with a session pushes its end back, and the cookie follows.
+ * with a session pushes its end back now and then, and the cookie follows. A session opened with a recovery code
+ * only reaches the routes that replace the authenticator app.
  */
 @Injectable()
 export class SessionGuard implements CanActivate {
@@ -17,13 +19,12 @@ export class SessionGuard implements CanActivate {
     private readonly sessions: SessionService,
   ) {}
 
-  /** @throws AppError UNAUTHENTICATED without a session, or when it expired. */
+  /**
+   * @throws AppError UNAUTHENTICATED without a session, or when it expired;
+   * AUTHENTICATOR_REPLACEMENT_REQUIRED for a session that must replace its authenticator app first.
+   */
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const isPublic = this.reflector.getAllAndOverride<boolean | undefined>(IS_PUBLIC, [
-      context.getHandler(),
-      context.getClass(),
-    ]);
-    if (isPublic === true) {
+    if (this.isMarked(context, IS_PUBLIC)) {
       return true;
     }
     const http = context.switchToHttp();
@@ -32,7 +33,26 @@ export class SessionGuard implements CanActivate {
     if (session === undefined) {
       throw new AppError('UNAUTHENTICATED', 'Sign in first');
     }
-    writeSessionCookie(http.getResponse<Response>(), session);
+    if (session.renewed) {
+      writeSessionCookie(http.getResponse<Response>(), session);
+    }
+    if (
+      session.mustReplaceAuthenticator &&
+      !this.isMarked(context, OPEN_DURING_AUTHENTICATOR_REPLACEMENT)
+    ) {
+      throw new AppError(
+        'AUTHENTICATOR_REPLACEMENT_REQUIRED',
+        'Set up a new authenticator app first',
+      );
+    }
     return true;
+  }
+
+  private isMarked(context: ExecutionContext, metadataKey: string): boolean {
+    const marked = this.reflector.getAllAndOverride<boolean | undefined>(metadataKey, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
+    return marked === true;
   }
 }

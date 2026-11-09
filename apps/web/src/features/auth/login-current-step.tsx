@@ -1,5 +1,4 @@
 import { LoginPasswordStep } from './login-password-step.tsx';
-import { LoginReplaceAuthenticatorStep } from './login-replace-authenticator-step.tsx';
 import { LoginSecondFactorStep } from './login-second-factor-step.tsx';
 import type { LoginFlow } from './use-login-flow.ts';
 
@@ -24,13 +23,6 @@ export function LoginCurrentStep({ flow }: { flow: LoginFlow }) {
           onCredentialsRefused={flow.credentialsRefused}
           onSetupRequired={flow.setupRequired}
           onSignedIn={flow.signedIn}
-        />
-      );
-    case 'replaceAuthenticator':
-      return (
-        <LoginReplaceAuthenticatorStep
-          recoveryCodesLeft={step.recoveryCodesLeft}
-          onDone={flow.enterApp}
         />
       );
   }

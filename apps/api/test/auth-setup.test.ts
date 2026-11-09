@@ -10,10 +10,8 @@ import { SetupService } from '../src/auth/setup.service.ts';
 import { callAuth, errorCode, sessionCookieFrom } from './auth-requests.ts';
 import { totpCode, wrongTotpCode } from './authenticator-app.ts';
 import { type RunningApi, startApi } from './start-api.ts';
+import { TEST_PASSWORD, TEST_SETUP_CODE, TEST_USERNAME } from './test-account.ts';
 import { insertSetupCode, openTestDatabase, resetAuthTables } from './test-database.ts';
-
-const SETUP_CODE = 'K7QD-M2XA-PT4R';
-const PASSWORD = 'correct horse battery staple';
 
 let api: RunningApi;
 let database: Database;
@@ -22,19 +20,19 @@ function post(path: string, body: unknown): Promise<Response> {
   return callAuth(api, 'POST', path, { body });
 }
 
-async function startEnrollment(setupCodeTyped = SETUP_CODE) {
+async function startEnrollment(setupCodeTyped = TEST_SETUP_CODE) {
   const response = await post('/setup/totp-secret', {
     setupCode: setupCodeTyped,
-    username: 'alex',
+    username: TEST_USERNAME,
   });
   return totpEnrollmentSchema.parse(await response.json());
 }
 
 async function createAccount(secret: string, code = totpCode(secret)) {
   return post('/setup', {
-    setupCode: SETUP_CODE,
-    username: 'alex',
-    password: PASSWORD,
+    setupCode: TEST_SETUP_CODE,
+    username: TEST_USERNAME,
+    password: TEST_PASSWORD,
     totpSecret: secret,
     totpCode: code,
   });
@@ -52,7 +50,7 @@ afterAll(async () => {
 
 beforeEach(async () => {
   await resetAuthTables(database);
-  await insertSetupCode(database, SETUP_CODE, new Date(Date.now() + 60 * 60 * 1_000));
+  await insertSetupCode(database, TEST_SETUP_CODE, new Date(Date.now() + 60 * 60 * 1_000));
 });
 
 describe('setup status', () => {
@@ -84,14 +82,17 @@ describe('setup status', () => {
     await api.get(SetupService).issueNewCode();
 
     expect(await database.select().from(setupCode)).toHaveLength(1);
-    const response = await post('/setup/totp-secret', { setupCode: SETUP_CODE, username: 'alex' });
+    const response = await post('/setup/totp-secret', {
+      setupCode: TEST_SETUP_CODE,
+      username: TEST_USERNAME,
+    });
     expect(await errorCode(response)).toBe('INVALID_SETUP_CODE');
   });
 });
 
 describe('setup', () => {
   it('gives a secret for the authenticator app, named after the user', async () => {
-    const enrollment = await startEnrollment(SETUP_CODE.toLowerCase());
+    const enrollment = await startEnrollment(TEST_SETUP_CODE.toLowerCase());
 
     expect(enrollment.otpauthUri).toBe(
       `otpauth://totp/MailBox:alex?secret=${enrollment.secret}&issuer=MailBox`,
@@ -108,7 +109,7 @@ describe('setup', () => {
     expect(new Set(recoveryCodes).size).toBe(10);
     const [created] = await database.select().from(account);
     expect(created).toMatchObject({
-      username: 'alex',
+      username: TEST_USERNAME,
       passwordHash: expect.stringMatching(/^\$argon2id\$/),
     });
     expect(created?.totpSecretEncrypted).not.toContain(secret);
@@ -128,7 +129,7 @@ describe('after the setup', () => {
 
     expect(authStatusSchema.parse(await status.json())).toEqual({
       state: 'signedIn',
-      username: 'alex',
+      username: TEST_USERNAME,
     });
   });
 
@@ -138,7 +139,10 @@ describe('after the setup', () => {
 
     const status = await fetch(`${api.url}/api/auth/status`);
     expect(authStatusSchema.parse(await status.json())).toEqual({ state: 'signedOut' });
-    const again = await post('/setup/totp-secret', { setupCode: SETUP_CODE, username: 'alex' });
+    const again = await post('/setup/totp-secret', {
+      setupCode: TEST_SETUP_CODE,
+      username: TEST_USERNAME,
+    });
     expect(again.status).toBe(409);
     expect(await errorCode(again)).toBe('SETUP_NOT_AVAILABLE');
   });
@@ -162,7 +166,7 @@ describe('refused setups', () => {
   ])('answers 401 INVALID_SETUP_CODE for %s', async (_case, code, expiresAt) => {
     await insertSetupCode(database, 'ABCD-EFGH-IJKL', expiresAt);
 
-    const response = await post('/setup/totp-secret', { setupCode: code, username: 'alex' });
+    const response = await post('/setup/totp-secret', { setupCode: code, username: TEST_USERNAME });
 
     expect(response.status).toBe(401);
     expect(await errorCode(response)).toBe('INVALID_SETUP_CODE');
@@ -180,10 +184,13 @@ describe('refused setups', () => {
 
   it('makes whoever guesses setup codes wait, even once they find the right one', async () => {
     for (let guess = 0; guess < 5; guess += 1) {
-      await post('/setup/totp-secret', { setupCode: 'ZZZZ-ZZZZ-ZZZZ', username: 'alex' });
+      await post('/setup/totp-secret', { setupCode: 'ZZZZ-ZZZZ-ZZZZ', username: TEST_USERNAME });
     }
 
-    const response = await post('/setup/totp-secret', { setupCode: SETUP_CODE, username: 'alex' });
+    const response = await post('/setup/totp-secret', {
+      setupCode: TEST_SETUP_CODE,
+      username: TEST_USERNAME,
+    });
 
     expect(response.status).toBe(429);
     expect(errorResponseSchema.parse(await response.json())).toMatchObject({

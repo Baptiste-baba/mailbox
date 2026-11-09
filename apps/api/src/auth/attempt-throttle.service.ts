@@ -67,10 +67,11 @@ export class AttemptThrottleService {
 
   private async ensureAllowed(kind: AttemptKind, client: string): Promise<void> {
     const ofKind = eq(authAttempt.kind, kind);
-    const waitLeft = Math.max(
-      await this.waitLeft(and(ofKind, eq(authAttempt.client, client)), FREE_FAILURES_PER_DEVICE),
-      await this.waitLeft(ofKind, FREE_FAILURES_OVERALL),
-    );
+    const waits = await Promise.all([
+      this.waitLeft(and(ofKind, eq(authAttempt.client, client)), FREE_FAILURES_PER_DEVICE),
+      this.waitLeft(ofKind, FREE_FAILURES_OVERALL),
+    ]);
+    const waitLeft = Math.max(...waits);
     if (waitLeft > 0) {
       const details: TooManyAttemptsDetails = { retryAfterSeconds: Math.ceil(waitLeft / 1_000) };
       throw new AppError('TOO_MANY_ATTEMPTS', 'Too many failed attempts', { details });

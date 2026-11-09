@@ -1,7 +1,13 @@
 import type { AuthStatus } from '@mailbox/shared';
 import { afterEach, describe, expect, test, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import { fakeApi, serverError, testThread, unauthenticated } from '../../testing/fake-api.ts';
+import {
+  apiError,
+  fakeApi,
+  serverError,
+  testThread,
+  unauthenticated,
+} from '../../testing/fake-api.ts';
 import { renderApp } from '../../testing/render-app.tsx';
 
 const signedOut = (): AuthStatus => ({ state: 'signedOut' });
@@ -90,6 +96,27 @@ describe('when the access was reset on the server', () => {
 
     await expect.element(screen.getByRole('heading', { name: 'Installation' })).toBeVisible();
     expect(router.state.location.pathname).toBe('/setup');
+  });
+});
+
+describe('when the session was opened with a recovery code', () => {
+  test('goes to the new authenticator app once the api refuses everything else', async () => {
+    let refused = false;
+    fakeApi({
+      authStatus: () =>
+        refused
+          ? { state: 'authenticatorReplacementRequired', recoveryCodesLeft: 3 }
+          : { state: 'signedIn', username: 'alex' },
+      threadPages: () => {
+        refused = true;
+        return apiError(403, 'AUTHENTICATOR_REPLACEMENT_REQUIRED')();
+      },
+    });
+
+    const { router } = await renderApp('/all');
+
+    await expect.poll(() => router.state.location.pathname).toBe('/new-authenticator');
+    expect(router.state.location.search).toEqual({ redirect: '/all' });
   });
 });
 

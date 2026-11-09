@@ -40,7 +40,8 @@ export class SetupController {
     @Res({ passthrough: true }) response: Response,
   ): Promise<SetupResponse> {
     const created = await this.setup.createAccount(body, clientAddress(request));
-    writeSessionCookie(response, await this.sessions.start(request.get('user-agent') ?? ''));
+    const session = await this.sessions.start(request.get('user-agent') ?? '', false);
+    writeSessionCookie(response, session);
     return created;
   }
 }
