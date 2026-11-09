@@ -1,0 +1,25 @@
+import { fr } from '../../i18n/fr.ts';
+
+function stepClassName(index: number, current: number): string {
+  if (index === current) {
+    return 'font-semibold text-klein';
+  }
+  return index < current ? 'text-ink2' : 'text-ink3';
+}
+
+/** Where the user is among the steps of the setup: a real sequence, hence the numbers. */
+export function SetupProgress({ current }: { current: number }) {
+  return (
+    <ol aria-label={fr.setup.progressLabel} className="flex flex-wrap gap-x-4 gap-y-1 text-meta">
+      {fr.setup.steps.map((step, index) => (
+        <li
+          key={step}
+          aria-current={index === current ? 'step' : undefined}
+          className={stepClassName(index, current)}
+        >
+          {index + 1}. {step}
+        </li>
+      ))}
+    </ol>
+  );
+}

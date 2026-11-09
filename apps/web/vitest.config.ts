@@ -17,6 +17,9 @@ export default defineProject({
       '@tanstack/react-virtual',
       'lucide-react',
       'zod',
+      '@zxcvbn-ts/core',
+      '@zxcvbn-ts/language-common',
+      '@zxcvbn-ts/language-fr',
     ],
   },
   test: {
