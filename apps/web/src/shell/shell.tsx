@@ -1,6 +1,5 @@
 import { ColumnResizeHandle, ResizableColumn, ResizableColumns, useColumnRef } from '@mailbox/ui';
 import { CatchBoundary, Outlet } from '@tanstack/react-router';
-import { useSignInAgainWhenSessionEnds } from '../features/auth/index.ts';
 import { Sidebar } from './sidebar.tsx';
 import { SidebarCrash } from './sidebar-message.tsx';
 import {
@@ -13,7 +12,6 @@ import {
  * share of the window; dragged narrower than its minimum, it folds to its icons.
  */
 export function Shell() {
-  useSignInAgainWhenSessionEnds();
   const sidebar = useColumnRef();
   const onSidebarResize = useCollapseOnNarrowWindow(sidebar);
   return (

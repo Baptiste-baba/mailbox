@@ -1,6 +1,5 @@
 import type {
   AuthStatus,
-  LoginResponse,
   MailboxList,
   SetupResponse,
   Thread,
@@ -46,22 +45,32 @@ interface FakeApi {
   setupEnrollment?: (body: unknown) => TotpEnrollment | Response;
   setup?: (body: unknown) => SetupResponse | Response;
   /** Answers the sign-in, given the body the app sent. */
-  login?: (body: unknown) => LoginResponse | Response;
+  login?: (body: unknown) => Response;
   /** Answers the requests replacing the authenticator app. */
   authenticatorSecret?: () => TotpEnrollment | Response;
   authenticatorReplacement?: (body: unknown) => Response;
 }
 
+/** An error of the api contract, as the api answers it. */
+export function apiError(status: number, code: string, details?: object) {
+  return () => Response.json({ code, message: code, details }, { status });
+}
+
 /** What the api answers when it fails on its side. */
-export const serverError = () =>
-  Response.json({ code: 'INTERNAL_ERROR', message: 'Internal server error' }, { status: 500 });
+export const serverError = apiError(500, 'INTERNAL_ERROR');
 
 /** What the api answers to a request without a valid session. */
-export const unauthenticated = () =>
-  Response.json({ code: 'UNAUTHENTICATED', message: 'Sign in first' }, { status: 401 });
+export const unauthenticated = apiError(401, 'UNAUTHENTICATED');
 
-const notFound = () =>
-  Response.json({ code: 'THREAD_NOT_FOUND', message: 'Thread not found' }, { status: 404 });
+const notFound = apiError(404, 'THREAD_NOT_FOUND');
+
+const TEST_TOTP_SECRET = 'GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ';
+
+/** A secret for the authenticator app, as the api gives it. */
+export const testEnrollment: TotpEnrollment = {
+  secret: TEST_TOTP_SECRET,
+  otpauthUri: `otpauth://totp/MailBox:alex?secret=${TEST_TOTP_SECRET}&issuer=MailBox`,
+};
 
 const signedIn = (): AuthStatus => ({ state: 'signedIn', username: 'alex' });
 const noThread = (): ThreadPage => ({ threads: [], nextCursor: null });

@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ShellRouteImport } from './routes/_shell'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as NewAuthenticatorRouteImport } from './routes/new-authenticator'
 import { Route as SetupRouteImport } from './routes/setup'
 import { Route as ShellViewRouteRouteImport } from './routes/_shell/$view/route'
 import { Route as ShellViewIndexRouteImport } from './routes/_shell/$view/index'
@@ -29,6 +30,11 @@ const ShellRoute = ShellRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NewAuthenticatorRoute = NewAuthenticatorRouteImport.update({
+  id: '/new-authenticator',
+  path: '/new-authenticator',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SetupRoute = SetupRouteImport.update({
@@ -55,6 +61,7 @@ const ShellViewIdRoute = ShellViewIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/new-authenticator': typeof NewAuthenticatorRoute
   '/setup': typeof SetupRoute
   '/$view': typeof ShellViewRouteRouteWithChildren
   '/$view/$id': typeof ShellViewIdRoute
@@ -63,6 +70,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/new-authenticator': typeof NewAuthenticatorRoute
   '/setup': typeof SetupRoute
   '/$view/$id': typeof ShellViewIdRoute
   '/$view': typeof ShellViewIndexRoute
@@ -72,6 +80,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_shell': typeof ShellRouteWithChildren
   '/login': typeof LoginRoute
+  '/new-authenticator': typeof NewAuthenticatorRoute
   '/setup': typeof SetupRoute
   '/_shell/$view': typeof ShellViewRouteRouteWithChildren
   '/_shell/$view/$id': typeof ShellViewIdRoute
@@ -79,14 +88,22 @@ export interface FileRoutesById {
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/setup' | '/$view' | '/$view/$id' | '/$view/'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/new-authenticator'
+    | '/setup'
+    | '/$view'
+    | '/$view/$id'
+    | '/$view/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/setup' | '/$view/$id' | '/$view'
+  to: '/' | '/login' | '/new-authenticator' | '/setup' | '/$view/$id' | '/$view'
   id:
     | '__root__'
     | '/'
     | '/_shell'
     | '/login'
+    | '/new-authenticator'
     | '/setup'
     | '/_shell/$view'
     | '/_shell/$view/$id'
@@ -97,6 +114,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ShellRoute: typeof ShellRouteWithChildren
   LoginRoute: typeof LoginRoute
+  NewAuthenticatorRoute: typeof NewAuthenticatorRoute
   SetupRoute: typeof SetupRoute
 }
 
@@ -121,6 +139,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/new-authenticator': {
+      id: '/new-authenticator'
+      path: '/new-authenticator'
+      fullPath: '/new-authenticator'
+      preLoaderRoute: typeof NewAuthenticatorRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/setup': {
@@ -182,6 +207,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ShellRoute: ShellRouteWithChildren,
   LoginRoute: LoginRoute,
+  NewAuthenticatorRoute: NewAuthenticatorRoute,
   SetupRoute: SetupRoute,
 }
 export const routeTree = rootRouteImport

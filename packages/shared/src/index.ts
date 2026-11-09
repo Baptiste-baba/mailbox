@@ -1,11 +1,5 @@
 export { type AuthStatus, authStatusSchema } from './auth/auth-status.ts';
-export {
-  type LoginRequest,
-  type LoginResponse,
-  loginRequestSchema,
-  loginResponseSchema,
-  type SecondFactor,
-} from './auth/login.ts';
+export { type LoginRequest, loginRequestSchema, type SecondFactor } from './auth/login.ts';
 export {
   RECOVERY_CODE_COUNT,
   type SetupEnrollmentRequest,

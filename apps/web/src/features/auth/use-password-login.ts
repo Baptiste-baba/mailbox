@@ -3,13 +3,9 @@ import { useState } from 'react';
 import { ApiError } from '../../api/api-error.ts';
 import { fr } from '../../i18n/fr.ts';
 import { authErrorMessage } from './auth-error-message.ts';
+import type { Credentials } from './credentials.ts';
 import { logIn } from './login-requests.ts';
 import { useRetryCountdown } from './use-retry-countdown.ts';
-
-export interface Credentials {
-  username: string;
-  password: string;
-}
 
 export interface PasswordLoginOptions {
   initial: Credentials;

@@ -15,6 +15,13 @@
       "when": 1794162985588,
       "tag": "0001_add_auth_attempt_client",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1794247646303,
+      "tag": "0002_add_session_authenticator_replacement",
+      "breakpoints": true
     }
   ]
 }

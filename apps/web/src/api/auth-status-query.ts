@@ -1,5 +1,5 @@
 import { authStatusSchema } from '@mailbox/shared';
-import { queryOptions } from '@tanstack/react-query';
+import { type QueryClient, queryOptions } from '@tanstack/react-query';
 import { fetchApi } from './fetch-api.ts';
 
 /**
@@ -11,3 +11,8 @@ export const authStatusQuery = queryOptions({
   queryFn: ({ signal }) => fetchApi('/auth/status', authStatusSchema, signal),
   staleTime: Number.POSITIVE_INFINITY,
 });
+
+/** Forgets the status: the next page asks the server again, and goes where the answer leads. */
+export function forgetAuthStatus(queryClient: QueryClient): void {
+  queryClient.removeQueries({ queryKey: authStatusQuery.queryKey });
+}

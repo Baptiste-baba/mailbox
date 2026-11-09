@@ -22,6 +22,13 @@ export interface StartedSession {
   expiresAt: Date;
 }
 
+export interface ResumedSession extends StartedSession {
+  /** Opened with a recovery code, and no new authenticator app set up since. */
+  mustReplaceAuthenticator: boolean;
+  /** Its end was just pushed back: the cookie must follow. */
+  renewed: boolean;
+}
+
 function nextExpiry(): Date {
   return new Date(Date.now() + SESSION_LIFETIME_MS);
 }
@@ -31,7 +38,8 @@ function nextExpiry(): Date {
 export class SessionService {
   constructor(@Inject(DATABASE) private readonly database: Database) {}
 
-  async start(userAgent: string): Promise<StartedSession> {
+  /** @param mustReplaceAuthenticator The session was opened with a recovery code. */
+  async start(userAgent: string, mustReplaceAuthenticator: boolean): Promise<StartedSession> {
     const token = randomBytes(TOKEN_BYTES).toString('base64url');
     const expiresAt = nextExpiry();
     await this.database.delete(session).where(lte(session.expiresAt, new Date()));
@@ -39,6 +47,7 @@ export class SessionService {
       tokenHash: hashToken(token),
       userAgent: userAgent.slice(0, USER_AGENT_MAX_LENGTH),
       expiresAt,
+      mustReplaceAuthenticator,
     });
     return { token, expiresAt };
   }
@@ -47,25 +56,38 @@ export class SessionService {
    * The session of a token, its expiry pushed back when it was last pushed over an hour ago;
    * undefined when it is unknown or expired.
    */
-  async resume(token: string): Promise<StartedSession | undefined> {
+  async resume(token: string): Promise<ResumedSession | undefined> {
     const now = new Date();
     const [found] = await this.database
-      .select({ id: session.id, expiresAt: session.expiresAt })
+      .select({
+        id: session.id,
+        expiresAt: session.expiresAt,
+        mustReplaceAuthenticator: session.mustReplaceAuthenticator,
+      })
       .from(session)
       .where(and(eq(session.tokenHash, hashToken(token)), gt(session.expiresAt, now)))
       .limit(1);
     if (found === undefined) {
       return undefined;
     }
+    const { mustReplaceAuthenticator } = found;
     if (found.expiresAt.getTime() > now.getTime() + SESSION_LIFETIME_MS - RENEWAL_INTERVAL_MS) {
-      return { token, expiresAt: found.expiresAt };
+      return { token, expiresAt: found.expiresAt, mustReplaceAuthenticator, renewed: false };
     }
     const expiresAt = nextExpiry();
     await this.database
       .update(session)
       .set({ lastSeenAt: now, expiresAt })
       .where(eq(session.id, found.id));
-    return { token, expiresAt };
+    return { token, expiresAt, mustReplaceAuthenticator, renewed: true };
+  }
+
+  /** A new authenticator app is set up: the sessions opened with a recovery code are free again. */
+  async endAuthenticatorReplacement(): Promise<void> {
+    await this.database
+      .update(session)
+      .set({ mustReplaceAuthenticator: false })
+      .where(eq(session.mustReplaceAuthenticator, true));
   }
 
   async end(token: string): Promise<void> {

@@ -1,11 +1,5 @@
 import { account, type Database } from '@mailbox/db';
-import {
-  AppError,
-  type AuthStatus,
-  type LoginRequest,
-  type LoginResponse,
-  type SecondFactor,
-} from '@mailbox/shared';
+import { AppError, type AuthStatus, type LoginRequest, type SecondFactor } from '@mailbox/shared';
 import { Inject, Injectable } from '@nestjs/common';
 import { and, eq, isNull, lt, or } from 'drizzle-orm';
 import { DATABASE } from '../database/database.module.ts';
@@ -13,7 +7,7 @@ import { AttemptThrottleService } from './attempt-throttle.service.ts';
 import { verifyPassword } from './password-hash.ts';
 import { RecoveryCodesService } from './recovery-codes.service.ts';
 import { SecretBox } from './secret-box.ts';
-import { SessionService, type StartedSession } from './session.service.ts';
+import { type ResumedSession, SessionService, type StartedSession } from './session.service.ts';
 import { SetupService } from './setup.service.ts';
 import { TotpService } from './totp.service.ts';
 
@@ -21,13 +15,8 @@ type StoredAccount = typeof account.$inferSelect;
 
 export interface StatusResult {
   status: AuthStatus;
-  /** The session of the request, its expiry pushed back: the cookie follows. */
-  renewedSession: StartedSession | undefined;
-}
-
-export interface LoginResult {
-  response: LoginResponse;
-  session: StartedSession;
+  /** The session of the request, if it is valid. */
+  session: ResumedSession | undefined;
 }
 
 // Phones capitalise the first letter of a field: "Alex" and "alex" are the same user.
@@ -53,15 +42,20 @@ export class LoginService {
     if (stored === undefined) {
       // The setup screen asks for the status: a code that expired meanwhile is replaced at once.
       await this.setup.issueCodeIfNeeded();
-      return { status: { state: 'setupRequired' }, renewedSession: undefined };
+      return { status: { state: 'setupRequired' }, session: undefined };
     }
-    const renewedSession =
+    const session =
       sessionToken === undefined ? undefined : await this.sessions.resume(sessionToken);
-    const status: AuthStatus =
-      renewedSession === undefined
-        ? { state: 'signedOut' }
-        : { state: 'signedIn', username: stored.username };
-    return { status, renewedSession };
+    if (session === undefined) {
+      return { status: { state: 'signedOut' }, session };
+    }
+    const status: AuthStatus = session.mustReplaceAuthenticator
+      ? {
+          state: 'authenticatorReplacementRequired',
+          recoveryCodesLeft: await this.recoveryCodes.countLeft(),
+        }
+      : { state: 'signedIn', username: stored.username };
+    return { status, session };
   }
 
   /**
@@ -69,13 +63,15 @@ export class LoginService {
    * @throws AppError SETUP_REQUIRED, INVALID_CREDENTIALS, SECOND_FACTOR_REQUIRED,
    * INVALID_SECOND_FACTOR, TOO_MANY_ATTEMPTS
    */
-  async logIn(request: LoginRequest, client: string, userAgent: string): Promise<LoginResult> {
+  async logIn(request: LoginRequest, client: string, userAgent: string): Promise<StartedSession> {
     const found = await this.findAccount();
     // No account, after a reset for instance: the sign-in screen sends to setup. The status says
     // as much to anyone, so this reveals nothing, and is no failed guess.
     if (found === undefined) {
       throw new AppError('SETUP_REQUIRED', 'No account yet: set it up first');
     }
+    // Checked again at the second step: the sign-in keeps no state between its two requests, at
+    // the cost of a second hash of the password.
     const stored = await this.throttle.attempt('password', client, () =>
       this.checkPassword(request, found),
     );
@@ -87,12 +83,8 @@ export class LoginService {
     await this.throttle.attempt('second_factor', client, () =>
       this.checkSecondFactor(stored, secondFactor),
     );
-    const session = await this.sessions.start(userAgent);
-    const response: LoginResponse = {
-      usedRecoveryCode: secondFactor.kind === 'recoveryCode',
-      recoveryCodesLeft: await this.recoveryCodes.countLeft(),
-    };
-    return { response, session };
+    // A recovery code means the authenticator app is presumed lost: this session may only replace it.
+    return this.sessions.start(userAgent, secondFactor.kind === 'recoveryCode');
   }
 
   private async findAccount(): Promise<StoredAccount | undefined> {

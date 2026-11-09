@@ -123,8 +123,6 @@ export const fr = {
     },
     replaceDone: 'Enregistrer et continuer',
     replaceLoadError: 'Impossible de préparer la nouvelle application d’authentification.',
-    sessionNotKept:
-      'La session n’a pas pu s’ouvrir : ton navigateur refuse peut-être les cookies de ce site.',
   },
   setup: {
     steps: ['Code', 'Compte', 'Application', 'Codes de secours'],

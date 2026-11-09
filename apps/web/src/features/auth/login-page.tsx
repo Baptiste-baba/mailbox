@@ -11,14 +11,13 @@ const route = getRouteApi('/login');
 export function LoginPage() {
   const { redirect, reason } = route.useSearch();
   const flow = useLoginFlow(redirect);
-  const { name } = flow.step;
   return (
     <AuthLayout title={fr.auth.loginTitle}>
-      {reason === 'expired' && name === 'password' && (
+      {reason === 'expired' && flow.step.name === 'password' && (
         <p className="text-ink2">{fr.auth.sessionExpired}</p>
       )}
       <LoginCurrentStep flow={flow} />
-      {name !== 'replaceAuthenticator' && <LostAccess />}
+      <LostAccess />
     </AuthLayout>
   );
 }

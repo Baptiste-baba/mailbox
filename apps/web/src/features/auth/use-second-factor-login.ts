@@ -1,11 +1,12 @@
-import { type LoginResponse, loginRequestSchema } from '@mailbox/shared';
+import { loginRequestSchema } from '@mailbox/shared';
 import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 import { ApiError } from '../../api/api-error.ts';
 import { fr } from '../../i18n/fr.ts';
 import { authErrorMessage } from './auth-error-message.ts';
+import type { Credentials } from './credentials.ts';
 import { logIn } from './login-requests.ts';
-import type { Credentials } from './use-password-login.ts';
+import { useCodeInput } from './use-code-input.ts';
 import { useRetryCountdown } from './use-retry-countdown.ts';
 
 export type SecondFactorKind = 'totp' | 'recoveryCode';
@@ -21,27 +22,19 @@ export interface SecondFactorLoginOptions {
   onCredentialsRefused: () => void;
   /** The access was reset on the server meanwhile: off to setup. */
   onSetupRequired: () => void;
-  onSignedIn: (response: LoginResponse) => void;
+  onSignedIn: () => void;
 }
 
 /** Which second factor the user types, what they typed, and why it is refused, if it is. */
 function useSecondFactorInput() {
   const [kind, setKind] = useState<SecondFactorKind>('totp');
-  const [code, setCode] = useState('');
-  const [codeError, setCodeError] = useState<string>();
+  const input = useCodeInput();
   return {
+    ...input,
     kind,
-    code,
-    codeError,
-    setCodeError,
-    changeCode: (typed: string) => {
-      setCode(typed);
-      setCodeError(undefined);
-    },
     switchKind: () => {
       setKind(kind === 'totp' ? 'recoveryCode' : 'totp');
-      setCode('');
-      setCodeError(undefined);
+      input.clear();
     },
   };
 }

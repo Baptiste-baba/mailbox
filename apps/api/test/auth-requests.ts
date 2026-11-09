@@ -1,4 +1,4 @@
-import { errorResponseSchema } from '@mailbox/shared';
+import { authStatusSchema, errorResponseSchema } from '@mailbox/shared';
 import { SESSION_COOKIE } from '../src/auth/session-cookie.ts';
 import type { RunningApi } from './start-api.ts';
 
@@ -25,6 +25,12 @@ export function callAuth(
     init.body = typeof options.body === 'string' ? options.body : JSON.stringify(options.body);
   }
   return fetch(`${api.url}/api/auth${path}`, init);
+}
+
+/** The authentication status the api gives a session, or nobody without a cookie. */
+export async function authStatusOf(api: RunningApi, cookie?: string) {
+  const response = await callAuth(api, 'GET', '/status', { cookie });
+  return { response, status: authStatusSchema.parse(await response.json()) };
 }
 
 export async function errorCode(response: Response): Promise<string> {

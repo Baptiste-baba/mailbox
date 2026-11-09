@@ -5,8 +5,10 @@ import {
 } from '@mailbox/shared';
 import { Body, Controller, HttpCode, HttpStatus, Post, Put } from '@nestjs/common';
 import { AccountService } from './account.service.ts';
+import { OpenDuringAuthenticatorReplacement } from './authenticator-replacement.decorator.ts';
 
 /** A new authenticator app for the signed-in account. */
+@OpenDuringAuthenticatorReplacement()
 @Controller('auth/totp')
 export class TotpController {
   constructor(private readonly account: AccountService) {}

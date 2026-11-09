@@ -2,17 +2,13 @@ import { setupRequestSchema, type TotpEnrollment } from '@mailbox/shared';
 import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 import { fr } from '../../i18n/fr.ts';
+import type { Credentials } from './credentials.ts';
 import type { PasswordScore } from './password-checker.ts';
 import { startEnrollment } from './setup-requests.ts';
 import { usePasswordScore } from './use-password-score.ts';
 
 /** "Bonne" at least: hard enough to guess even from a stolen copy of the database. */
 export const MIN_PASSWORD_SCORE: PasswordScore = 3;
-
-export interface SetupAccount {
-  username: string;
-  password: string;
-}
 
 interface AccountErrors {
   username?: string;
@@ -21,7 +17,7 @@ interface AccountErrors {
 }
 
 function accountErrors(
-  account: SetupAccount,
+  account: Credentials,
   confirmation: string,
   score: PasswordScore | undefined,
 ): AccountErrors {
@@ -42,10 +38,10 @@ function accountErrors(
 
 export interface SetupAccountFormOptions {
   setupCode: string;
-  initial: SetupAccount;
+  initial: Credentials;
   /** Handles what concerns the whole setup; gives the message to show here, if any. */
   onFailure: (error: unknown) => string | undefined;
-  onDone: (account: SetupAccount, enrollment: TotpEnrollment) => void;
+  onDone: (account: Credentials, enrollment: TotpEnrollment) => void;
 }
 
 /** The values of the account step, their errors, and its submission to the server. */

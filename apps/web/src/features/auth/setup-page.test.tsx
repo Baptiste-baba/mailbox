@@ -1,28 +1,19 @@
-import type { AuthStatus, SetupResponse, TotpEnrollment } from '@mailbox/shared';
+import type { AuthStatus, SetupResponse } from '@mailbox/shared';
 import { afterEach, describe, expect, test, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import { fakeApi } from '../../testing/fake-api.ts';
-import { renderApp } from '../../testing/render-app.tsx';
+import { apiError, fakeApi, testEnrollment } from '../../testing/fake-api.ts';
+import { type AppScreen, renderApp } from '../../testing/render-app.tsx';
 
-const SECRET = 'GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ';
 const STRONG_PASSWORD = 'plume orage vitrail 42 sous la lune';
-const enrollment: TotpEnrollment = {
-  secret: SECRET,
-  otpauthUri: `otpauth://totp/MailBox:alex?secret=${SECRET}&issuer=MailBox`,
-};
 const created: SetupResponse = {
   recoveryCodes: Array.from({ length: 10 }, (_, index) => `ABCD-EFGH-JK${'LMNPQRSTUV'[index]}A`),
 };
-
-function apiError(status: number, code: string) {
-  return () => Response.json({ code, message: code }, { status });
-}
 
 async function openSetup(api: Parameters<typeof fakeApi>[0] = {}) {
   let status: AuthStatus = { state: 'setupRequired' };
   const fetchMock = fakeApi({
     authStatus: () => status,
-    setupEnrollment: () => enrollment,
+    setupEnrollment: () => testEnrollment,
     ...api,
   });
   const rendered = await renderApp('/setup');
@@ -33,14 +24,12 @@ async function openSetup(api: Parameters<typeof fakeApi>[0] = {}) {
   };
 }
 
-type Screen = Awaited<ReturnType<typeof renderApp>>['screen'];
-
-async function enterCode(screen: Screen, code = 'k7qd-m2xa-pt4r') {
+async function enterCode(screen: AppScreen, code = 'k7qd-m2xa-pt4r') {
   await userEvent.fill(screen.getByLabelText('Code d’installation'), code);
   await userEvent.click(screen.getByRole('button', { name: 'Continuer' }));
 }
 
-async function enterAccount(screen: Screen, password = STRONG_PASSWORD) {
+async function enterAccount(screen: AppScreen, password = STRONG_PASSWORD) {
   await userEvent.fill(screen.getByLabelText('Nom d’utilisateur'), 'alex');
   await userEvent.fill(screen.getByLabelText('Mot de passe', { exact: true }), password);
   await userEvent.fill(screen.getByLabelText('Confirme le mot de passe'), password);
@@ -76,7 +65,7 @@ describe('setup, step by step', () => {
       setupCode: 'K7QD-M2XA-PT4R',
       username: 'alex',
       password: STRONG_PASSWORD,
-      totpSecret: SECRET,
+      totpSecret: testEnrollment.secret,
       totpCode: '123456',
     });
   });
