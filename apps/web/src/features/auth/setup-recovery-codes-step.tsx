@@ -2,8 +2,8 @@ import { Button, Checkbox, CopyButton } from '@mailbox/ui';
 import { DownloadIcon } from 'lucide-react';
 import { useState } from 'react';
 import { fr } from '../../i18n/fr.ts';
+import { AuthStepLayout } from './auth-step-layout.tsx';
 import { downloadTextFile } from './download-text-file.ts';
-import { SetupStepLayout } from './setup-step-layout.tsx';
 
 interface SetupRecoveryCodesStepProps {
   username: string;
@@ -20,7 +20,7 @@ export function SetupRecoveryCodesStep({
   const [saved, setSaved] = useState(false);
   const asText = recoveryCodes.join('\n');
   return (
-    <SetupStepLayout
+    <AuthStepLayout
       title={fr.setup.recoveryTitle}
       intro={fr.setup.recoveryIntro}
       onSubmit={onEnter}
@@ -42,8 +42,8 @@ export function SetupRecoveryCodesStep({
         <CopyButton
           text={asText}
           label={fr.setup.copyCodes}
-          copiedLabel={fr.setup.copied}
-          failedLabel={fr.setup.copyFailed}
+          copiedLabel={fr.authenticator.copied}
+          failedLabel={fr.authenticator.copyFailed}
         />
         <Button
           variant="secondary"
@@ -64,6 +64,6 @@ export function SetupRecoveryCodesStep({
         checked={saved}
         onChange={(event) => setSaved(event.target.checked)}
       />
-    </SetupStepLayout>
+    </AuthStepLayout>
   );
 }

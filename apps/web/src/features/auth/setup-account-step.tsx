@@ -1,8 +1,8 @@
 import { Button, PasswordField, TextField } from '@mailbox/ui';
 import { fr } from '../../i18n/fr.ts';
+import { AuthStepLayout } from './auth-step-layout.tsx';
 import type { PasswordScore } from './password-checker.ts';
 import { PasswordStrengthBars } from './password-strength.tsx';
-import { SetupStepLayout } from './setup-step-layout.tsx';
 import {
   MIN_PASSWORD_SCORE,
   type SetupAccountForm,
@@ -24,7 +24,7 @@ interface SetupAccountStepProps extends SetupAccountFormOptions {
 export function SetupAccountStep({ onBack, ...options }: SetupAccountStepProps) {
   const form = useSetupAccountForm(options);
   return (
-    <SetupStepLayout
+    <AuthStepLayout
       title={fr.setup.accountTitle}
       intro={fr.setup.accountIntro}
       onSubmit={form.submit}
@@ -32,16 +32,16 @@ export function SetupAccountStep({ onBack, ...options }: SetupAccountStepProps) 
       actions={
         <>
           <Button variant="primary" size="lg" type="submit" disabled={form.pending}>
-            {fr.setup.continue}
+            {fr.common.continue}
           </Button>
           <Button variant="text" onClick={onBack}>
-            {fr.setup.back}
+            {fr.common.back}
           </Button>
         </>
       }
     >
       <TextField
-        label={fr.setup.usernameLabel}
+        label={fr.auth.usernameLabel}
         error={form.errors.username}
         value={form.values.username}
         onChange={(event) => form.set.username(event.target.value)}
@@ -51,7 +51,7 @@ export function SetupAccountStep({ onBack, ...options }: SetupAccountStepProps) 
         autoFocus
       />
       <NewPasswordFields form={form} />
-    </SetupStepLayout>
+    </AuthStepLayout>
   );
 }
 
@@ -61,8 +61,8 @@ function NewPasswordFields({ form }: { form: SetupAccountForm }) {
   return (
     <>
       <PasswordField
-        label={fr.setup.passwordLabel}
-        revealLabel={fr.setup.revealPassword}
+        label={fr.auth.passwordLabel}
+        revealLabel={fr.auth.revealPassword}
         hint={strengthHint(score)}
         error={form.errors.password}
         value={form.values.password}
@@ -74,7 +74,7 @@ function NewPasswordFields({ form }: { form: SetupAccountForm }) {
       )}
       <PasswordField
         label={fr.setup.confirmLabel}
-        revealLabel={fr.setup.revealPassword}
+        revealLabel={fr.auth.revealPassword}
         error={form.errors.confirmation}
         value={form.values.confirmation}
         onChange={(event) => form.set.confirmation(event.target.value)}

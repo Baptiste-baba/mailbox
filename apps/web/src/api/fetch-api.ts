@@ -6,16 +6,12 @@ import { ServerUnreachableError } from './server-unreachable-error.ts';
 const REQUEST_TIMEOUT_MS = 15_000;
 
 interface ApiRequest {
-  method: 'GET' | 'POST';
+  method: 'GET' | 'POST' | 'PUT';
   body?: unknown;
   signal?: AbortSignal | undefined;
 }
 
-async function requestApi<Schema extends z.ZodType>(
-  path: string,
-  schema: Schema,
-  { method, body, signal }: ApiRequest,
-): Promise<z.output<Schema>> {
+async function requestApi(path: string, { method, body, signal }: ApiRequest): Promise<Response> {
   const timeout = AbortSignal.timeout(REQUEST_TIMEOUT_MS);
   const headers = new Headers({ accept: 'application/json' });
   if (body !== undefined) {
@@ -40,7 +36,7 @@ async function requestApi<Schema extends z.ZodType>(
       ? new ApiError(error.data.code, response.status, error.data.details)
       : new ApiError('INTERNAL_ERROR', response.status);
   }
-  return schema.parse(await response.json());
+  return response;
 }
 
 /**
@@ -48,12 +44,13 @@ async function requestApi<Schema extends z.ZodType>(
  * @throws ApiError when the api answers with an error, ServerUnreachableError when it does not
  * answer.
  */
-export function fetchApi<Schema extends z.ZodType>(
+export async function fetchApi<Schema extends z.ZodType>(
   path: string,
   schema: Schema,
   signal?: AbortSignal,
 ): Promise<z.output<Schema>> {
-  return requestApi(path, schema, { method: 'GET', signal });
+  const response = await requestApi(path, { method: 'GET', signal });
+  return schema.parse(await response.json());
 }
 
 /**
@@ -61,10 +58,20 @@ export function fetchApi<Schema extends z.ZodType>(
  * @throws ApiError when the api answers with an error, ServerUnreachableError when it does not
  * answer.
  */
-export function postApi<Schema extends z.ZodType>(
+export async function postApi<Schema extends z.ZodType>(
   path: string,
   body: unknown,
   schema: Schema,
 ): Promise<z.output<Schema>> {
-  return requestApi(path, schema, { method: 'POST', body });
+  const response = await requestApi(path, { method: 'POST', body });
+  return schema.parse(await response.json());
+}
+
+/**
+ * Sends `body` to `path` as JSON, to replace what is there; the api answers with no content.
+ * @throws ApiError when the api answers with an error, ServerUnreachableError when it does not
+ * answer.
+ */
+export async function putApi(path: string, body: unknown): Promise<void> {
+  await requestApi(path, { method: 'PUT', body });
 }
