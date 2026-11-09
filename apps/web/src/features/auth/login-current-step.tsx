@@ -13,6 +13,7 @@ export function LoginCurrentStep({ flow }: { flow: LoginFlow }) {
           initial={flow.credentials}
           rejection={step.rejection}
           onDone={flow.passwordChecked}
+          onSetupRequired={flow.setupRequired}
         />
       );
     case 'secondFactor':
@@ -21,6 +22,7 @@ export function LoginCurrentStep({ flow }: { flow: LoginFlow }) {
           credentials={flow.credentials}
           onBack={flow.backToPassword}
           onCredentialsRefused={flow.credentialsRefused}
+          onSetupRequired={flow.setupRequired}
           onSignedIn={flow.signedIn}
         />
       );

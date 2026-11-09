@@ -21,7 +21,8 @@ export function useSignInAgainWhenSessionEnds(): void {
         if (!(error instanceof ApiError) || error.code !== 'UNAUTHENTICATED') {
           return;
         }
-        queryClient.setQueryData(authStatusQuery.queryKey, { state: 'signedOut' });
+        // Asked again on the way: after a reset on the server, the answer is the setup, not sign-in.
+        queryClient.removeQueries({ queryKey: authStatusQuery.queryKey });
         void router.navigate({
           to: '/login',
           search: { redirect: router.state.location.href, reason: 'expired' },

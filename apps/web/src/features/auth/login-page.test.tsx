@@ -103,7 +103,29 @@ describe('sign-in, when something is wrong', () => {
 
     await expect.element(screen.getByText(/Code incorrect ou déjà utilisé/)).toBeVisible();
   });
+});
 
+describe('sign-in, when the access was reset on the server', () => {
+  // Regression: a sign-in page open while the access was reset on the server stayed stuck.
+  test('goes to setup when the access was reset on the server meanwhile', async () => {
+    let reset = false;
+    fakeApi({
+      authStatus: () => (reset ? { state: 'setupRequired' } : { state: 'signedOut' }),
+      login: () => {
+        reset = true;
+        return apiError(409, 'SETUP_REQUIRED')();
+      },
+    });
+    const { screen, router } = await renderApp('/login');
+
+    await enterPassword(screen);
+
+    await expect.element(screen.getByRole('heading', { name: 'Installation' })).toBeVisible();
+    expect(router.state.location.pathname).toBe('/setup');
+  });
+});
+
+describe('sign-in, after too many attempts', () => {
   test('counts down the wait after too many attempts, the form closed meanwhile', async () => {
     fakeApi({
       authStatus: () => ({ state: 'signedOut' }),

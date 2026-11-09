@@ -37,6 +37,11 @@ export function useLoginFlow(redirect: string | undefined) {
       }
     },
     credentialsRefused: () => setStep({ name: 'password', rejection: fr.login.invalidCredentials }),
+    /** No account any more, after a reset on the server: off to setup. */
+    setupRequired: () => {
+      queryClient.removeQueries({ queryKey: authStatusQuery.queryKey });
+      void navigate({ to: '/setup' });
+    },
     backToPassword: () => setStep({ name: 'password', rejection: undefined }),
     enterApp,
   };

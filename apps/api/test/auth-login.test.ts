@@ -1,4 +1,4 @@
-import { type Database, session } from '@mailbox/db';
+import { authAttempt, type Database, session } from '@mailbox/db';
 import { errorResponseSchema, loginResponseSchema } from '@mailbox/shared';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { callAuth, errorCode, sessionSetCookie } from './auth-requests.ts';
@@ -130,5 +130,18 @@ describe('sign-in with a recovery code', () => {
     const again = await logIn(recoveryCode);
     expect(again.status).toBe(401);
     expect(await errorCode(again)).toBe('INVALID_SECOND_FACTOR');
+  });
+});
+
+// Regression: after a reset on the server, sign-in answered "wrong password" and never sent to setup.
+describe('sign-in once the access was reset', () => {
+  it('answers 409 SETUP_REQUIRED without counting a failed guess', async () => {
+    await resetAuthTables(database);
+
+    const response = await logIn(withNextCode());
+
+    expect(response.status).toBe(409);
+    expect(await errorCode(response)).toBe('SETUP_REQUIRED');
+    expect(await database.select().from(authAttempt)).toHaveLength(0);
   });
 });
