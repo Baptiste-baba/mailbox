@@ -1,12 +1,9 @@
-import { Button, CopyButton, QrCode, TextField } from '@mailbox/ui';
+import { Button } from '@mailbox/ui';
 import { fr } from '../../i18n/fr.ts';
-import { SetupStepLayout } from './setup-step-layout.tsx';
+import { AuthStepLayout } from './auth-step-layout.tsx';
+import { AuthenticatorEnrollment } from './authenticator-enrollment.tsx';
+import { TotpCodeField } from './totp-code-field.tsx';
 import { type CreateAccountOptions, useCreateAccount } from './use-create-account.ts';
-
-// Groups of four, as authenticator apps show their keys: easier to read and type.
-function groupedSecret(secret: string): string {
-  return secret.match(/.{1,4}/g)?.join(' ') ?? secret;
-}
 
 interface SetupAuthenticatorStepProps extends CreateAccountOptions {
   onBack: () => void;
@@ -16,7 +13,7 @@ interface SetupAuthenticatorStepProps extends CreateAccountOptions {
 export function SetupAuthenticatorStep({ onBack, ...options }: SetupAuthenticatorStepProps) {
   const form = useCreateAccount(options);
   return (
-    <SetupStepLayout
+    <AuthStepLayout
       title={fr.setup.authenticatorTitle}
       intro={fr.setup.authenticatorIntro}
       onSubmit={form.submit}
@@ -27,43 +24,13 @@ export function SetupAuthenticatorStep({ onBack, ...options }: SetupAuthenticato
             {fr.setup.createAccount}
           </Button>
           <Button variant="text" onClick={onBack}>
-            {fr.setup.back}
+            {fr.common.back}
           </Button>
         </>
       }
     >
-      <QrCode value={options.enrollment.otpauthUri} label={fr.setup.qrLabel} className="size-45" />
-      <SecretKey secret={options.enrollment.secret} />
-      <TextField
-        label={fr.setup.totpCodeLabel}
-        error={form.codeError}
-        value={form.code}
-        onChange={(event) => form.changeCode(event.target.value)}
-        inputMode="numeric"
-        autoComplete="one-time-code"
-        maxLength={6}
-        autoFocus
-      />
-    </SetupStepLayout>
-  );
-}
-
-/** The secret in clear, for an app that cannot scan, or a password manager on this computer. */
-function SecretKey({ secret }: { secret: string }) {
-  return (
-    <div className="flex flex-col gap-1.5">
-      <span className="text-meta font-semibold text-ink2">{fr.setup.secretLabel}</span>
-      <div className="flex items-center justify-between gap-3">
-        <code className="font-sans text-base font-medium tracking-wide break-all">
-          {groupedSecret(secret)}
-        </code>
-        <CopyButton
-          text={secret}
-          label={fr.setup.copy}
-          copiedLabel={fr.setup.copied}
-          failedLabel={fr.setup.copyFailed}
-        />
-      </div>
-    </div>
+      <AuthenticatorEnrollment enrollment={options.enrollment} />
+      <TotpCodeField value={form.code} onChange={form.changeCode} error={form.codeError} />
+    </AuthStepLayout>
   );
 }

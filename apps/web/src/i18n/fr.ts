@@ -3,6 +3,8 @@ export const fr = {
   common: {
     comingSoon: 'Bientôt disponible',
     retry: 'Réessayer',
+    continue: 'Continuer',
+    back: 'Retour',
     unreadCount: (count: number) => `${count} non ${count >= 2 ? 'lus' : 'lu'}`,
   },
   dates: {
@@ -70,6 +72,9 @@ export const fr = {
     productName: 'MailBox',
     setupTitle: 'Installation',
     loginTitle: 'Connexion',
+    usernameLabel: 'Nom d’utilisateur',
+    passwordLabel: 'Mot de passe',
+    revealPassword: 'Afficher le mot de passe',
     sessionExpired: 'Ta session a expiré. Reconnecte-toi.',
     tooManyAttempts: (wait: string) => `Trop d’essais. Réessaie dans ${wait}.`,
     waitSeconds: (seconds: number) => `${seconds} s`,
@@ -77,11 +82,53 @@ export const fr = {
     unreachable: 'Impossible de joindre le serveur. Vérifie qu’il est démarré, puis réessaie.',
     unexpected: 'Le serveur a rencontré un problème. Réessaie dans un instant.',
   },
+  authenticator: {
+    qrLabel: 'QR code à scanner avec ton application d’authentification',
+    secretLabel: 'Ou saisis cette clé dans l’application',
+    copy: 'Copier',
+    copied: 'Copié',
+    copyFailed: 'Copie impossible',
+    codeLabel: 'Code à 6 chiffres affiché par l’application',
+    codeFormat: 'Le code a 6 chiffres.',
+    codeRejected:
+      'Code incorrect. Tape le code affiché en ce moment ; s’il est refusé encore, vérifie l’heure de ton téléphone.',
+  },
+  login: {
+    signIn: 'Se connecter',
+    missingCredentials: 'Saisis ton nom d’utilisateur et ton mot de passe.',
+    invalidCredentials: 'Nom d’utilisateur ou mot de passe incorrect.',
+    codeTitle: 'Vérification',
+    codeIntro: 'Tape le code à 6 chiffres affiché par ton application d’authentification.',
+    codeRejected: 'Code incorrect ou déjà utilisé. Attends le code suivant dans ton application.',
+    useRecoveryCode: 'Utiliser un code de secours',
+    recoveryTitle: 'Code de secours',
+    recoveryIntro: 'Tape un de tes codes de secours. Chacun ne sert qu’une fois.',
+    recoveryLabel: 'Code de secours',
+    recoveryFormat: 'Le code a la forme XXXX-XXXX-XXXX.',
+    recoveryRejected: 'Code de secours inconnu ou déjà utilisé.',
+    useAuthenticator: 'Utiliser l’application d’authentification',
+    lostAccess: 'Accès perdu ?',
+    lostAccessHelp:
+      'Sans ton application d’authentification, utilise un de tes codes de secours. Sans eux non plus, réinitialise l’accès depuis le serveur, comme l’explique la documentation de MailBox : tes mails et tes réglages sont conservés.',
+    replaceTitle: 'Nouvelle application d’authentification',
+    replaceIntro:
+      'Tu t’es connecté avec un code de secours : configure une nouvelle application d’authentification pour continuer.',
+    recoveryCodesLeft: (count: number) => {
+      if (count === 0) {
+        return 'Tu n’as plus de code de secours.';
+      }
+      return count === 1
+        ? 'Il te reste un seul code de secours.'
+        : `Il te reste ${count} codes de secours.`;
+    },
+    replaceDone: 'Enregistrer et continuer',
+    replaceLoadError: 'Impossible de préparer la nouvelle application d’authentification.',
+    sessionNotKept:
+      'La session n’a pas pu s’ouvrir : ton navigateur refuse peut-être les cookies de ce site.',
+  },
   setup: {
     steps: ['Code', 'Compte', 'Application', 'Codes de secours'],
     progressLabel: 'Étapes de l’installation',
-    continue: 'Continuer',
-    back: 'Retour',
     codeTitle: 'Code d’installation',
     codeIntro:
       'Ce code prouve que c’est bien toi qui installes MailBox. Le serveur l’affiche dans ses journaux à chaque démarrage.',
@@ -92,10 +139,7 @@ export const fr = {
       'Ce code est inconnu ou a expiré. Redémarre le serveur pour en afficher un nouveau.',
     accountTitle: 'Ton compte',
     accountIntro: 'Tu te connecteras avec ce nom d’utilisateur et ce mot de passe.',
-    usernameLabel: 'Nom d’utilisateur',
     usernameRequired: 'Choisis un nom d’utilisateur.',
-    passwordLabel: 'Mot de passe',
-    revealPassword: 'Afficher le mot de passe',
     passwordTooShort: 'Au moins 12 caractères.',
     passwordTooWeak:
       'Trop facile à deviner. Une phrase de plusieurs mots est plus sûre, et plus facile à retenir.',
@@ -106,15 +150,6 @@ export const fr = {
     authenticatorTitle: 'Application d’authentification',
     authenticatorIntro:
       'Scanne ce QR code avec ton application d’authentification : celle de ton gestionnaire de mots de passe, Google Authenticator ou une autre.',
-    qrLabel: 'QR code à scanner avec ton application d’authentification',
-    secretLabel: 'Ou saisis cette clé dans l’application',
-    copy: 'Copier',
-    copied: 'Copié',
-    copyFailed: 'Copie impossible',
-    totpCodeLabel: 'Code à 6 chiffres affiché par l’application',
-    totpCodeFormat: 'Le code a 6 chiffres.',
-    totpCodeRejected:
-      'Code incorrect. Tape le code affiché en ce moment ; s’il est refusé encore, vérifie l’heure de ton téléphone.',
     createAccount: 'Créer le compte',
     alreadyDone: 'Le compte vient d’être créé, depuis un autre appareil. Connecte-toi.',
     signIn: 'Se connecter',

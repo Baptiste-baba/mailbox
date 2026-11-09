@@ -4,9 +4,8 @@ import { useState } from 'react';
 import { ApiError } from '../../api/api-error.ts';
 import { fr } from '../../i18n/fr.ts';
 import { createAccount } from './setup-requests.ts';
+import { isTotpCode } from './totp-code-field.tsx';
 import type { SetupAccount } from './use-setup-account-form.ts';
-
-const TOTP_CODE = /^\d{6}$/;
 
 export interface CreateAccountOptions {
   setupCode: string;
@@ -26,14 +25,14 @@ export function useCreateAccount(options: CreateAccountOptions) {
   const creation = useMutation({ mutationFn: createAccount });
   const onError = (error: unknown) => {
     if (error instanceof ApiError && error.code === 'INVALID_SECOND_FACTOR') {
-      setCodeError(fr.setup.totpCodeRejected);
+      setCodeError(fr.authenticator.codeRejected);
     } else {
       setFormError(onFailure(error));
     }
   };
   const submit = () => {
-    if (!TOTP_CODE.test(code)) {
-      setCodeError(fr.setup.totpCodeFormat);
+    if (!isTotpCode(code)) {
+      setCodeError(fr.authenticator.codeFormat);
       return;
     }
     setFormError(undefined);
@@ -43,7 +42,7 @@ export function useCreateAccount(options: CreateAccountOptions) {
     );
   };
   const changeCode = (typed: string) => {
-    setCode(typed.trim());
+    setCode(typed);
     setCodeError(undefined);
   };
   return { code, changeCode, codeError, formError, pending: creation.isPending, submit };

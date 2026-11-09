@@ -1,8 +1,8 @@
 import type { FormEvent, ReactNode } from 'react';
 
-interface SetupStepLayoutProps {
-  title: string;
-  intro: string;
+interface AuthStepLayoutProps {
+  title?: string;
+  intro?: string;
   onSubmit: () => void;
   /** Why the step cannot go on, beyond the errors of its fields. */
   error?: string | undefined;
@@ -11,25 +11,27 @@ interface SetupStepLayoutProps {
   children: ReactNode;
 }
 
-/** One step of the setup: a title, what it is for, its fields, then its buttons. */
-export function SetupStepLayout({
+/** One step of setup or sign-in: a title and what it is for, if any, its fields, then its buttons. */
+export function AuthStepLayout({
   title,
   intro,
   onSubmit,
   error,
   actions,
   children,
-}: SetupStepLayoutProps) {
+}: AuthStepLayoutProps) {
   const submit = (event: FormEvent) => {
     event.preventDefault();
     onSubmit();
   };
   return (
     <form noValidate onSubmit={submit} className="flex flex-col gap-6">
-      <div className="flex flex-col gap-1.5">
-        <h2 className="text-heading font-semibold">{title}</h2>
-        <p className="text-ink2">{intro}</p>
-      </div>
+      {(title !== undefined || intro !== undefined) && (
+        <div className="flex flex-col gap-1.5">
+          {title !== undefined && <h2 className="text-heading font-semibold">{title}</h2>}
+          {intro !== undefined && <p className="text-ink2">{intro}</p>}
+        </div>
+      )}
       {children}
       {error !== undefined && (
         <p role="alert" className="text-verm">

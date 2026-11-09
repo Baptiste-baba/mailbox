@@ -2,7 +2,7 @@ import { setupEnrollmentRequestSchema } from '@mailbox/shared';
 import { Button, TextField } from '@mailbox/ui';
 import { useState } from 'react';
 import { fr } from '../../i18n/fr.ts';
-import { SetupStepLayout } from './setup-step-layout.tsx';
+import { AuthStepLayout } from './auth-step-layout.tsx';
 
 interface SetupCodeStepProps {
   initialCode: string;
@@ -24,13 +24,13 @@ export function SetupCodeStep({ initialCode, rejection, onDone }: SetupCodeStepP
     }
   };
   return (
-    <SetupStepLayout
+    <AuthStepLayout
       title={fr.setup.codeTitle}
       intro={fr.setup.codeIntro}
       onSubmit={submit}
       actions={
         <Button variant="primary" size="lg" type="submit">
-          {fr.setup.continue}
+          {fr.common.continue}
         </Button>
       }
     >
@@ -49,6 +49,6 @@ export function SetupCodeStep({ initialCode, rejection, onDone }: SetupCodeStepP
         spellCheck={false}
         autoFocus
       />
-    </SetupStepLayout>
+    </AuthStepLayout>
   );
 }

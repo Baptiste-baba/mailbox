@@ -1,5 +1,6 @@
 import type {
   AuthStatus,
+  LoginResponse,
   MailboxList,
   SetupResponse,
   Thread,
@@ -44,6 +45,11 @@ interface FakeApi {
   /** Answers the setup requests, given the body the app sent. */
   setupEnrollment?: (body: unknown) => TotpEnrollment | Response;
   setup?: (body: unknown) => SetupResponse | Response;
+  /** Answers the sign-in, given the body the app sent. */
+  login?: (body: unknown) => LoginResponse | Response;
+  /** Answers the requests replacing the authenticator app. */
+  authenticatorSecret?: () => TotpEnrollment | Response;
+  authenticatorReplacement?: (body: unknown) => Response;
 }
 
 /** What the api answers when it fails on its side. */
@@ -60,6 +66,10 @@ const notFound = () =>
 const signedIn = (): AuthStatus => ({ state: 'signedIn', username: 'alex' });
 const noThread = (): ThreadPage => ({ threads: [], nextCursor: null });
 
+type FakeRoute = (sent: unknown, url: URL) => object;
+
+const THREAD_PATH = '/api/threads/';
+
 /** Answers the app's requests to the api as the given functions say, and records them. */
 export function fakeApi({
   threadPages = noThread,
@@ -68,30 +78,30 @@ export function fakeApi({
   authStatus = signedIn,
   setupEnrollment = serverError,
   setup = serverError,
+  login = serverError,
+  authenticatorSecret = serverError,
+  authenticatorReplacement = serverError,
 }: FakeApi = {}) {
+  const routes: Record<string, FakeRoute> = {
+    '/api/threads': (_sent, url) => threadPages(url),
+    '/api/mailboxes': () => mailboxes(),
+    '/api/folders': () => ({ folders: [] }),
+    '/api/auth/status': () => authStatus(),
+    '/api/auth/setup/totp-secret': setupEnrollment,
+    '/api/auth/setup': setup,
+    '/api/auth/login': login,
+    '/api/auth/totp/secret': () => authenticatorSecret(),
+    '/api/auth/totp': authenticatorReplacement,
+  };
   const fetchMock = vi.fn(async (input: string, init?: RequestInit) => {
     const url = new URL(input, window.location.origin);
-    const answer = (body: object) => (body instanceof Response ? body : Response.json(body));
     const sent: unknown = typeof init?.body === 'string' ? JSON.parse(init.body) : undefined;
-    if (url.pathname === '/api/auth/setup/totp-secret') {
-      return answer(setupEnrollment(sent));
-    }
-    if (url.pathname === '/api/auth/setup') {
-      return answer(setup(sent));
-    }
-    if (url.pathname === '/api/threads') {
-      return answer(threadPages(url));
-    }
-    if (url.pathname.startsWith('/api/threads/')) {
-      return answer(thread(decodeURIComponent(url.pathname.slice('/api/threads/'.length))));
-    }
-    if (url.pathname === '/api/mailboxes') {
-      return answer(mailboxes());
-    }
-    if (url.pathname === '/api/auth/status') {
-      return answer(authStatus());
-    }
-    return Response.json({ folders: [] });
+    const route = routes[url.pathname];
+    const body =
+      route === undefined
+        ? thread(decodeURIComponent(url.pathname.slice(THREAD_PATH.length)))
+        : route(sent, url);
+    return body instanceof Response ? body : Response.json(body);
   });
   vi.stubGlobal('fetch', fetchMock);
   return fetchMock;
