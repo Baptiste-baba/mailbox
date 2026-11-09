@@ -16,10 +16,12 @@ export interface PasswordLoginOptions {
   /** Why the credentials typed before were refused, if they were. */
   rejection: string | undefined;
   onDone: (credentials: Credentials) => void;
+  onSetupRequired: () => void;
 }
 
 /** The username and password, checked by the server before it asks for the second factor. */
-export function usePasswordLogin({ initial, rejection, onDone }: PasswordLoginOptions) {
+export function usePasswordLogin(options: PasswordLoginOptions) {
+  const { initial, rejection, onDone, onSetupRequired } = options;
   const [username, setUsername] = useState(initial.username);
   const [password, setPassword] = useState(initial.password);
   const [formError, setFormError] = useState(rejection);
@@ -29,6 +31,8 @@ export function usePasswordLogin({ initial, rejection, onDone }: PasswordLoginOp
     // The expected answer: the password is right, the second factor comes next.
     if (error instanceof ApiError && error.code === 'SECOND_FACTOR_REQUIRED') {
       onDone({ username: username.trim(), password });
+    } else if (error instanceof ApiError && error.code === 'SETUP_REQUIRED') {
+      onSetupRequired();
     } else if (!countdown.startFrom(error)) {
       setFormError(
         authErrorMessage(error, {

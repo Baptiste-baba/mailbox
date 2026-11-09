@@ -56,14 +56,44 @@ describe('where the app sends whoever opens it', () => {
 
 describe('when the session ends or the server is out of reach', () => {
   test('asks to sign in again once the api refuses the session, then comes back', async () => {
-    fakeApi({ threadPages: unauthenticated });
+    let sessionEnded = false;
+    fakeApi({
+      authStatus: () =>
+        sessionEnded ? { state: 'signedOut' } : { state: 'signedIn', username: 'alex' },
+      threadPages: () => {
+        sessionEnded = true;
+        return unauthenticated();
+      },
+    });
 
     const { screen, router } = await renderApp('/all');
 
     await expect.element(screen.getByText('Ta session a expiré. Reconnecte-toi.')).toBeVisible();
     expect(router.state.location.search).toEqual({ redirect: '/all', reason: 'expired' });
   });
+});
 
+describe('when the access was reset on the server', () => {
+  // Regression: after a reset on the server, an open tab stayed on sign-in, which always failed.
+  test('sends to setup once the access was reset on the server', async () => {
+    let reset = false;
+    fakeApi({
+      authStatus: () =>
+        reset ? { state: 'setupRequired' } : { state: 'signedIn', username: 'alex' },
+      threadPages: () => {
+        reset = true;
+        return unauthenticated();
+      },
+    });
+
+    const { screen, router } = await renderApp('/inbox');
+
+    await expect.element(screen.getByRole('heading', { name: 'Installation' })).toBeVisible();
+    expect(router.state.location.pathname).toBe('/setup');
+  });
+});
+
+describe('when the server is out of reach', () => {
   test('says the server is out of reach, and tries again on request', async () => {
     let reachable = false;
     fakeApi({

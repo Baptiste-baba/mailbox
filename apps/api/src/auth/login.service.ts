@@ -66,12 +66,18 @@ export class LoginService {
 
   /**
    * @param client Address of the device, slowed down on its own after failures.
-   * @throws AppError INVALID_CREDENTIALS, SECOND_FACTOR_REQUIRED, INVALID_SECOND_FACTOR,
-   * TOO_MANY_ATTEMPTS
+   * @throws AppError SETUP_REQUIRED, INVALID_CREDENTIALS, SECOND_FACTOR_REQUIRED,
+   * INVALID_SECOND_FACTOR, TOO_MANY_ATTEMPTS
    */
   async logIn(request: LoginRequest, client: string, userAgent: string): Promise<LoginResult> {
+    const found = await this.findAccount();
+    // No account, after a reset for instance: the sign-in screen sends to setup. The status says
+    // as much to anyone, so this reveals nothing, and is no failed guess.
+    if (found === undefined) {
+      throw new AppError('SETUP_REQUIRED', 'No account yet: set it up first');
+    }
     const stored = await this.throttle.attempt('password', client, () =>
-      this.checkPassword(request),
+      this.checkPassword(request, found),
     );
     const { secondFactor } = request;
     // Outside the throttled try: asking for the second factor is the normal next step.
@@ -94,11 +100,10 @@ export class LoginService {
     return stored;
   }
 
-  private async checkPassword(request: LoginRequest): Promise<StoredAccount> {
-    const stored = await this.findAccount();
-    if (stored === undefined) {
-      throw new AppError('INVALID_CREDENTIALS', 'Wrong username or password');
-    }
+  private async checkPassword(
+    request: LoginRequest,
+    stored: StoredAccount,
+  ): Promise<StoredAccount> {
     // The username is compared after the hash: the response time does not tell which one was wrong.
     const passwordMatches = await verifyPassword(request.password, stored.passwordHash);
     if (!passwordMatches || !sameUsername(stored.username, request.username)) {

@@ -19,6 +19,8 @@ export interface SecondFactorLoginOptions {
   credentials: Credentials;
   /** The password changed meanwhile: back to the first step. */
   onCredentialsRefused: () => void;
+  /** The access was reset on the server meanwhile: off to setup. */
+  onSetupRequired: () => void;
   onSignedIn: (response: LoginResponse) => void;
 }
 
@@ -46,7 +48,7 @@ function useSecondFactorInput() {
 
 /** The code of the authenticator app, or a recovery code, sent with the password to sign in. */
 export function useSecondFactorLogin(options: SecondFactorLoginOptions) {
-  const { credentials, onCredentialsRefused, onSignedIn } = options;
+  const { credentials, onCredentialsRefused, onSetupRequired, onSignedIn } = options;
   const input = useSecondFactorInput();
   const { kind, code, setCodeError } = input;
   const [formError, setFormError] = useState<string>();
@@ -57,6 +59,8 @@ export function useSecondFactorLogin(options: SecondFactorLoginOptions) {
       setCodeError(messages[kind].rejected);
     } else if (error instanceof ApiError && error.code === 'INVALID_CREDENTIALS') {
       onCredentialsRefused();
+    } else if (error instanceof ApiError && error.code === 'SETUP_REQUIRED') {
+      onSetupRequired();
     } else if (!countdown.startFrom(error)) {
       setFormError(authErrorMessage(error));
     }
