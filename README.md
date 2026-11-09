@@ -36,6 +36,36 @@ only. Put an HTTPS endpoint in front of it, such as `tailscale serve`, to reach 
 Each service has a memory and CPU limit (1.4 GB of memory in total), restarts on its own after a
 failure, and, for the api and the worker, runs without any Linux privilege on a read-only filesystem.
 
+### Creating your account
+
+On its first start, the app asks for a setup code, which only whoever runs the server can read: the
+api writes it to its logs, valid for an hour. Restarting the api (`docker compose restart api`)
+writes a new one.
+
+```bash
+docker compose logs api | grep "setup code"
+```
+
+Then choose a username and a password, set up an authenticator app (the one of your password
+manager, Google Authenticator or any other app showing 6-digit codes) and keep the ten recovery
+codes somewhere safe. Signing in asks for the password and a code of the app; a recovery code works
+once in place of the app, and asks to set up a new one. A session lasts 30 days after its last use.
+
+Sessions only work over HTTPS, such as `tailscale serve` gives, or on `localhost`.
+
+### Lost access
+
+Without the password, or without both the authenticator app and the recovery codes, reset the
+access from the server. This erases the password, the authenticator app, the recovery codes and
+every session, keeps mailboxes and mail, and prints a new setup code:
+
+```bash
+docker compose exec api node dist/reset-auth.js
+```
+
+Changing `MAILBOX_SECRET_KEY` makes the stored authenticator secret unreadable: reset the access
+afterwards.
+
 ### Updating
 
 `MAILBOX_VERSION` chooses what to run: `main` follows every validated change, a version number such
