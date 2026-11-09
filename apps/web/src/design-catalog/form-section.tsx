@@ -1,4 +1,4 @@
-import { Checkbox, PasswordField, QrCode, TextField } from '@mailbox/ui';
+import { Checkbox, CopyButton, PasswordField, QrCode, TextField } from '@mailbox/ui';
 import { CatalogSection, SampleName } from './catalog-section.tsx';
 
 const SAMPLE_LINK =
@@ -24,6 +24,15 @@ export function FormSection() {
         <Checkbox label="Case cochée" defaultChecked />
         <Checkbox label="Case désactivée" disabled />
         <SampleName name="Checkbox" />
+      </div>
+      <div className="flex flex-col items-start gap-2">
+        <CopyButton
+          text="GEZD GNBV GY3T QOJQ"
+          label="Copier"
+          copiedLabel="Copié"
+          failedLabel="Copie impossible"
+        />
+        <SampleName name="CopyButton : dit « Copié » un instant après la copie" />
       </div>
       <div className="flex flex-col gap-2">
         <QrCode value={SAMPLE_LINK} label="QR code d'exemple" className="size-45" />
