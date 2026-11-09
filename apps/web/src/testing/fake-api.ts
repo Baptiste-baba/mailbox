@@ -1,4 +1,4 @@
-import type { MailboxList, Thread, ThreadPage, ThreadSummary } from '@mailbox/shared';
+import type { AuthStatus, MailboxList, Thread, ThreadPage, ThreadSummary } from '@mailbox/shared';
 import { vi } from 'vitest';
 
 export const testMailboxes: MailboxList = {
@@ -29,24 +29,33 @@ export function testThread(id: string, unread: boolean): ThreadSummary {
 }
 
 interface FakeApi {
-  threadPages: (url: URL) => ThreadPage | Response;
+  threadPages?: (url: URL) => ThreadPage | Response;
   thread?: (threadId: string) => Thread | Response;
   mailboxes?: () => MailboxList | Response;
+  authStatus?: () => AuthStatus | Response;
 }
 
 /** What the api answers when it fails on its side. */
 export const serverError = () =>
   Response.json({ code: 'INTERNAL_ERROR', message: 'Internal server error' }, { status: 500 });
 
+/** What the api answers to a request without a valid session. */
+export const unauthenticated = () =>
+  Response.json({ code: 'UNAUTHENTICATED', message: 'Sign in first' }, { status: 401 });
+
 const notFound = () =>
   Response.json({ code: 'THREAD_NOT_FOUND', message: 'Thread not found' }, { status: 404 });
 
+const signedIn = (): AuthStatus => ({ state: 'signedIn', username: 'alex' });
+const noThread = (): ThreadPage => ({ threads: [], nextCursor: null });
+
 /** Answers the app's requests to the api as the given functions say, and records them. */
 export function fakeApi({
-  threadPages,
+  threadPages = noThread,
   thread = notFound,
   mailboxes = () => testMailboxes,
-}: FakeApi) {
+  authStatus = signedIn,
+}: FakeApi = {}) {
   const fetchMock = vi.fn(async (input: string) => {
     const url = new URL(input, window.location.origin);
     const answer = (body: object) => (body instanceof Response ? body : Response.json(body));
@@ -58,6 +67,9 @@ export function fakeApi({
     }
     if (url.pathname === '/api/mailboxes') {
       return answer(mailboxes());
+    }
+    if (url.pathname === '/api/auth/status') {
+      return answer(authStatus());
     }
     return Response.json({ folders: [] });
   });
