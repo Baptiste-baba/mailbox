@@ -14,10 +14,9 @@ const variants: { variant: ButtonVariant; label: string }[] = [
 ];
 
 const sizes: { size: ButtonSize; height: string }[] = [
-  { size: 'lg', height: '34 px' },
-  { size: 'md', height: '28 px' },
-  { size: 'sm', height: '26 px' },
-  { size: 'xs', height: '22 px' },
+  { size: 'lg', height: '48 px' },
+  { size: 'md', height: '40 px' },
+  { size: 'sm', height: '32 px' },
 ];
 
 export function ButtonSection() {

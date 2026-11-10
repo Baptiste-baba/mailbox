@@ -4,28 +4,27 @@ import { pressableClassNames } from '../pressable-class-names.ts';
 import { Kbd } from './kbd.tsx';
 
 type ButtonVariant = 'primary' | 'secondary' | 'text' | 'neutralText';
-type ButtonSize = 'lg' | 'md' | 'sm' | 'xs';
+type ButtonSize = 'lg' | 'md' | 'sm';
 
-// Hover states reuse the colour tokens.
+// Hover states reuse the colour tokens. The border of `secondary` is drawn within its height, so every
+// variant of a size lines up.
 const variantClassNames: Record<ButtonVariant, string> = {
-  primary: 'bg-primary font-semibold text-on-primary enabled:hover:bg-primary-hover',
-  secondary: 'border border-line bg-surface font-medium text-ink enabled:hover:bg-field',
-  text: 'font-medium text-link enabled:hover:bg-field',
-  neutralText: 'font-medium text-ink enabled:hover:bg-field',
+  primary: 'bg-primary text-on-primary enabled:hover:bg-primary-hover',
+  secondary: 'border border-line bg-surface text-ink enabled:hover:bg-field',
+  text: 'text-link enabled:hover:bg-field',
+  neutralText: 'text-ink enabled:hover:bg-field',
 };
 
 const sizeClassNames: Record<ButtonSize, string> = {
-  lg: 'h-8.5 rounded-md',
-  md: 'h-7 rounded-md',
-  sm: 'h-6.5 rounded-md',
-  xs: 'h-5.5 rounded-md',
+  lg: 'h-12 text-body [&>svg]:icon-18',
+  md: 'h-10 text-base [&>svg]:icon-18',
+  sm: 'h-8 text-small [&>svg]:icon-16',
 };
 
+const paddingClassNames: Record<ButtonSize, string> = { lg: 'px-5', md: 'px-4', sm: 'px-3' };
+
 function paddingClassName(variant: ButtonVariant, size: ButtonSize): string {
-  if (variant === 'text' || variant === 'neutralText') {
-    return 'px-1.5';
-  }
-  return size === 'lg' ? 'px-4' : 'px-3';
+  return variant === 'text' || variant === 'neutralText' ? 'px-2' : paddingClassNames[size];
 }
 
 interface ButtonProps extends ComponentProps<'button'> {
@@ -52,7 +51,7 @@ export function Button({
     <button
       type={type}
       className={joinClassNames(
-        'inline-flex flex-none items-center justify-center gap-1.75 whitespace-nowrap text-base touch:h-11 [&>svg]:icon-14',
+        'inline-flex flex-none items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium touch:min-h-11',
         pressableClassNames,
         variantClassNames[variant],
         sizeClassNames[size],

@@ -19,12 +19,7 @@ export function PasswordField({ revealLabel, ...props }: PasswordFieldProps) {
       autoCorrect="off"
       spellCheck={false}
       trailing={
-        <IconButton
-          label={revealLabel}
-          pressed={revealed}
-          onClick={() => setRevealed(!revealed)}
-          className="h-6 w-6.5"
-        >
+        <IconButton label={revealLabel} pressed={revealed} onClick={() => setRevealed(!revealed)}>
           {revealed ? <EyeOffIcon /> : <EyeIcon />}
         </IconButton>
       }
