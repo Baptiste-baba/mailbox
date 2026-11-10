@@ -28,7 +28,11 @@
   /* Keyboard focus. */
   --ring: #3640ff;
   --danger: #b91c1c;
+  /* Behind danger text: an error, or a button whose action cannot be undone. */
   --danger-tint: #fef2f2;
+  --danger-tint-hover: #fee2e2;
+  /* Over the page, behind a dialog. */
+  --scrim: rgba(15, 23, 42, 0.4);
   /* Something to do, such as reconnecting a mailbox. */
   --warn: #b45309;
   --warn-tint: #fef3c7;
@@ -66,6 +70,8 @@
   --ring: #929bff;
   --danger: #f87171;
   --danger-tint: #3b1219;
+  --danger-tint-hover: #4a1620;
+  --scrim: rgba(0, 0, 0, 0.6);
   --warn: #fbbf24;
   --warn-tint: #3a2a0b;
   --success: #4ade80;
@@ -98,6 +104,8 @@
   --color-ring: var(--ring);
   --color-danger: var(--danger);
   --color-danger-tint: var(--danger-tint);
+  --color-danger-tint-hover: var(--danger-tint-hover);
+  --color-scrim: var(--scrim);
   --color-warn: var(--warn);
   --color-warn-tint: var(--warn-tint);
   --color-success: var(--success);

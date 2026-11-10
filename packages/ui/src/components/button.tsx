@@ -3,7 +3,7 @@ import { joinClassNames } from '../join-class-names.ts';
 import { pressableClassNames } from '../pressable-class-names.ts';
 import { Kbd } from './kbd.tsx';
 
-type ButtonVariant = 'primary' | 'secondary' | 'text';
+type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'text';
 type ButtonSize = 'lg' | 'field' | 'md' | 'sm';
 
 // Hover states reuse the colour tokens. The border of `secondary` is drawn within its height, so every
@@ -11,6 +11,8 @@ type ButtonSize = 'lg' | 'field' | 'md' | 'sm';
 const variantClassNames: Record<ButtonVariant, string> = {
   primary: 'bg-primary text-on-primary available:hover:bg-primary-hover',
   secondary: 'border border-line bg-surface text-ink available:hover:bg-field',
+  // An action that cannot be undone, such as removing: never the default one.
+  danger: 'bg-danger-tint text-danger available:hover:bg-danger-tint-hover',
   text: 'text-link available:hover:bg-field',
 };
 

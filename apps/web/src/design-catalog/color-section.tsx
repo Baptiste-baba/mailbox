@@ -10,6 +10,7 @@ const colorGroups = [
       { token: 'surface', className: 'bg-surface' },
       { token: 'field', className: 'bg-field' },
       { token: 'tint', className: 'bg-tint' },
+      { token: 'scrim', className: 'bg-scrim' },
     ],
   },
   {
@@ -40,6 +41,7 @@ const colorGroups = [
     swatches: [
       { token: 'danger', className: 'bg-danger' },
       { token: 'danger-tint', className: 'bg-danger-tint' },
+      { token: 'danger-tint-hover', className: 'bg-danger-tint-hover' },
     ],
   },
   {
