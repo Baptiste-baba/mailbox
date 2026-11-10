@@ -1,6 +1,19 @@
 export { type AuthStatus, authStatusSchema } from './auth/auth-status.ts';
 export { MIN_PASSWORD_LENGTH } from './auth/credentials.ts';
+export {
+  type IdentityConfirmation,
+  identityConfirmationSchema,
+} from './auth/identity-confirmation.ts';
 export { type LoginRequest, loginRequestSchema, type SecondFactor } from './auth/login.ts';
+export {
+  type PasskeyList,
+  type PasskeyLoginRequest,
+  type PasskeyRegistration,
+  type PasskeySummary,
+  passkeyListSchema,
+  passkeyLoginRequestSchema,
+  passkeyRegistrationSchema,
+} from './auth/passkeys.ts';
 export {
   RECOVERY_CODE_COUNT,
   type SetupEnrollmentRequest,
@@ -16,6 +29,13 @@ export {
   totpConfirmationSchema,
   totpEnrollmentSchema,
 } from './auth/totp-enrollment.ts';
+export {
+  type PasskeyAuthenticationResponse,
+  type PasskeyCreationOptions,
+  type PasskeyRequestOptions,
+  passkeyCreationOptionsSchema,
+  passkeyRequestOptionsSchema,
+} from './auth/webauthn.ts';
 export { AppError } from './errors/app-error.ts';
 export { type ErrorCode, errorCodeSchema } from './errors/error-code.ts';
 export { type ErrorResponse, errorResponseSchema } from './errors/error-response.ts';
