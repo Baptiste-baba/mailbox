@@ -2,6 +2,7 @@ import { existsSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { databaseUrlSchema, logLevelSchema, portSchema } from '@mailbox/config';
 import * as z from 'zod';
+import { appUrlSchema } from './app-url.ts';
 import { trustedProxiesSchema } from './trusted-proxies.ts';
 
 const webDirectorySchema = z
@@ -25,6 +26,7 @@ const apiEnvironmentSchema = z
   .object({
     DATABASE_URL: databaseUrlSchema,
     MAILBOX_SECRET_KEY: secretKeySchema,
+    MAILBOX_URL: appUrlSchema,
     API_HOST: z.string().min(1).default('127.0.0.1'),
     API_PORT: portSchema.default(3000),
     // Unset in development, where Vite serves the web app itself.
@@ -36,6 +38,7 @@ const apiEnvironmentSchema = z
   .transform((environment) => ({
     databaseUrl: environment.DATABASE_URL,
     secretKey: environment.MAILBOX_SECRET_KEY,
+    appUrl: environment.MAILBOX_URL,
     host: environment.API_HOST,
     port: environment.API_PORT,
     webDirectory: environment.WEB_DIRECTORY,
