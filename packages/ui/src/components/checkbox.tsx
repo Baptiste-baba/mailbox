@@ -12,13 +12,13 @@ export function Checkbox({ label, className, ...inputProps }: CheckboxProps) {
   return (
     <label
       className={joinClassNames(
-        'inline-flex items-start gap-2 text-base text-ink has-disabled:cursor-not-allowed has-disabled:opacity-55 touch:min-h-11 touch:items-center',
+        'inline-flex items-start gap-2.5 text-base text-ink has-disabled:cursor-not-allowed has-disabled:opacity-55 touch:min-h-11 touch:items-center',
         className,
       )}
     >
       <input
         type="checkbox"
-        className="mt-px size-4 flex-none accent-primary disabled:cursor-not-allowed touch:mt-0 touch:size-5"
+        className="mt-0.5 size-4.5 flex-none accent-primary disabled:cursor-not-allowed touch:mt-0 touch:size-5"
         {...inputProps}
       />
       <span>{label}</span>

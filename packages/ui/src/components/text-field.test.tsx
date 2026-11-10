@@ -13,6 +13,14 @@ describe('TextField', () => {
     await expect.element(field).toHaveValue('alex');
   });
 
+  test('focuses when its label, written inside the field, is clicked', async () => {
+    const screen = await render(<TextField label="Nom d'utilisateur" />);
+
+    await userEvent.click(screen.getByText("Nom d'utilisateur"));
+
+    await expect.element(screen.getByRole('textbox', { name: "Nom d'utilisateur" })).toHaveFocus();
+  });
+
   test('is described by its hint', async () => {
     const screen = await render(
       <TextField label="Code" hint="Il est dans les journaux du serveur." />,

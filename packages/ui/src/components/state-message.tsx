@@ -26,7 +26,7 @@ export function StateMessage({ message, action, layout = 'block', className }: S
       {action !== undefined && (
         <Button
           variant={block ? 'secondary' : 'text'}
-          size={block ? 'sm' : 'xs'}
+          size={block ? 'md' : 'sm'}
           onClick={action.onClick}
         >
           {action.label}
