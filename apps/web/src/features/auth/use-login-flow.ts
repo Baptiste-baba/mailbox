@@ -3,9 +3,7 @@ import { fr } from '../../i18n/fr.ts';
 import type { Credentials } from './credentials.ts';
 import { useContinueTo } from './use-continue-to.ts';
 
-export type LoginStep =
-  | { name: 'password'; rejection: string | undefined }
-  | { name: 'secondFactor' };
+type LoginStep = { name: 'password'; rejection: string | undefined } | { name: 'secondFactor' };
 
 /** Where the sign-in stands, and how each step hands over to the next. */
 export function useLoginFlow(redirect: string | undefined) {

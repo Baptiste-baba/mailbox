@@ -9,7 +9,7 @@ import { logIn } from './login-requests.ts';
 import { useCodeInput } from './use-code-input.ts';
 import { useRetryCountdown } from './use-retry-countdown.ts';
 
-export type SecondFactorKind = 'totp' | 'recoveryCode';
+type SecondFactorKind = 'totp' | 'recoveryCode';
 
 const messages: Record<SecondFactorKind, { format: string; rejected: string }> = {
   totp: { format: fr.authenticator.codeFormat, rejected: fr.login.codeRejected },
