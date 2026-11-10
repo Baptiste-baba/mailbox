@@ -6,6 +6,7 @@ import { mailboxesQuery } from '../../api/mailboxes-query.ts';
 import { threadQuery } from '../../api/thread-query.ts';
 import { fr } from '../../i18n/fr.ts';
 import { ReplyBar } from './reply-bar.tsx';
+import { ThreadFrame } from './thread-frame.tsx';
 import { ThreadHeader } from './thread-header.tsx';
 import { ThreadMessages } from './thread-messages.tsx';
 import { ThreadMessage, ThreadSkeleton } from './thread-states.tsx';
@@ -44,23 +45,17 @@ function OpenThread({ thread }: { thread: Thread }) {
   );
   const latestMessage = thread.messages.at(-1);
   return (
-    <>
+    <ThreadFrame>
       <ThreadToolbar />
       <div className="min-h-0 flex-1 overflow-y-auto overscroll-none">
-        {/* At least as tall as the pane, so that the open message can stretch to its bottom. */}
-        <article className="flex min-h-full flex-col gap-5.5 px-10 pt-7 pb-6">
+        <article className="flex flex-col gap-6 px-9 py-7">
           <ThreadHeader thread={thread} mailbox={mailbox} />
-          <ThreadMessages
-            thread={thread}
-            ownAddress={mailbox?.address}
-            reply={
-              latestMessage !== undefined && (
-                <ReplyBar latestMessage={latestMessage} ownAddress={mailbox?.address} />
-              )
-            }
-          />
+          <ThreadMessages thread={thread} ownAddress={mailbox?.address} />
         </article>
       </div>
-    </>
+      {latestMessage !== undefined && (
+        <ReplyBar latestMessage={latestMessage} ownAddress={mailbox?.address} />
+      )}
+    </ThreadFrame>
   );
 }

@@ -11,14 +11,14 @@ interface ThreadHeaderProps {
 /** Subject of the thread, who takes part in it and the mailbox it is in. */
 export function ThreadHeader({ thread, mailbox }: ThreadHeaderProps) {
   return (
-    <header className="flex flex-col gap-2">
+    <header className="flex flex-col gap-2.5">
       <h2 className="text-subject font-semibold break-words">
         {thread.subject || fr.inbox.noSubject}
       </h2>
-      <div className="flex flex-wrap items-center gap-x-3.5 gap-y-1 text-caption text-ink-2">
+      <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-small text-ink-2">
         <span>{participantsLine(thread.messages, mailbox?.address)}</span>
         {mailbox !== undefined && (
-          <span className="flex items-center gap-1.25" title={mailbox.address}>
+          <span className="flex items-center gap-2.5" title={mailbox.address}>
             <Swatch color={mailbox.color} shape="circle" small />
             {mailbox.name}
           </span>

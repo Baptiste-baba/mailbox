@@ -56,6 +56,7 @@ export const fr = {
     move: 'Ranger',
     reply: 'Répondre',
     replyTo: (names: string) => `Répondre à ${names}`,
+    send: 'Envoyer',
     messagesLabel: 'Messages du fil',
     me: 'Toi',
     meInSentence: 'toi',

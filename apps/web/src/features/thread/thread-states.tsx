@@ -1,15 +1,18 @@
-import { Card, Skeleton, StateMessage } from '@mailbox/ui';
+import { Skeleton, StateMessage } from '@mailbox/ui';
 import type { ErrorComponentProps } from '@tanstack/react-router';
 import { fr } from '../../i18n/fr.ts';
+import { ThreadFrame } from './thread-frame.tsx';
 
-/** Why the thread pane shows no thread, centred in it, with what to do about it. */
+/** Why the thread pane shows no thread, centred in its card, with what to do about it. */
 export function ThreadMessage({ message, onRetry }: { message: string; onRetry?: () => void }) {
   return (
-    <StateMessage
-      message={message}
-      action={onRetry === undefined ? undefined : { label: fr.common.retry, onClick: onRetry }}
-      className="flex-1 justify-center px-10"
-    />
+    <ThreadFrame>
+      <StateMessage
+        message={message}
+        action={onRetry === undefined ? undefined : { label: fr.common.retry, onClick: onRetry }}
+        className="flex-1 justify-center px-10"
+      />
+    </ThreadFrame>
   );
 }
 
@@ -26,18 +29,22 @@ export function ThreadCrash({ reset }: ErrorComponentProps) {
 /** The shape of a thread while it loads. */
 export function ThreadSkeleton() {
   return (
-    <div aria-hidden="true" className="flex flex-col gap-5.5 px-10 pt-20">
-      <Skeleton className="h-6 w-3/5" />
-      <Skeleton className="h-3 w-2/5" />
-      <Card className="flex gap-3 px-4 py-4.5">
-        <Skeleton className="size-7.5 flex-none rounded-full" />
-        <div className="flex flex-1 flex-col gap-2.5 pt-1">
-          <Skeleton className="h-3 w-1/4" />
-          <Skeleton className="h-3 w-full" />
-          <Skeleton className="h-3 w-5/6" />
-          <Skeleton className="h-3 w-2/3" />
+    <ThreadFrame>
+      <div aria-hidden="true" className="flex flex-col gap-6 px-9 pt-22">
+        <div className="flex flex-col gap-3">
+          <Skeleton className="h-6 w-3/5" />
+          <Skeleton className="h-3.5 w-2/5" />
         </div>
-      </Card>
-    </div>
+        <div className="flex gap-3.5 rounded-lg border border-line px-4.5 py-5">
+          <Skeleton className="size-9 flex-none rounded-full" />
+          <div className="flex flex-1 flex-col gap-3 pt-1">
+            <Skeleton className="h-3.5 w-1/4" />
+            <Skeleton className="h-3.5 w-full" />
+            <Skeleton className="h-3.5 w-5/6" />
+            <Skeleton className="h-3.5 w-2/3" />
+          </div>
+        </div>
+      </div>
+    </ThreadFrame>
   );
 }

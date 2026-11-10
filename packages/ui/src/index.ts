@@ -11,7 +11,6 @@ export { Kbd } from './components/kbd.tsx';
 export { Meter } from './components/meter.tsx';
 export { NavGroup, NavGroupAction } from './components/nav-group.tsx';
 export { NavItem } from './components/nav-item.tsx';
-export { PaneHeader } from './components/pane-header.tsx';
 export { PasswordField } from './components/password-field.tsx';
 export { QrCode } from './components/qr-code.tsx';
 export {
