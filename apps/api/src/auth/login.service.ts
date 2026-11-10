@@ -1,17 +1,11 @@
-import { account, type Database } from '@mailbox/db';
 import { AppError, type AuthStatus, type LoginRequest, type SecondFactor } from '@mailbox/shared';
-import { Inject, Injectable } from '@nestjs/common';
-import { and, eq, isNull, lt, or } from 'drizzle-orm';
-import { DATABASE } from '../database/database.module.ts';
+import { Injectable } from '@nestjs/common';
+import { AccountCredentialsService, type StoredAccount } from './account-credentials.service.ts';
 import { AttemptThrottleService } from './attempt-throttle.service.ts';
 import { verifyPassword } from './password-hash.ts';
 import { RecoveryCodesService } from './recovery-codes.service.ts';
-import { SecretBox } from './secret-box.ts';
 import { type ResumedSession, SessionService, type StartedSession } from './session.service.ts';
 import { SetupService } from './setup.service.ts';
-import { TotpService } from './totp.service.ts';
-
-type StoredAccount = typeof account.$inferSelect;
 
 export interface StatusResult {
   status: AuthStatus;
@@ -28,17 +22,15 @@ function sameUsername(stored: string, typed: string): boolean {
 @Injectable()
 export class LoginService {
   constructor(
-    @Inject(DATABASE) private readonly database: Database,
+    private readonly credentials: AccountCredentialsService,
     private readonly setup: SetupService,
     private readonly throttle: AttemptThrottleService,
     private readonly sessions: SessionService,
-    private readonly totp: TotpService,
-    private readonly secretBox: SecretBox,
     private readonly recoveryCodes: RecoveryCodesService,
   ) {}
 
   async status(sessionToken: string | undefined): Promise<StatusResult> {
-    const stored = await this.findAccount();
+    const stored = await this.credentials.find();
     if (stored === undefined) {
       // The setup screen asks for the status: a code that expired meanwhile is replaced at once.
       await this.setup.issueCodeIfNeeded();
@@ -64,7 +56,7 @@ export class LoginService {
    * INVALID_SECOND_FACTOR, TOO_MANY_ATTEMPTS
    */
   async logIn(request: LoginRequest, client: string, userAgent: string): Promise<StartedSession> {
-    const found = await this.findAccount();
+    const found = await this.credentials.find();
     // No account, after a reset for instance: the sign-in screen sends to setup. The status says
     // as much to anyone, so this reveals nothing, and is no failed guess.
     if (found === undefined) {
@@ -87,11 +79,6 @@ export class LoginService {
     return this.sessions.start(userAgent, secondFactor.kind === 'recoveryCode');
   }
 
-  private async findAccount(): Promise<StoredAccount | undefined> {
-    const [stored] = await this.database.select().from(account).limit(1);
-    return stored;
-  }
-
   private async checkPassword(
     request: LoginRequest,
     stored: StoredAccount,
@@ -111,26 +98,6 @@ export class LoginService {
       }
       return;
     }
-    const secret = this.secretBox.open(stored.totpSecretEncrypted);
-    const step = this.totp.matchingStep(secret, secondFactor.code);
-    if (step === undefined || !(await this.claimTotpStep(step))) {
-      throw new AppError('INVALID_SECOND_FACTOR', 'Wrong or already used code');
-    }
-  }
-
-  // A code works once: its time step must come after the last one accepted. One statement, so that
-  // two requests racing with the same code cannot both pass.
-  private async claimTotpStep(step: number): Promise<boolean> {
-    const claimed = await this.database
-      .update(account)
-      .set({ totpLastUsedStep: step })
-      .where(
-        and(
-          eq(account.id, 1),
-          or(isNull(account.totpLastUsedStep), lt(account.totpLastUsedStep, step)),
-        ),
-      )
-      .returning({ id: account.id });
-    return claimed.length > 0;
+    await this.credentials.checkTotpCode(stored, secondFactor.code);
   }
 }

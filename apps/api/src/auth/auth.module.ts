@@ -2,6 +2,7 @@ import { type DynamicModule, Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import type { AppUrl } from '../config/app-url.ts';
 import { AccountService } from './account.service.ts';
+import { AccountCredentialsService } from './account-credentials.service.ts';
 import { AttemptThrottleService } from './attempt-throttle.service.ts';
 import { AuthController } from './auth.controller.ts';
 import { IdentityConfirmationController } from './identity-confirmation.controller.ts';
@@ -42,6 +43,7 @@ export function createAuthModule(secretKey: Buffer, appUrl: AppUrl): DynamicModu
       TotpController,
     ],
     providers: [
+      AccountCredentialsService,
       AccountService,
       AttemptThrottleService,
       IdentityConfirmationService,
