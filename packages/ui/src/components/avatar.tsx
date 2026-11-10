@@ -10,19 +10,29 @@ const toneClassNames: Record<AvatarTone, string> = {
   danger: 'bg-danger-tint text-danger',
 };
 
+type AvatarSize = 'md' | 'sm';
+
+const sizeClassNames: Record<AvatarSize, string> = {
+  md: 'size-10 text-small',
+  sm: 'size-9 text-caption',
+};
+
 type AvatarProps = {
   tone?: AvatarTone;
+  /** `md` in a list, `sm` in a thread. */
+  size?: AvatarSize;
   className?: string;
 } & ({ name: string } | { icon: ReactNode });
 
 /** A round badge before a person or an organisation, with the initials of its name or an icon. */
-export function Avatar({ tone = 'neutral', className, ...content }: AvatarProps) {
+export function Avatar({ tone = 'neutral', size = 'md', className, ...content }: AvatarProps) {
   return (
     // Hidden from screen readers: the name it stands for is always written next to it.
     <span
       aria-hidden="true"
       className={joinClassNames(
-        'grid size-10 flex-none place-items-center rounded-full text-small font-semibold [&>svg]:icon-18',
+        'grid flex-none place-items-center rounded-full font-semibold [&>svg]:icon-18',
+        sizeClassNames[size],
         toneClassNames[tone],
         className,
       )}

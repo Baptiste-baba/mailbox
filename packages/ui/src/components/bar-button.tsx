@@ -1,20 +1,17 @@
 import type { ComponentProps, ReactNode } from 'react';
 import { joinClassNames } from '../join-class-names.ts';
 import { pressableClassNames } from '../pressable-class-names.ts';
-import { Kbd } from './kbd.tsx';
 
 interface BarButtonProps extends ComponentProps<'button'> {
   icon: ReactNode;
-  shortcut?: string | undefined;
 }
 
 /**
- * A wide button set into a surface, that opens a larger action such as replying: it looks like the
- * field where that action will happen. Its type defaults to `button`.
+ * A wide button that opens a larger action such as replying: it looks like the field where that
+ * action will happen. Its type defaults to `button`.
  */
 export function BarButton({
   icon,
-  shortcut,
   type = 'button',
   className,
   children,
@@ -24,7 +21,7 @@ export function BarButton({
     <button
       type={type}
       className={joinClassNames(
-        'flex h-11 w-full items-center gap-2.5 rounded-md bg-field pr-2 pl-3.5 text-left text-ink-2 border border-line available:hover:text-ink [&>svg]:icon-15',
+        'flex h-11 min-w-0 items-center gap-2.5 rounded-md bg-field px-3.5 text-left text-ink-2 available:hover:text-ink [&>svg]:icon-18',
         pressableClassNames,
         className,
       )}
@@ -32,7 +29,6 @@ export function BarButton({
     >
       {icon}
       <span className="min-w-0 flex-1 truncate">{children}</span>
-      {shortcut !== undefined && <Kbd aria-hidden="true">{shortcut}</Kbd>}
     </button>
   );
 }

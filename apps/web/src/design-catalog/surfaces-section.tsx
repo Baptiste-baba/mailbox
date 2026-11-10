@@ -4,14 +4,12 @@ import {
   Card,
   ColumnResizeHandle,
   FileChip,
-  IconButton,
-  PaneHeader,
   ResizableColumn,
   ResizableColumns,
   RowLink,
   StateMessage,
 } from '@mailbox/ui';
-import { ArchiveIcon, FileTextIcon, ReplyIcon } from 'lucide-react';
+import { FileTextIcon, ReplyIcon } from 'lucide-react';
 import { CatalogSection, SampleName } from './catalog-section.tsx';
 
 const noop = () => undefined;
@@ -19,19 +17,6 @@ const noop = () => undefined;
 export function SurfacesSection() {
   return (
     <CatalogSection title="Surfaces et états">
-      <div className="flex flex-col gap-2">
-        <div className="overflow-hidden rounded-md border border-line bg-chrome">
-          <PaneHeader>
-            <span className="font-semibold text-heading">Réception</span>
-            <div className="ml-auto">
-              <IconButton label="Archiver" shortcut="E">
-                <ArchiveIcon />
-              </IconButton>
-            </div>
-          </PaneHeader>
-        </div>
-        <SampleName name="<PaneHeader> · en-tête de colonne, 52 px sur un filet" />
-      </div>
       <div className="flex flex-col gap-2">
         <div className="flex flex-col gap-1 rounded-md bg-chrome p-1.5">
           <RowLink href="#" aria-current="page">
@@ -58,7 +43,7 @@ export function SurfacesSection() {
             <div>
               <FileChip icon={<FileTextIcon />} name="Contrat_v3.pdf" details="PDF, 214 ko" />
             </div>
-            <BarButton icon={<ReplyIcon />} shortcut="R" onClick={noop}>
+            <BarButton icon={<ReplyIcon />} onClick={noop}>
               Répondre à Claire Dubois
             </BarButton>
           </Card>
