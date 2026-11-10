@@ -78,7 +78,10 @@
   },
   "overrides": [
     {
-      "includes": ["packages/shared/src/auth/webauthn.ts"],
+      "includes": [
+        "packages/shared/src/auth/webauthn.ts",
+        "apps/api/test/passkeys-contract.test.ts"
+      ],
       "linter": {
         "rules": {
           "style": {
