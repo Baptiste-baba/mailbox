@@ -31,6 +31,9 @@
   --ring: #3640ff;
   --danger: #b91c1c;
   --danger-tint: #fef2f2;
+  /* Something to do, such as reconnecting a mailbox. */
+  --warn: #b45309;
+  --warn-tint: #fef3c7;
   /* A requirement met. */
   --success: #15803d;
   /* Ring around the current step. */
@@ -65,6 +68,8 @@
   --ring: #929bff;
   --danger: #f87171;
   --danger-tint: #3b1219;
+  --warn: #fbbf24;
+  --warn-tint: #3a2a0b;
   --success: #4ade80;
   --halo: #343c9e;
   --muted: #3d4275;
@@ -96,6 +101,8 @@
   --color-ring: var(--ring);
   --color-danger: var(--danger);
   --color-danger-tint: var(--danger-tint);
+  --color-warn: var(--warn);
+  --color-warn-tint: var(--warn-tint);
   --color-success: var(--success);
   --color-halo: var(--halo);
   --color-muted: var(--muted);

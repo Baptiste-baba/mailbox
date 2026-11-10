@@ -7,8 +7,8 @@ type IconButtonVariant = 'neutral' | 'danger';
 // A toggle that is on takes the selection colours, as the active item of a list does.
 const variantClassNames: Record<IconButtonVariant, string> = {
   neutral:
-    'text-ink-2 enabled:not-aria-pressed:hover:bg-field enabled:not-aria-pressed:hover:text-ink aria-pressed:bg-tint aria-pressed:text-tint-ink',
-  danger: 'text-danger enabled:hover:bg-danger-tint',
+    'text-ink-2 available:not-aria-pressed:hover:bg-field available:not-aria-pressed:hover:text-ink aria-pressed:bg-tint aria-pressed:text-tint-ink',
+  danger: 'text-danger available:hover:bg-danger-tint',
 };
 
 interface IconButtonProps

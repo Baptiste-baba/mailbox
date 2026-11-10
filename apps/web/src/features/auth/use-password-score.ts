@@ -13,7 +13,7 @@ export function usePasswordScore(password: string, username: string): PasswordSc
     () =>
       checker === undefined || password === ''
         ? undefined
-        : checker(password, [username, fr.auth.productName]),
+        : checker(password, [username, fr.common.productName]),
     [checker, password, username],
   );
 }

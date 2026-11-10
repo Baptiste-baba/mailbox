@@ -1,5 +1,5 @@
 import { Button } from '@mailbox/ui';
-import { PencilIcon } from 'lucide-react';
+import { PencilLineIcon } from 'lucide-react';
 import { comingSoonHint } from '../hint.ts';
 import { fr } from '../i18n/fr.ts';
 import { shortcuts } from '../shortcuts.ts';
@@ -8,32 +8,30 @@ import { shortcuts } from '../shortcuts.ts';
 export function NewMailButton() {
   const title = comingSoonHint(fr.sidebar.newMail, shortcuts.newMail.label);
   return (
-    <>
+    <div className="mb-3.5">
       <div className="@max-rail:hidden">
         <Button
           variant="primary"
-          size="lg"
           shortcut={shortcuts.newMail.label}
-          disabled
+          aria-disabled
           title={title}
-          className="w-full"
+          className="h-11 w-full"
         >
-          <PencilIcon />
+          <PencilLineIcon />
           {fr.sidebar.newMail}
         </Button>
       </div>
       <div className="hidden @max-rail:block">
         <Button
           variant="primary"
-          size="lg"
-          disabled
+          aria-disabled
           title={title}
           aria-label={fr.sidebar.newMail}
-          className="w-full px-0"
+          className="h-11 w-full px-0"
         >
-          <PencilIcon />
+          <PencilLineIcon />
         </Button>
       </div>
-    </>
+    </div>
   );
 }

@@ -1,5 +1,5 @@
 import { Button } from '@mailbox/ui';
-import { FolderIcon, PencilIcon, ReplyIcon } from 'lucide-react';
+import { FolderIcon, PencilLineIcon, ReplyIcon } from 'lucide-react';
 import type { ComponentProps } from 'react';
 import { CatalogSection, SampleName } from './catalog-section.tsx';
 
@@ -41,9 +41,9 @@ export function ButtonSection() {
       ))}
       <div className="flex flex-col gap-2">
         <div className="flex flex-wrap items-center gap-3">
-          <div className="w-57 rounded-md bg-page p-2.5">
-            <Button variant="primary" size="lg" shortcut="C" className="w-full">
-              <PencilIcon />
+          <div className="w-60">
+            <Button variant="primary" shortcut="C" className="h-11 w-full">
+              <PencilLineIcon />
               Nouveau mail
             </Button>
           </div>

@@ -4,8 +4,8 @@ import { type RefObject, useEffect, useRef } from 'react';
 /** Below this width the sidebar, the list and the thread no longer fit side by side at full size. */
 const NARROW_WINDOW = '(max-width: 1139px)';
 
-/** Share of the window the sidebar takes until the user resizes it. */
-export const SIDEBAR_DEFAULT_SIZE = '15%';
+/** Share of the window the sidebar takes until the user resizes it: 272 px of a 1440 px window. */
+export const SIDEBAR_DEFAULT_SIZE = '19%';
 
 /**
  * Folds the sidebar to its icons while the window is too narrow, and gives it back the share of the
