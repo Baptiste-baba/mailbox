@@ -6,7 +6,6 @@
 @import "../tokens/layout.css";
 @import "./variants.css";
 @import "./base.css";
-@import "./ai.css";
 @import "./icons.css";
 
 /* Lets Tailwind find the classes of the components, whichever app imports this file. */

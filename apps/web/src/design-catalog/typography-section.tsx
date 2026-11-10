@@ -2,42 +2,42 @@ import { CatalogSection, SampleName } from './catalog-section.tsx';
 
 const textStyles = [
   {
-    name: 'text-greeting · 27 px · 500',
-    className: 'text-greeting font-medium',
-    sample: 'Bonjour. Trois réponses t’attendent, dont une avant vendredi.',
+    name: 'text-display · 40 px · 600 · heading',
+    className: 'text-display font-semibold text-heading',
+    sample: 'Connexion',
   },
   {
-    name: 'text-title · 24 px · 700',
-    className: 'text-title font-bold',
+    name: 'text-title · 32 px · 600 · heading',
+    className: 'text-title font-semibold text-heading',
+    sample: 'Réception',
+  },
+  {
+    name: 'text-subject · 26 px · 600',
+    className: 'text-subject font-semibold',
     sample: 'Contrat de prestation : version finale',
   },
   {
-    name: 'text-compose · 15 px · interligne 1,7',
-    className: 'text-compose',
-    sample: 'Merci pour cette version finale, tout est bon pour moi.',
-  },
-  {
-    name: 'text-mail · 14,5 px · interligne 1,65',
-    className: 'text-mail',
+    name: 'text-body · 16 px · interligne 26 px',
+    className: 'text-body',
     sample: 'Vous trouverez ci-joint la version finale du contrat, avec vos deux remarques.',
   },
+  { name: 'text-base · 15 px · 600', className: 'text-base font-semibold', sample: 'Paul Mercier' },
   {
-    name: 'text-base · 13 px · 600',
-    className: 'text-base font-semibold',
-    sample: 'Paul Mercier',
+    name: 'text-base · 15 px · 400',
+    className: 'text-base',
+    sample: 'Contrat de prestation : version finale',
   },
   {
-    name: 'text-base · 13 px · 400 · aitx',
-    className: 'text-base text-aitx',
-    sample: 'Attend ta date de démarrage et le contrat signé avant vendredi.',
+    name: 'text-small · 14 px · ink-2',
+    className: 'text-small text-ink-2',
+    sample: 'Vous trouverez ci-joint la version finale du contrat…',
   },
-  { name: 'text-meta · 12 px · ink3', className: 'text-meta text-ink3', sample: 'hier, 18:42' },
   {
-    name: 'text-label · 11,5 px · 600',
-    className: 'text-label font-semibold text-ink2',
-    sample: 'À traiter',
+    name: 'text-caption · 13 px · ink-2',
+    className: 'text-caption text-ink-2',
+    sample: 'hier, 18:42',
   },
-  { name: 'text-micro · 11 px', className: 'text-micro text-ink3', sample: 'Boîtes' },
+  { name: 'text-micro · 12 px · 500', className: 'text-micro font-medium', sample: '⌘K' },
 ];
 
 export function TypographySection() {

@@ -5,47 +5,42 @@ const colorGroups = [
   {
     label: 'Fonds',
     swatches: [
-      { token: 'paper', className: 'bg-paper' },
-      { token: 'mist', className: 'bg-mist' },
-      { token: 'mist2', className: 'bg-mist2' },
-      { token: 'well', className: 'bg-well' },
-      { token: 'raise', className: 'bg-raise' },
+      { token: 'page', className: 'bg-page' },
+      { token: 'chrome', className: 'bg-chrome' },
+      { token: 'surface', className: 'bg-surface' },
+      { token: 'field', className: 'bg-field' },
+      { token: 'selected', className: 'bg-selected' },
       { token: 'tint', className: 'bg-tint' },
-      { token: 'avatar', className: 'bg-avatar' },
     ],
   },
   {
     label: 'Filets',
-    swatches: [
-      { token: 'frost', className: 'bg-frost' },
-      { token: 'frost2', className: 'bg-frost2' },
-      { token: 'tintln', className: 'bg-tintln' },
-    ],
+    swatches: [{ token: 'line', className: 'bg-line' }],
   },
   {
     label: 'Texte',
     swatches: [
+      { token: 'heading', className: 'bg-heading' },
       { token: 'ink', className: 'bg-ink' },
-      { token: 'ink2', className: 'bg-ink2' },
-      { token: 'ink3', className: 'bg-ink3' },
-      { token: 'aitx', className: 'bg-aitx' },
+      { token: 'ink-2', className: 'bg-ink-2' },
+      { token: 'link', className: 'bg-link' },
+      { token: 'tint-ink', className: 'bg-tint-ink' },
     ],
   },
   {
-    label: 'Action et sélection',
+    label: 'Action',
     swatches: [
-      { token: 'klein', className: 'bg-klein' },
-      { token: 'kleinbg', className: 'bg-kleinbg' },
-      { token: 'kleintx', className: 'bg-kleintx' },
-      { token: 'onk', className: 'bg-onk' },
+      { token: 'primary', className: 'bg-primary' },
+      { token: 'primary-hover', className: 'bg-primary-hover' },
+      { token: 'on-primary', className: 'bg-on-primary' },
       { token: 'ring', className: 'bg-ring' },
     ],
   },
   {
-    label: 'Danger et échéance',
+    label: 'Danger',
     swatches: [
-      { token: 'verm', className: 'bg-verm' },
-      { token: 'vermbg', className: 'bg-vermbg' },
+      { token: 'danger', className: 'bg-danger' },
+      { token: 'danger-tint', className: 'bg-danger-tint' },
     ],
   },
   {
@@ -58,15 +53,6 @@ const colorGroups = [
       { token: 'slate', className: 'bg-slate' },
     ],
   },
-  {
-    label: 'Dégradé IA',
-    swatches: [
-      { token: 'g1', className: 'bg-g1' },
-      { token: 'g2', className: 'bg-g2' },
-      { token: 'g3', className: 'bg-g3' },
-      { token: 'g-fill-end', className: 'bg-g-fill-end' },
-    ],
-  },
 ];
 
 export function ColorSection() {
@@ -74,11 +60,11 @@ export function ColorSection() {
     <CatalogSection title="Couleurs">
       {colorGroups.map((group) => (
         <div key={group.label} className="flex flex-col gap-2">
-          <h4 className="text-meta text-ink2">{group.label}</h4>
+          <h4 className="text-caption text-ink-2">{group.label}</h4>
           <div className="flex flex-wrap gap-4">
             {group.swatches.map((swatch) => (
-              <div key={swatch.token} className="flex w-16 flex-col gap-1">
-                <span className={`h-10 rounded-md shadow-lift ${swatch.className}`} />
+              <div key={swatch.token} className="flex w-20 flex-col gap-1">
+                <span className={`h-10 rounded-md border border-line ${swatch.className}`} />
                 <SampleName name={`--${swatch.token}`} />
               </div>
             ))}

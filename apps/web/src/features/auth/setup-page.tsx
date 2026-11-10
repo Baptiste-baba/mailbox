@@ -19,7 +19,7 @@ export function SetupPage() {
   if (flow.unavailable) {
     return (
       <AuthLayout title={fr.auth.setupTitle}>
-        <p className="text-ink2">{fr.setup.alreadyDone}</p>
+        <p className="text-ink-2">{fr.setup.alreadyDone}</p>
         <Button variant="primary" size="lg" onClick={flow.signInInstead}>
           {fr.setup.signIn}
         </Button>

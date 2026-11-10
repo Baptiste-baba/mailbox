@@ -29,12 +29,12 @@ export function AuthStepLayout({
       {(title !== undefined || intro !== undefined) && (
         <div className="flex flex-col gap-1.5">
           {title !== undefined && <h2 className="text-heading font-semibold">{title}</h2>}
-          {intro !== undefined && <p className="text-ink2">{intro}</p>}
+          {intro !== undefined && <p className="text-ink-2">{intro}</p>}
         </div>
       )}
       {children}
       {error !== undefined && (
-        <p role="alert" className="text-verm">
+        <p role="alert" className="text-danger">
           {error}
         </p>
       )}

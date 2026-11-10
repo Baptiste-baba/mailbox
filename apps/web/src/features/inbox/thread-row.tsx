@@ -20,7 +20,7 @@ export function ThreadRow({ thread, view, mailbox, now }: ThreadRowProps) {
   return (
     <ThreadRowLink to="/$view/$id" params={{ view, id: thread.id }} search={(previous) => previous}>
       <span
-        className={`mt-3 size-1.5 flex-none rounded-full ${thread.unread ? 'bg-klein' : 'bg-transparent'}`}
+        className={`mt-3 size-1.5 flex-none rounded-full ${thread.unread ? 'bg-primary' : 'bg-transparent'}`}
       />
       <Avatar name={sender} />
       <span className="flex min-w-0 flex-1 flex-col gap-0.5">
@@ -28,13 +28,16 @@ export function ThreadRow({ thread, view, mailbox, now }: ThreadRowProps) {
           <span className={`truncate ${thread.unread ? 'font-semibold' : 'font-medium'}`}>
             {sender}
           </span>
-          <time dateTime={thread.lastMessageAt} className="ml-auto flex-none text-meta text-ink3">
+          <time
+            dateTime={thread.lastMessageAt}
+            className="ml-auto flex-none text-caption text-ink-2"
+          >
             {formatListDate(thread.lastMessageAt, now)}
           </time>
         </span>
         <span className="truncate">{thread.subject || fr.inbox.noSubject}</span>
-        <span className="truncate text-ink3">{thread.snippet}</span>
-        <span className="flex items-center gap-2.5 pt-0.75 text-label text-ink3">
+        <span className="truncate text-ink-2">{thread.snippet}</span>
+        <span className="flex items-center gap-2.5 pt-0.75 text-caption text-ink-2">
           {mailbox !== undefined && (
             <span className="flex items-center gap-1.25">
               <Swatch color={mailbox.color} shape="circle" small />

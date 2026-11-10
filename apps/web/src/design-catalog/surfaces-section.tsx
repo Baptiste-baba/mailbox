@@ -20,9 +20,9 @@ export function SurfacesSection() {
   return (
     <CatalogSection title="Surfaces et états">
       <div className="flex flex-col gap-2">
-        <div className="overflow-hidden rounded-md bg-paper shadow-lift">
+        <div className="overflow-hidden rounded-md border border-line bg-chrome">
           <PaneHeader>
-            <span className="text-heading font-bold">Réception</span>
+            <span className="font-semibold text-heading">Réception</span>
             <div className="ml-auto">
               <IconButton label="Archiver" shortcut="E">
                 <ArchiveIcon />
@@ -33,7 +33,7 @@ export function SurfacesSection() {
         <SampleName name="<PaneHeader> · en-tête de colonne, 52 px sur un filet" />
       </div>
       <div className="flex flex-col gap-2">
-        <div className="flex flex-col gap-1 rounded-md bg-paper p-1.5">
+        <div className="flex flex-col gap-1 rounded-md bg-chrome p-1.5">
           <RowLink href="#" aria-current="page">
             <Avatar name="Claire Dubois" />
             <span className="flex flex-col">
@@ -49,12 +49,12 @@ export function SurfacesSection() {
             </span>
           </RowLink>
         </div>
-        <SampleName name="<RowLink> · ligne de liste, en carte quand elle est la page courante" />
+        <SampleName name="<RowLink> · ligne de liste, teintée quand elle est la page courante" />
       </div>
       <div className="flex flex-col gap-2">
-        <div className="rounded-md bg-well p-4">
+        <div className="rounded-md bg-page p-4">
           <Card className="flex flex-col gap-3 p-4">
-            <p className="text-mail">Vous trouverez ci-joint la version finale du contrat.</p>
+            <p className="text-body">Vous trouverez ci-joint la version finale du contrat.</p>
             <div>
               <FileChip icon={<FileTextIcon />} name="Contrat_v3.pdf" details="PDF, 214 ko" />
             </div>
@@ -66,18 +66,18 @@ export function SurfacesSection() {
         <SampleName name="<Card>, <FileChip> et <BarButton> · un message, sa pièce jointe, sa réponse" />
       </div>
       <div className="flex flex-col gap-2">
-        <div className="h-24 overflow-hidden rounded-md shadow-lift">
+        <div className="h-24 overflow-hidden rounded-md border border-line">
           <ResizableColumns id="catalog-columns" className="h-full">
             <ResizableColumn
               id="catalog-left"
               defaultSize="35%"
               minSize={80}
-              className="bg-mist p-3"
+              className="bg-chrome p-3"
             >
               Liste
             </ResizableColumn>
             <ColumnResizeHandle />
-            <ResizableColumn id="catalog-right" minSize={80} className="bg-well p-3">
+            <ResizableColumn id="catalog-right" minSize={80} className="bg-page p-3">
               Fil
             </ResizableColumn>
           </ResizableColumns>
@@ -85,7 +85,7 @@ export function SurfacesSection() {
         <SampleName name="<ResizableColumns> · glisser le filet, flèches une fois sélectionné, double-clic pour revenir" />
       </div>
       <div className="flex flex-col gap-2">
-        <div className="flex flex-col gap-4 rounded-md bg-paper py-6">
+        <div className="flex flex-col gap-4 rounded-md bg-chrome py-6">
           <StateMessage
             message="Impossible de charger les mails."
             action={{ label: 'Réessayer', onClick: noop }}

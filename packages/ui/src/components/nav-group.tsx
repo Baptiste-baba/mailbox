@@ -20,13 +20,13 @@ export function NavGroup({ title, action, children, className }: NavGroupProps) 
     <div
       className={joinClassNames(
         'flex flex-col gap-px',
-        title === undefined ? undefined : '@max-rail:pt-2 @max-rail:shadow-hairline-top',
+        title === undefined ? undefined : '@max-rail:pt-2 @max-rail:border-t @max-rail:border-line',
         className,
       )}
     >
       {title !== undefined && (
         <div className="flex items-center gap-1.5 px-2 pb-1 @max-rail:sr-only">
-          <h2 className="text-micro font-semibold text-ink3">{title}</h2>
+          <h2 className="text-caption font-semibold text-ink-2">{title}</h2>
           {action}
         </div>
       )}
@@ -41,7 +41,7 @@ export function NavGroupAction({ type = 'button', ...props }: ComponentProps<'bu
     <button
       type={type}
       className={joinClassNames(
-        'ml-auto text-micro font-medium text-klein enabled:hover:text-kleintx @max-rail:hidden',
+        'ml-auto text-caption font-medium text-link enabled:hover:underline @max-rail:hidden',
         pressableClassNames,
       )}
       {...props}

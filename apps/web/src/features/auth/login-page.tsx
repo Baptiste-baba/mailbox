@@ -14,7 +14,7 @@ export function LoginPage() {
   return (
     <AuthLayout title={fr.auth.loginTitle}>
       {reason === 'ended' && flow.step.name === 'password' && (
-        <p className="text-ink2">{fr.auth.sessionEnded}</p>
+        <p className="text-ink-2">{fr.auth.sessionEnded}</p>
       )}
       <LoginCurrentStep flow={flow} />
       <LostAccess />

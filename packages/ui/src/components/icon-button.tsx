@@ -7,8 +7,8 @@ type IconButtonVariant = 'neutral' | 'danger';
 // A toggle that is on takes the selection colours, as the active item of a list does.
 const variantClassNames: Record<IconButtonVariant, string> = {
   neutral:
-    'text-ink2 enabled:not-aria-pressed:hover:bg-mist2 enabled:not-aria-pressed:hover:text-ink aria-pressed:bg-kleinbg aria-pressed:text-klein',
-  danger: 'text-verm enabled:hover:bg-vermbg',
+    'text-ink-2 enabled:not-aria-pressed:hover:bg-field enabled:not-aria-pressed:hover:text-ink aria-pressed:bg-tint aria-pressed:text-link',
+  danger: 'text-danger enabled:hover:bg-danger-tint',
 };
 
 interface IconButtonProps
@@ -39,7 +39,7 @@ export function IconButton({
       aria-pressed={pressed}
       title={shortcut === undefined ? label : `${label} (${shortcut})`}
       className={joinClassNames(
-        'grid h-7 w-7.5 flex-none place-items-center rounded-sm touch:size-11 [&>svg]:icon-16',
+        'grid h-7 w-7.5 flex-none place-items-center rounded-md touch:size-11 [&>svg]:icon-16',
         pressableClassNames,
         variantClassNames[variant],
         className,

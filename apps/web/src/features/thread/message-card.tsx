@@ -38,21 +38,21 @@ export function MessageCard({
             type="button"
             aria-expanded={open}
             onClick={onToggle}
-            className="flex min-w-0 flex-col gap-0.75 rounded-xs text-left"
+            className="flex min-w-0 flex-col gap-0.75 rounded-sm text-left"
           >
             <span className="flex items-baseline gap-2.5">
               <span className="truncate font-semibold">{sender}</span>
               {open && (
-                <span className="truncate text-meta text-ink3">
+                <span className="truncate text-caption text-ink-2">
                   {recipientsLine(message, ownAddress)}
                 </span>
               )}
-              <time dateTime={message.sentAt} className="ml-auto flex-none text-meta text-ink3">
+              <time dateTime={message.sentAt} className="ml-auto flex-none text-caption text-ink-2">
                 {formatMessageDate(message.sentAt, now)}
               </time>
             </span>
             {!open && (
-              <span className="truncate text-ink3">
+              <span className="truncate text-ink-2">
                 {message.bodyText.replace(/\s+/g, ' ').trim()}
               </span>
             )}
@@ -61,7 +61,7 @@ export function MessageCard({
         </div>
       </div>
       {footer !== undefined && (
-        <div className="sticky bottom-0 rounded-b-card bg-raise px-5 pt-3 pb-4 shadow-hairline-top">
+        <div className="sticky bottom-0 rounded-b-xl bg-surface px-5 pt-3 pb-4 border-t border-line">
           {footer}
         </div>
       )}

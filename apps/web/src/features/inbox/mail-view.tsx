@@ -9,7 +9,7 @@ export function MailView() {
   return (
     <ResizableColumns id="mail-view">
       <ResizableColumn id="list" defaultSize="30%" minSize={300} maxSize="50%">
-        <section aria-label={fr.inbox.listLabel} className="flex h-full flex-col bg-paper">
+        <section aria-label={fr.inbox.listLabel} className="flex h-full flex-col bg-chrome">
           <CatchBoundary getResetKey={() => 'mail-list'} errorComponent={ThreadListCrash}>
             <MailList />
           </CatchBoundary>
@@ -17,7 +17,7 @@ export function MailView() {
       </ResizableColumn>
       <ColumnResizeHandle />
       <ResizableColumn id="thread" minSize={360}>
-        <main className="flex h-full min-w-0 flex-col bg-well">
+        <main className="flex h-full min-w-0 flex-col bg-page">
           <Outlet />
         </main>
       </ResizableColumn>

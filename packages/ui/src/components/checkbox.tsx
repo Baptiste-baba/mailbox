@@ -18,7 +18,7 @@ export function Checkbox({ label, className, ...inputProps }: CheckboxProps) {
     >
       <input
         type="checkbox"
-        className="mt-px size-4 flex-none accent-klein disabled:cursor-not-allowed touch:mt-0 touch:size-5"
+        className="mt-px size-4 flex-none accent-primary disabled:cursor-not-allowed touch:mt-0 touch:size-5"
         {...inputProps}
       />
       <span>{label}</span>

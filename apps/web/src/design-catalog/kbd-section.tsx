@@ -15,7 +15,7 @@ export function KbdSection() {
         <SampleName name="<Kbd>" />
       </div>
       <div className="flex flex-col gap-2">
-        <div className="flex w-fit gap-2 rounded-md bg-klein p-2">
+        <div className="flex w-fit gap-2 rounded-md bg-primary p-2">
           <Kbd surface="accent">C</Kbd>
           <Kbd surface="accent">⌘↵</Kbd>
         </div>

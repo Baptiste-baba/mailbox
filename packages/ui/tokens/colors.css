@@ -1,110 +1,98 @@
-/* Values from the design handoff (direction E). The theme is the `light` or `dark` class of an ancestor. */
+/* The theme is the `light` or `dark` class of an ancestor. Every text colour reaches AA contrast on
+   every background it is drawn on. */
 
 .light {
   /* Native controls (check boxes, scroll bars) follow the theme. */
   color-scheme: light;
-  --paper: #ffffff;
-  --mist: #f3f5fa;
-  --mist2: #e9edf5;
-  --well: #f6f7fb;
-  --raise: #ffffff;
-  --tint: #f0f3fd;
-  --frost: #e2e7f0;
-  --frost2: #cdd4e2;
-  --tintln: rgba(31, 63, 209, 0.13);
-  --ink: #0b1530;
-  --ink2: #53607c;
-  --ink3: #646e89;
-  --aitx: #2c3f86;
-  --klein: #1f3fd1;
-  --kleinbg: #e8edfd;
-  --kleintx: #1a35ae;
-  --onk: #ffffff;
-  --ring: rgba(31, 63, 209, 0.28);
-  --verm: #b9301b;
-  --vermbg: #fbebe7;
-  --navy: #12245e;
-  --azur: #2f6fe0;
-  --ciel: #5c93e6;
-  --glacier: #9db5dc;
-  --slate: #7a859d;
-  --g1: #1f3fd1;
-  --g2: #2f7bea;
-  --g3: #2fb0e4;
-  /* End of a gradient fill under text: white on cyan would fall below AA contrast. */
-  --g-fill-end: var(--g2);
-  /* Background of an avatar: one step above the surface it sits on in each theme. */
-  --avatar: var(--mist2);
+  /* Behind the cards: the reading pane. */
+  --page: #f8fafc;
+  /* Columns and screens drawn flat: sidebar, mail list, sign-in. */
+  --chrome: #ffffff;
+  /* Cards and controls raised above the page. */
+  --surface: #ffffff;
+  /* Filled fields, current navigation item, hovered rows. */
+  --field: #f1f5f9;
+  --line: #e2e8f0;
+  --ink: #1e293b;
+  /* Secondary text: dates, addresses, start of a mail, placeholders. */
+  --ink-2: #5a6880;
+  /* Page titles. */
+  --heading: #131653;
+  --primary: #3640ff;
+  --primary-hover: #2b33d6;
+  --on-primary: #ffffff;
+  /* Text that acts: links, current tab, counts of the current view. */
+  --link: #3640ff;
+  --tint: #dbe8ff;
+  --tint-ink: #3640ff;
+  /* The open mail in the list. */
+  --selected: #eff4ff;
+  /* Keyboard focus. */
+  --ring: #3640ff;
+  --danger: #b91c1c;
+  --danger-tint: #fef2f2;
+  /* Colours a mailbox or a folder can take. */
+  --navy: #131653;
+  --azur: #3640ff;
+  --ciel: #6e78ff;
+  --glacier: #a5b4fc;
+  --slate: #94a3b8;
 }
 
 .dark {
   color-scheme: dark;
-  --paper: #121826;
-  --mist: #0c111c;
-  --mist2: #1a2133;
-  --well: #0e131e;
-  --raise: #1a2235;
-  --tint: #151e3a;
-  --frost: #242c3e;
-  --frost2: #353f56;
-  --tintln: rgba(125, 151, 255, 0.18);
-  --ink: #e9edf6;
-  --ink2: #a7b1c7;
-  --ink3: #8d97ae;
-  --aitx: #b3c1f2;
-  --klein: #7d97ff;
-  --kleinbg: #1d2853;
-  --kleintx: #bcc9ff;
-  --onk: #0a1240;
-  --ring: rgba(125, 151, 255, 0.38);
-  --verm: #ff8a75;
-  --vermbg: #3b1813;
-  --navy: #a9baf2;
-  --azur: #6f9df2;
-  --ciel: #8db6ee;
-  --glacier: #5f7499;
-  --slate: #8792a9;
-  --g1: #7d97ff;
-  --g2: #6faeff;
-  --g3: #63d0ec;
-  --g-fill-end: var(--g3);
-  --avatar: var(--frost);
+  --page: #0b0c22;
+  --chrome: #101230;
+  --surface: #15183c;
+  --field: #1d2148;
+  --line: #262a5c;
+  --ink: #eceeff;
+  --ink-2: #a3a8cc;
+  --heading: #f4f5ff;
+  --primary: #3640ff;
+  --primary-hover: #4a53ff;
+  --on-primary: #ffffff;
+  --link: #929bff;
+  --tint: #1c2165;
+  --tint-ink: #b8beff;
+  --selected: #1c1f4e;
+  --ring: #929bff;
+  --danger: #f87171;
+  --danger-tint: #3b1219;
+  --navy: #c3c8ff;
+  --azur: #6e78ff;
+  --ciel: #8a94ff;
+  --glacier: #5b67c7;
+  --slate: #6e739c;
 }
 
 /* `inline` makes utilities read the variable where they apply, so a `.dark` block inside a light page stays dark. */
 @theme inline {
   --color-*: initial;
-  --color-paper: var(--paper);
-  --color-mist: var(--mist);
-  --color-mist2: var(--mist2);
-  --color-well: var(--well);
-  --color-raise: var(--raise);
-  --color-tint: var(--tint);
-  --color-frost: var(--frost);
-  --color-frost2: var(--frost2);
-  --color-tintln: var(--tintln);
+  --color-page: var(--page);
+  --color-chrome: var(--chrome);
+  --color-surface: var(--surface);
+  --color-field: var(--field);
+  --color-line: var(--line);
   --color-ink: var(--ink);
-  --color-ink2: var(--ink2);
-  --color-ink3: var(--ink3);
-  --color-aitx: var(--aitx);
-  --color-klein: var(--klein);
-  --color-kleinbg: var(--kleinbg);
-  --color-kleintx: var(--kleintx);
-  --color-onk: var(--onk);
+  --color-ink-2: var(--ink-2);
+  --color-heading: var(--heading);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-on-primary: var(--on-primary);
+  --color-link: var(--link);
+  --color-tint: var(--tint);
+  --color-tint-ink: var(--tint-ink);
+  --color-selected: var(--selected);
   --color-ring: var(--ring);
-  --color-verm: var(--verm);
-  --color-vermbg: var(--vermbg);
+  --color-danger: var(--danger);
+  --color-danger-tint: var(--danger-tint);
   --color-navy: var(--navy);
   --color-azur: var(--azur);
   --color-ciel: var(--ciel);
   --color-glacier: var(--glacier);
   --color-slate: var(--slate);
-  --color-g1: var(--g1);
-  --color-g2: var(--g2);
-  --color-g3: var(--g3);
-  --color-g-fill-end: var(--g-fill-end);
-  --color-avatar: var(--avatar);
   /* A QR code stays dark on light in both themes: some scanners cannot read it inverted. */
-  --color-qr-module: #0b1530;
+  --color-qr-module: #1e293b;
   --color-qr-background: #ffffff;
 }

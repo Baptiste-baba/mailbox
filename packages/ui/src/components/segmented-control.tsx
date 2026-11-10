@@ -31,12 +31,12 @@ export function SegmentedControl<Value extends string>({
     <div
       role="radiogroup"
       aria-label={label}
-      className={joinClassNames('inline-flex flex-none rounded-md bg-mist2 p-0.5', className)}
+      className={joinClassNames('inline-flex flex-none rounded-md bg-field p-0.5', className)}
     >
       {options.map((option) => (
         <label
           key={option.value}
-          className="grid h-5.5 place-items-center rounded-xs px-2.5 text-meta text-ink2 touch:h-10 has-checked:bg-paper has-checked:font-semibold has-checked:text-ink has-checked:shadow-lift not-has-checked:hover:text-ink has-focus-visible:outline-3 has-focus-visible:outline-ring"
+          className="grid h-5.5 place-items-center rounded-sm px-2.5 text-caption text-ink-2 touch:h-10 has-checked:bg-surface has-checked:font-semibold has-checked:text-ink has-checked:shadow-card not-has-checked:hover:text-ink has-focus-visible:outline-3 has-focus-visible:outline-ring"
         >
           <input
             type="radio"
