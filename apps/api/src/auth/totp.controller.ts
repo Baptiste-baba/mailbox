@@ -1,14 +1,17 @@
 import {
+  AppError,
   type TotpConfirmation,
   type TotpEnrollment,
   totpConfirmationSchema,
 } from '@mailbox/shared';
-import { Body, Controller, HttpCode, HttpStatus, Post, Put } from '@nestjs/common';
+import { Body, Controller, HttpCode, HttpStatus, Post, Put, Req } from '@nestjs/common';
+import type { Request } from 'express';
 import { AccountService } from './account.service.ts';
-import { OpenDuringAuthenticatorReplacement } from './authenticator-replacement.decorator.ts';
+import { AuthenticatorReplacementRoute } from './authenticator-replacement.decorator.ts';
+import { readSessionToken } from './session-cookie.ts';
 
-/** A new authenticator app for the signed-in account. */
-@OpenDuringAuthenticatorReplacement()
+/** A new authenticator app, set up by a session opened with a recovery code. */
+@AuthenticatorReplacementRoute()
 @Controller('auth/totp')
 export class TotpController {
   constructor(private readonly account: AccountService) {}
@@ -21,7 +24,15 @@ export class TotpController {
 
   @Put()
   @HttpCode(HttpStatus.NO_CONTENT)
-  replace(@Body({ schema: totpConfirmationSchema }) confirmation: TotpConfirmation): Promise<void> {
-    return this.account.replaceTotp(confirmation);
+  async replace(
+    @Body({ schema: totpConfirmationSchema }) confirmation: TotpConfirmation,
+    @Req() request: Request,
+  ): Promise<void> {
+    const sessionToken = readSessionToken(request);
+    // The session guard lets no request through without a session: this only narrows the type.
+    if (sessionToken === undefined) {
+      throw new AppError('UNAUTHENTICATED', 'Sign in first');
+    }
+    await this.account.replaceTotp(confirmation, sessionToken);
   }
 }

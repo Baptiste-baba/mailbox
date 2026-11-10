@@ -9,12 +9,14 @@ import { forgetAuthStatus } from '../../api/auth-status-query.ts';
 const SESSION_REFUSALS = new Set<ErrorCode>([
   'UNAUTHENTICATED',
   'AUTHENTICATOR_REPLACEMENT_REQUIRED',
+  'AUTHENTICATOR_REPLACEMENT_NOT_REQUIRED',
 ]);
 
 /**
  * Once the api refuses the session, to a query or to an action, asks the status again and goes
  * where it leads, then back to the same page: sign-in when the session ended, setup after a reset,
- * the new authenticator app after a recovery code.
+ * the new authenticator app after a recovery code, the app once that new app was set up in another
+ * tab.
  */
 export function useFollowRefusedSession(): void {
   const queryClient = useQueryClient();
@@ -29,7 +31,7 @@ export function useFollowRefusedSession(): void {
       // Sign-in sends on to setup or to the new authenticator app when that is what the status says.
       void router.navigate({
         to: '/login',
-        search: error.code === 'UNAUTHENTICATED' ? { redirect, reason: 'expired' } : { redirect },
+        search: error.code === 'UNAUTHENTICATED' ? { redirect, reason: 'ended' } : { redirect },
       });
     };
     const unsubscribeFromQueries = queryClient.getQueryCache().subscribe((event) => {

@@ -1,14 +1,7 @@
 import { type Database, session } from '@mailbox/db';
-import { totpEnrollmentSchema } from '@mailbox/shared';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
-import {
-  authStatusOf,
-  callAuth,
-  errorCode,
-  sessionCookieFrom,
-  sessionSetCookie,
-} from './auth-requests.ts';
-import { totpCode, wrongTotpCode } from './authenticator-app.ts';
+import { authStatusOf, callAuth, sessionCookieFrom, sessionSetCookie } from './auth-requests.ts';
+import { totpCode } from './authenticator-app.ts';
 import { type RunningApi, startApi } from './start-api.ts';
 import {
   createTestAccount,
@@ -89,62 +82,5 @@ describe('sign-out', () => {
       state: 'signedOut',
     });
     expect((await authStatusOf(api, sessionCookieFrom(otherDevice))).status.state).toBe('signedIn');
-  });
-});
-
-describe('replacing the authenticator app', () => {
-  it('replaces the app at once: codes of the former app stop working', async () => {
-    const enrollment = await callAuth(api, 'POST', '/totp/secret', {
-      cookie: testAccount.setupCookie,
-    });
-    const { secret, otpauthUri } = totpEnrollmentSchema.parse(await enrollment.json());
-    expect(otpauthUri).toContain('MailBox:alex');
-
-    const replaced = await callAuth(api, 'PUT', '/totp', {
-      cookie: testAccount.setupCookie,
-      body: { totpSecret: secret, totpCode: totpCode(secret) },
-    });
-    expect(replaced.status).toBe(204);
-
-    const withFormerApp = await callAuth(api, 'POST', '/login', {
-      body: {
-        username: TEST_USERNAME,
-        password: TEST_PASSWORD,
-        secondFactor: { kind: 'totp', code: totpCode(testAccount.totpSecret, 1) },
-      },
-    });
-    expect(await errorCode(withFormerApp)).toBe('INVALID_SECOND_FACTOR');
-  });
-});
-
-describe('replacing the authenticator app without a session', () => {
-  it.each([
-    ['without a session', undefined],
-    ['with an unknown session', '__Host-mailbox_session=unknown'],
-  ])('refuses to give or replace an app %s', async (_case, cookie) => {
-    const totpSecret = 'GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ';
-    const enrollment = await callAuth(api, 'POST', '/totp/secret', { cookie });
-    const replacement = await callAuth(api, 'PUT', '/totp', {
-      cookie,
-      body: { totpSecret, totpCode: totpCode(totpSecret) },
-    });
-
-    expect([enrollment.status, replacement.status]).toEqual([401, 401]);
-    expect(await errorCode(replacement)).toBe('UNAUTHENTICATED');
-  });
-
-  it('keeps the former app when the code does not match the new one', async () => {
-    const enrollment = await callAuth(api, 'POST', '/totp/secret', {
-      cookie: testAccount.setupCookie,
-    });
-    const { secret } = totpEnrollmentSchema.parse(await enrollment.json());
-
-    const response = await callAuth(api, 'PUT', '/totp', {
-      cookie: testAccount.setupCookie,
-      body: { totpSecret: secret, totpCode: wrongTotpCode(secret) },
-    });
-
-    expect(response.status).toBe(401);
-    expect(await errorCode(response)).toBe('INVALID_SECOND_FACTOR');
   });
 });

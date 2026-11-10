@@ -5,6 +5,7 @@ import {
   apiError,
   fakeApi,
   serverError,
+  testEnrollment,
   testThread,
   unauthenticated,
 } from '../../testing/fake-api.ts';
@@ -74,8 +75,8 @@ describe('when the session ends or the server is out of reach', () => {
 
     const { screen, router } = await renderApp('/all');
 
-    await expect.element(screen.getByText('Ta session a expiré. Reconnecte-toi.')).toBeVisible();
-    expect(router.state.location.search).toEqual({ redirect: '/all', reason: 'expired' });
+    await expect.element(screen.getByText('Ta session a pris fin. Reconnecte-toi.')).toBeVisible();
+    expect(router.state.location.search).toEqual({ redirect: '/all', reason: 'ended' });
   });
 });
 
@@ -117,6 +118,28 @@ describe('when the session was opened with a recovery code', () => {
 
     await expect.poll(() => router.state.location.pathname).toBe('/new-authenticator');
     expect(router.state.location.search).toEqual({ redirect: '/all' });
+  });
+
+  test('goes on to the app once the new authenticator app was set up in another tab', async () => {
+    let setUpElsewhere = false;
+    fakeApi({
+      authStatus: () =>
+        setUpElsewhere
+          ? { state: 'signedIn', username: 'alex' }
+          : { state: 'authenticatorReplacementRequired', recoveryCodesLeft: 3 },
+      authenticatorSecret: () => testEnrollment,
+      authenticatorReplacement: () => {
+        setUpElsewhere = true;
+        return apiError(403, 'AUTHENTICATOR_REPLACEMENT_NOT_REQUIRED')();
+      },
+    });
+    const { screen, router } = await renderApp('/new-authenticator?redirect=%2Fall');
+
+    await userEvent.fill(screen.getByLabelText(/Code à 6 chiffres/), '123456');
+    await userEvent.click(screen.getByRole('button', { name: 'Enregistrer et continuer' }));
+
+    await expect.element(screen.getByRole('heading', { name: 'Toutes les boîtes' })).toBeVisible();
+    expect(router.state.location.pathname).toBe('/all');
   });
 });
 
