@@ -48,26 +48,50 @@ describe('mail list, from the keyboard', () => {
   });
 });
 
-describe('mail list, selected row', () => {
-  // Regression: the outline of the selected row was cut at the top of the list, covered by the
-  // row after it on hover, and touched by that row's hover background.
-  test('keeps the whole outline of the selected row in view, above its neighbours', async () => {
-    fakeApi({ threadPages: () => ({ threads, nextCursor: null }) });
-    const { screen } = await renderApp('/inbox/thread-a');
-    const selected = screen.getByRole('link', { name: /Sujet thread-a/ });
-    await expect.element(selected).toHaveAttribute('aria-current', 'page');
+describe('mail list, filter', () => {
+  test('shows every thread or unread ones only, from the tabs', async () => {
+    fakeApi({
+      threadPages: (url) => ({
+        threads: url.searchParams.get('unreadOnly') === 'true' ? [] : threads,
+        nextCursor: null,
+      }),
+    });
+    const { screen } = await renderApp('/inbox');
+    const filter = screen.getByRole('radiogroup', { name: 'Afficher' });
+    await expect.element(filter.getByRole('radio', { name: 'Tous' })).toBeChecked();
 
-    const row = selected.element();
+    await filter.getByText('Non lus').click();
+    await expect.element(screen.getByText('Aucun mail non lu.')).toBeVisible();
+    await expect.element(filter.getByRole('radio', { name: 'Non lus' })).toBeChecked();
+
+    await filter.getByText('Tous').click();
+    await expect.element(screen.getByText('Sujet thread-a')).toBeVisible();
+  });
+});
+
+describe('mail list, focused row', () => {
+  // Regression: the ring around a row was cut at the top of the list, and covered by the row after
+  // it. Rows now touch: the focused one goes above its neighbours.
+  test('keeps the whole focus ring of a row in view, above its neighbours', async () => {
+    fakeApi({ threadPages: () => ({ threads, nextCursor: null }) });
+    const { screen } = await renderApp('/inbox');
+    const first = screen.getByRole('link', { name: /Sujet thread-a/ });
+    await expect.element(first).toBeVisible();
+
+    const row = first.element();
+    if (row instanceof HTMLElement) {
+      row.focus();
+    }
+
+    await expect.element(first).toHaveFocus();
     const scrollArea = row.closest('ol')?.parentElement;
-    const outlineRoom =
+    const ringRoom =
       row.getBoundingClientRect().top - (scrollArea?.getBoundingClientRect().top ?? 0);
-    expect(outlineRoom).toBeGreaterThanOrEqual(2);
+    expect(ringRoom).toBeGreaterThanOrEqual(4);
     const layer = (element: Element | null | undefined) =>
       Number(getComputedStyle(element ?? row).zIndex) || 0;
     const nextRow = screen.getByRole('link', { name: /Sujet thread-b/ }).element();
     expect(layer(row.closest('li'))).toBeGreaterThan(layer(nextRow.closest('li')));
-    const spaceBetween = nextRow.getBoundingClientRect().top - row.getBoundingClientRect().bottom;
-    expect(spaceBetween).toBeGreaterThanOrEqual(4);
   });
 });
 

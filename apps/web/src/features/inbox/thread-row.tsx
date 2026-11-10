@@ -19,11 +19,8 @@ export function ThreadRow({ thread, view, mailbox, now }: ThreadRowProps) {
   const sender = thread.sender.name || thread.sender.address;
   return (
     <ThreadRowLink to="/$view/$id" params={{ view, id: thread.id }} search={(previous) => previous}>
-      <span
-        className={`mt-3 size-1.5 flex-none rounded-full ${thread.unread ? 'bg-primary' : 'bg-transparent'}`}
-      />
       <Avatar name={sender} />
-      <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+      <span className="flex min-w-0 flex-1 flex-col">
         <span className="flex items-baseline gap-2">
           <span className={`truncate ${thread.unread ? 'font-semibold' : 'font-medium'}`}>
             {sender}
@@ -35,23 +32,42 @@ export function ThreadRow({ thread, view, mailbox, now }: ThreadRowProps) {
             {formatListDate(thread.lastMessageAt, now)}
           </time>
         </span>
-        <span className="truncate">{thread.subject || fr.inbox.noSubject}</span>
-        <span className="truncate text-ink-2">{thread.snippet}</span>
-        <span className="flex items-center gap-2.5 pt-0.75 text-caption text-ink-2">
-          {mailbox !== undefined && (
-            <span className="flex items-center gap-1.25">
-              <Swatch color={mailbox.color} shape="circle" small />
-              {mailbox.name}
-            </span>
-          )}
-          {thread.hasAttachments && (
-            <span className="flex items-center">
-              <PaperclipIcon className="icon-12" />
-              <span className="sr-only">{fr.inbox.hasAttachments}</span>
-            </span>
+        <span className="flex items-center gap-2">
+          <span className={`truncate ${thread.unread ? 'font-semibold' : ''}`}>
+            {thread.subject || fr.inbox.noSubject}
+          </span>
+          {thread.unread && (
+            <span aria-hidden="true" className="ml-auto size-2 flex-none rounded-full bg-primary" />
           )}
         </span>
+        <span className="truncate text-small text-ink-2">{thread.snippet}</span>
+        <ThreadRowMeta mailbox={mailbox} hasAttachments={thread.hasAttachments} />
       </span>
     </ThreadRowLink>
+  );
+}
+
+function ThreadRowMeta({
+  mailbox,
+  hasAttachments,
+}: {
+  mailbox: MailboxSummary | undefined;
+  hasAttachments: boolean;
+}) {
+  return (
+    <span className="mt-2 flex items-center gap-2 text-caption leading-none text-ink-2">
+      {mailbox !== undefined && (
+        <span className="flex items-center gap-2">
+          <Swatch color={mailbox.color} shape="circle" />
+          {mailbox.name}
+        </span>
+      )}
+      {hasAttachments && (
+        <span className="flex items-center">
+          <PaperclipIcon className="icon-14" />
+          <span className="sr-only">{fr.inbox.hasAttachments}</span>
+        </span>
+      )}
+    </span>
   );
 }

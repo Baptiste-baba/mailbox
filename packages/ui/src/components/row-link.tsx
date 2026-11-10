@@ -9,7 +9,7 @@ export function RowLink({ className, ...props }: ComponentProps<'a'>) {
   return (
     <a
       className={joinClassNames(
-        'flex gap-2.5 rounded-md pt-2.5 pr-3 pb-2.75 pl-2',
+        'flex gap-3.5 rounded-lg px-3 py-3.5',
         'not-aria-[current=page]:hover:bg-page aria-[current=page]:bg-selected',
         className,
       )}

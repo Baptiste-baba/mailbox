@@ -8,7 +8,7 @@ import { ThreadListCrash } from './thread-list-states.tsx';
 export function MailView() {
   return (
     <ResizableColumns id="mail-view">
-      <ResizableColumn id="list" defaultSize="30%" minSize={300} maxSize="50%">
+      <ResizableColumn id="list" defaultSize="36%" minSize={300} maxSize="50%">
         <section aria-label={fr.inbox.listLabel} className="flex h-full flex-col bg-chrome">
           <CatchBoundary getResetKey={() => 'mail-list'} errorComponent={ThreadListCrash}>
             <MailList />

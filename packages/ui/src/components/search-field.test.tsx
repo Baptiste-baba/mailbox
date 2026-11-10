@@ -1,16 +1,16 @@
 import { describe, expect, test } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
+import { Kbd } from './kbd.tsx';
 import { SearchField } from './search-field.tsx';
-import { ToggleChip } from './toggle-chip.tsx';
 
 describe('SearchField', () => {
   test('is named by its label, apart from its trailing controls', async () => {
     const screen = await render(
       <SearchField
         label="Rechercher dans la réception"
-        placeholder="Rechercher"
-        trailing={<ToggleChip pressed={false}>IA</ToggleChip>}
+        placeholder="Rechercher dans la réception"
+        trailing={<Kbd>/</Kbd>}
       />,
     );
 
@@ -19,7 +19,7 @@ describe('SearchField', () => {
       exact: true,
     });
     await expect.element(field).toBeVisible();
-    await expect.element(screen.getByRole('button', { name: 'IA' })).toBeVisible();
+    await expect.element(screen.getByText('/', { exact: true })).toBeVisible();
   });
 
   test('takes what is typed in it', async () => {

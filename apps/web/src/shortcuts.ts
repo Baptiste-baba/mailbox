@@ -1,6 +1,7 @@
 export type ShortcutId =
   | 'newMail'
   | 'search'
+  | 'searchList'
   | 'settings'
   | 'nextThread'
   | 'previousThread'
@@ -8,8 +9,7 @@ export type ShortcutId =
   | 'archive'
   | 'snooze'
   | 'translate'
-  | 'reply'
-  | 'aiSearch';
+  | 'reply';
 
 interface Shortcut {
   /** As shown next to its action. */
@@ -22,6 +22,7 @@ interface Shortcut {
 export const shortcuts: Record<ShortcutId, Shortcut> = {
   newMail: { label: 'C' },
   search: { label: '⌘K' },
+  searchList: { label: '/' },
   settings: { label: '⌘,' },
   nextThread: { label: 'J', key: 'j' },
   previousThread: { label: 'K', key: 'k' },
@@ -30,5 +31,4 @@ export const shortcuts: Record<ShortcutId, Shortcut> = {
   snooze: { label: 'H' },
   translate: { label: 'T' },
   reply: { label: 'R' },
-  aiSearch: { label: '⌘I' },
 };
