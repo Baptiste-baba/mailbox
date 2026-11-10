@@ -23,7 +23,7 @@ export function Shell() {
           panelRef={sidebar}
           onResize={onSidebarResize}
           defaultSize={SIDEBAR_DEFAULT_SIZE}
-          minSize={190}
+          minSize={240}
           maxSize={320}
           collapsible
           collapsedSize={56}
