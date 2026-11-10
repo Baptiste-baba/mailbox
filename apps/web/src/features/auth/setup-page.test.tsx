@@ -72,11 +72,15 @@ describe('setup, step by step', () => {
 });
 
 describe('setup, checks before anything is sent', () => {
-  test('refuses a password that is easy to guess, even long enough', async () => {
+  // zxcvbn rates the first one "très faible", the second "bonne": only "excellente" is accepted.
+  test.each([
+    ['very weak', 'azertyuiop123'],
+    ['merely good', 'Bordeaux2025!'],
+  ])('refuses a %s password, even long enough', async (_case, password) => {
     const { screen, fetchMock } = await openSetup();
     await enterCode(screen);
 
-    await enterAccount(screen, 'azertyuiop123');
+    await enterAccount(screen, password);
 
     await expect.element(screen.getByText(/Trop facile à deviner/)).toBeVisible();
     expect(fetchMock.mock.calls.some(([url]) => url.includes('totp-secret'))).toBe(false);

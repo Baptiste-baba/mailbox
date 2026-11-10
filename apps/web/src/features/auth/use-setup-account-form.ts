@@ -7,8 +7,8 @@ import type { PasswordScore } from './password-checker.ts';
 import { startEnrollment } from './setup-requests.ts';
 import { usePasswordScore } from './use-password-score.ts';
 
-/** "Bonne" at least: hard enough to guess even from a stolen copy of the database. */
-export const MIN_PASSWORD_SCORE: PasswordScore = 3;
+/** "Excellente" only: hard to guess even from a stolen copy of the database. */
+export const MIN_PASSWORD_SCORE: PasswordScore = 4;
 
 interface AccountErrors {
   username?: string;
