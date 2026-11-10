@@ -12,7 +12,13 @@ afterEach(() => {
   vi.useRealTimers();
 });
 
-describe('passkey challenges', () => {
+function issueSignInChallenges(count: number): void {
+  for (let issued = 0; issued < count; issued++) {
+    challenges.issue('signIn');
+  }
+}
+
+describe('passkey challenges, signing in', () => {
   it('issues 32 random bytes in base64url, never the same twice', () => {
     const first = challenges.issue('signIn');
     const second = challenges.issue('signIn');
@@ -40,37 +46,55 @@ describe('passkey challenges', () => {
     expect(challenges.consume('bmV2ZXItaXNzdWVk', 'signIn')).toBe(false);
   });
 
-  it('keeps 100 challenges at most, forgetting the oldest', () => {
+  it('keeps 1,000 challenges at most, forgetting the oldest', () => {
     const oldest = challenges.issue('signIn');
     const second = challenges.issue('signIn');
-    for (let issued = 2; issued <= 100; issued++) {
-      challenges.issue('signIn');
-    }
+    issueSignInChallenges(999);
 
     expect(challenges.consume(oldest, 'signIn')).toBe(false);
     expect(challenges.consume(second, 'signIn')).toBe(true);
   });
 });
 
-describe('passkey challenges, purpose and session', () => {
-  it('refuses a challenge for another purpose, and uses it up all the same', () => {
-    const challenge = challenges.issue('identityConfirmation', 'session-a');
+describe('passkey challenges, of a session', () => {
+  it('accepts a challenge for the session and purpose it was issued for only', () => {
+    const challenge = challenges.issue('registration', 'session-a');
 
-    expect(challenges.consume(challenge, 'signIn')).toBe(false);
+    expect(challenges.consume(challenge, 'registration', 'session-b')).toBe(false);
     expect(challenges.consume(challenge, 'identityConfirmation', 'session-a')).toBe(false);
-  });
-
-  it('accepts a challenge from the session it was issued to only', () => {
-    const forA = challenges.issue('registration', 'session-a');
-    const alsoForA = challenges.issue('registration', 'session-a');
-
-    expect(challenges.consume(forA, 'registration', 'session-b')).toBe(false);
-    expect(challenges.consume(alsoForA, 'registration', 'session-a')).toBe(true);
+    expect(challenges.consume(challenge, 'signIn')).toBe(false);
+    expect(challenges.consume(challenge, 'registration', 'session-a')).toBe(true);
+    expect(challenges.consume(challenge, 'registration', 'session-a')).toBe(false);
   });
 
   it('refuses a sign-in challenge to a session', () => {
     const challenge = challenges.issue('signIn');
 
     expect(challenges.consume(challenge, 'signIn', 'session-a')).toBe(false);
+  });
+
+  it('replaces the challenge a session had for the same purpose', () => {
+    const former = challenges.issue('identityConfirmation', 'session-a');
+    const latest = challenges.issue('identityConfirmation', 'session-a');
+
+    expect(challenges.consume(former, 'identityConfirmation', 'session-a')).toBe(false);
+    expect(challenges.consume(latest, 'identityConfirmation', 'session-a')).toBe(true);
+  });
+
+  it('refuses a challenge of a session once its time is up', () => {
+    const challenge = challenges.issue('identityConfirmation', 'session-a');
+
+    vi.advanceTimersByTime(CHALLENGE_LIFETIME_MS);
+
+    expect(challenges.consume(challenge, 'identityConfirmation', 'session-a')).toBe(false);
+  });
+
+  // Regression: anyone asking to sign in again and again pushed out the challenges of sessions.
+  it('keeps the challenge of a session, however many sign-in challenges are asked for', () => {
+    const challenge = challenges.issue('identityConfirmation', 'session-a');
+
+    issueSignInChallenges(1_001);
+
+    expect(challenges.consume(challenge, 'identityConfirmation', 'session-a')).toBe(true);
   });
 });
