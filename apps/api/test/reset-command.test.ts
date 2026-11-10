@@ -1,10 +1,18 @@
-import { account, authAttempt, type Database, recoveryCode, session, setupCode } from '@mailbox/db';
+import {
+  account,
+  authAttempt,
+  type Database,
+  passkey,
+  recoveryCode,
+  session,
+  setupCode,
+} from '@mailbox/db';
 import { totpEnrollmentSchema } from '@mailbox/shared';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { RESET_CONFIRMATION, runResetCommand } from '../src/auth/reset-command.ts';
 import { callAuth } from './auth-requests.ts';
 import { type RunningApi, startApi } from './start-api.ts';
-import { signInOnFreshInstance } from './test-account.ts';
+import { signInOnFreshInstance, storeTestPasskey } from './test-account.ts';
 import { openTestDatabase } from './test-database.ts';
 
 let api: RunningApi;
@@ -20,6 +28,7 @@ async function rowCounts() {
     accounts: (await database.select().from(account)).length,
     sessions: (await database.select().from(session)).length,
     recoveryCodes: (await database.select().from(recoveryCode)).length,
+    passkeys: (await database.select().from(passkey)).length,
   };
 }
 
@@ -38,13 +47,14 @@ beforeEach(async () => {
 });
 
 describe('resetting the access from the server', () => {
-  it('erases the account and its sessions, then opens setup with the code it prints', async () => {
+  it('erases the account, its passkeys and sessions, then opens setup with the code it prints', async () => {
     await database.insert(authAttempt).values({ kind: 'password', client: '100.64.0.1' });
+    await storeTestPasskey(database);
     const prompt = terminal(RESET_CONFIRMATION);
 
     expect(await runResetCommand(process.env, prompt)).toBe(true);
 
-    expect(await rowCounts()).toEqual({ accounts: 0, sessions: 0, recoveryCodes: 0 });
+    expect(await rowCounts()).toEqual({ accounts: 0, sessions: 0, recoveryCodes: 0, passkeys: 0 });
     expect(await database.select().from(authAttempt)).toHaveLength(0);
     expect(await database.select().from(setupCode)).toHaveLength(1);
     expect((await callAuth(api, 'GET', '/status', { cookie })).status).toBe(200);
