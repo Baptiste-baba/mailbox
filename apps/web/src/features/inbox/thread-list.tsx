@@ -9,13 +9,18 @@ import { LoadMoreError, ThreadListMessage, ThreadListSkeleton } from './thread-l
 import { ThreadRow } from './thread-row.tsx';
 import { useThreadKeyboard } from './use-thread-keyboard.ts';
 
-const ROW_HEIGHT_ESTIMATE = 96;
-/** Room above the first row, so that the outline of a selected first row is not cut by the scroll area. */
+const ROW_HEIGHT_ESTIMATE = 114;
+/** Room above the first row, so that its focus ring is not cut by the scroll area. */
 const LIST_PADDING_TOP = 4;
-/** Room between rows, so that a hovered row never touches the outline of the selected one. */
-const ROW_GAP = 4;
 /** The next page is asked for while this many rows remain below the visible ones. */
 const LOAD_AHEAD_ROWS = 10;
+
+/**
+ * A line between two rows, from the text to the edge: hidden next to the open thread, which stands
+ * out by its tint alone.
+ */
+const ROW_SEPARATOR =
+  'before:absolute before:top-0 before:right-3 before:left-16.5 before:h-px before:bg-line-soft has-aria-[current=page]:before:hidden [li:has([aria-current=page])+&]:before:hidden';
 
 /**
  * The threads of the current view, or why there is none to show. Threads already shown stay on
@@ -75,7 +80,6 @@ function VirtualThreadList({
     estimateSize: () => ROW_HEIGHT_ESTIMATE,
     getItemKey: (index) => threads[index]?.id ?? index,
     paddingStart: LIST_PADDING_TOP,
-    gap: ROW_GAP,
     overscan: 6,
   });
   const rows = virtualizer.getVirtualItems();
@@ -98,9 +102,8 @@ function VirtualThreadList({
                 key={row.key}
                 ref={virtualizer.measureElement}
                 data-index={row.index}
-                // Each row is a layer of its own: the selected one goes on top, or the row after it
-                // would paint over its outline.
-                className="absolute inset-x-1.5 top-0 has-aria-[current=page]:z-10"
+                // The focused row goes on top, or the row after it would paint over its focus ring.
+                className={`absolute inset-x-3 top-0 has-focus:z-10 ${row.index === 0 ? '' : ROW_SEPARATOR}`}
                 style={{ transform: `translateY(${row.start}px)` }}
               >
                 <ThreadRow

@@ -1,63 +1,66 @@
-import { IconButton, PaneHeader } from '@mailbox/ui';
+import { Chip, SegmentedControl } from '@mailbox/ui';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
-import { CircleSmallIcon, PanelRightIcon } from 'lucide-react';
 import { mailboxesQuery, selectInboxUnreadCount } from '../../api/mailboxes-query.ts';
 import type { ThreadFilters } from '../../api/thread-pages-query.ts';
-import { comingSoonHint } from '../../hint.ts';
 import { fr } from '../../i18n/fr.ts';
-import { shortcuts } from '../../shortcuts.ts';
 import { useShortcut } from '../../use-shortcut.ts';
+import { MailSearchField } from './mail-search-field.tsx';
 
-/** Title of the view with its unread count, then the actions on the list. */
+type Filter = 'all' | 'unread';
+
+const filterOptions: { value: Filter; label: string }[] = [
+  { value: 'all', label: fr.inbox.filterAll },
+  { value: 'unread', label: fr.inbox.filterUnread },
+];
+
+/** Title of the view with its unread count, the choice between every thread and unread ones, then search. */
 export function MailListHeader({ filters }: { filters: ThreadFilters }) {
   const navigate = useNavigate();
-  const toggleUnreadOnly = () =>
-    navigate({
-      to: '.',
-      search: (previous) => ({ ...previous, unread: previous.unread ? undefined : true }),
-    });
-  useShortcut('unreadOnly', toggleUnreadOnly);
-  const { title, unreadCount } = useViewSummary(filters);
+  const showUnreadOnly = (unreadOnly: boolean) =>
+    navigate({ to: '.', search: (previous) => ({ ...previous, unread: unreadOnly || undefined }) });
+  useShortcut('unreadOnly', () => showUnreadOnly(!filters.unreadOnly));
+  const { title, unreadCount, place } = useViewSummary(filters);
   return (
-    <PaneHeader className="gap-2 pr-3 pl-4.5">
-      <h1 className="truncate text-heading font-bold">{title}</h1>
-      {unreadCount !== undefined && unreadCount > 0 && (
-        <span className="flex-none text-caption text-ink-2">
-          {fr.common.unreadCount(unreadCount)}
-        </span>
-      )}
-      <div className="ml-auto flex gap-0.5">
-        <IconButton
-          label={fr.inbox.unreadOnly}
-          shortcut={shortcuts.unreadOnly.label}
-          pressed={filters.unreadOnly}
-          onClick={toggleUnreadOnly}
-        >
-          <CircleSmallIcon />
-        </IconButton>
-        <IconButton label={comingSoonHint(fr.inbox.layout)} disabled>
-          <PanelRightIcon />
-        </IconButton>
+    <div className="flex-none px-6 pt-7">
+      <div className="flex items-center gap-3">
+        <h1 className="truncate text-title font-semibold text-heading">{title}</h1>
+        {unreadCount !== undefined && unreadCount > 0 && (
+          <Chip tone="tint">{fr.common.unreadCount(unreadCount)}</Chip>
+        )}
       </div>
-    </PaneHeader>
+      <SegmentedControl
+        variant="tabs"
+        label={fr.inbox.filterLabel}
+        options={filterOptions}
+        value={filters.unreadOnly ? 'unread' : 'all'}
+        onChange={(filter) => showUnreadOnly(filter === 'unread')}
+        className="mt-5"
+      />
+      <MailSearchField place={place} />
+    </div>
   );
 }
 
-function useViewSummary(filters: ThreadFilters): {
+interface ViewSummary {
   title: string;
   unreadCount?: number | undefined;
-} {
+  /** Where the search of the list looks, such as "la réception". */
+  place: string;
+}
+
+function useViewSummary(filters: ThreadFilters): ViewSummary {
   const mailboxes = useQuery(mailboxesQuery).data?.mailboxes;
   if (filters.view === 'all') {
-    return { title: fr.sidebar.allMailboxes };
+    return { title: fr.sidebar.allMailboxes, place: fr.inbox.allMailboxesPlace };
   }
   const mailbox = mailboxes?.find((candidate) => candidate.id === filters.mailboxId);
   if (mailbox !== undefined) {
-    return { title: mailbox.name, unreadCount: mailbox.unreadCount };
+    return { title: mailbox.name, unreadCount: mailbox.unreadCount, place: mailbox.name };
   }
   return {
     title: fr.sidebar.inbox,
     unreadCount: mailboxes && selectInboxUnreadCount({ mailboxes }),
+    place: fr.inbox.inboxPlace,
   };
 }

@@ -7,15 +7,15 @@ const SKELETON_ROW_IDS = Array.from({ length: 8 }, (_, index) => `skeleton-row-$
 /** Rows in the shape of threads while the first page loads. */
 export function ThreadListSkeleton() {
   return (
-    <div aria-hidden="true" className="flex flex-col px-1.5">
+    <div aria-hidden="true" className="flex flex-col px-3 pt-1">
       {SKELETON_ROW_IDS.map((rowId) => (
-        <div key={rowId} className="flex gap-2.5 pt-2.5 pr-3 pb-2.75 pl-4">
-          <Skeleton className="size-7.5 rounded-full" />
-          <div className="flex flex-1 flex-col gap-2 pt-1">
-            <Skeleton className="h-3 w-2/5" />
-            <Skeleton className="h-3 w-4/5" />
+        <div key={rowId} className="flex gap-3.5 px-3 py-3.5">
+          <Skeleton className="size-10 rounded-full" />
+          <div className="flex flex-1 flex-col gap-2.5 pt-1">
+            <Skeleton className="h-3.5 w-2/5" />
+            <Skeleton className="h-3.5 w-4/5" />
             <Skeleton className="h-3 w-3/5" />
-            <Skeleton className="mt-1 h-2.5 w-1/5" />
+            <Skeleton className="mt-1.5 h-3 w-1/5" />
           </div>
         </div>
       ))}

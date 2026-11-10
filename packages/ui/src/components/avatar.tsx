@@ -22,7 +22,7 @@ export function Avatar({ tone = 'neutral', className, ...content }: AvatarProps)
     <span
       aria-hidden="true"
       className={joinClassNames(
-        'grid size-7.5 flex-none place-items-center rounded-full text-caption font-semibold [&>svg]:icon-15',
+        'grid size-10 flex-none place-items-center rounded-full text-small font-semibold [&>svg]:icon-18',
         toneClassNames[tone],
         className,
       )}

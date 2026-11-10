@@ -1,13 +1,6 @@
 /* Icons are drawn on a 24 px grid with a 2 px stroke (Lucide). Each size takes the stroke the
    mockups give it, so that lines look equally fine whatever the size. */
 
-@utility icon-12 {
-  flex-shrink: 0;
-  width: 12px;
-  height: 12px;
-  stroke-width: 2;
-}
-
 @utility icon-14 {
   flex-shrink: 0;
   width: 14px;

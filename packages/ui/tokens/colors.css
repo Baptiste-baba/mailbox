@@ -13,6 +13,8 @@
   /* Filled fields, current navigation item, hovered rows. */
   --field: #f1f5f9;
   --line: #e2e8f0;
+  /* Between the rows of a list. */
+  --line-soft: #edf1f6;
   --ink: #1e293b;
   /* Secondary text: dates, addresses, start of a mail, placeholders. */
   --ink-2: #5a6880;
@@ -55,6 +57,7 @@
   --surface: #15183c;
   --field: #1d2148;
   --line: #262a5c;
+  --line-soft: #1e2250;
   --ink: #eceeff;
   --ink-2: #a3a8cc;
   --heading: #f4f5ff;
@@ -88,6 +91,7 @@
   --color-surface: var(--surface);
   --color-field: var(--field);
   --color-line: var(--line);
+  --color-line-soft: var(--line-soft);
   --color-ink: var(--ink);
   --color-ink-2: var(--ink-2);
   --color-heading: var(--heading);
