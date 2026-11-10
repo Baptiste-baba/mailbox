@@ -25,6 +25,8 @@ export interface StartedSession {
 export interface ResumedSession extends StartedSession {
   /** Opened with a recovery code, and no new authenticator app set up since. */
   mustReplaceAuthenticator: boolean;
+  /** When the user last proved who they are on this device; null for a recovery code session. */
+  identityConfirmedAt: Date | null;
   /** Its end was just pushed back: the cookie must follow. */
   renewed: boolean;
 }
@@ -48,6 +50,8 @@ export class SessionService {
       userAgent: userAgent.slice(0, USER_AGENT_MAX_LENGTH),
       expiresAt,
       mustReplaceAuthenticator,
+      // Signing in proves who one is. A recovery code session only replaces the authenticator app.
+      identityConfirmedAt: mustReplaceAuthenticator ? null : new Date(),
     });
     return { token, expiresAt };
   }
@@ -63,6 +67,7 @@ export class SessionService {
         id: session.id,
         expiresAt: session.expiresAt,
         mustReplaceAuthenticator: session.mustReplaceAuthenticator,
+        identityConfirmedAt: session.identityConfirmedAt,
       })
       .from(session)
       .where(and(eq(session.tokenHash, hashToken(token)), gt(session.expiresAt, now)))
@@ -70,16 +75,17 @@ export class SessionService {
     if (found === undefined) {
       return undefined;
     }
-    const { mustReplaceAuthenticator } = found;
+    const { mustReplaceAuthenticator, identityConfirmedAt } = found;
+    const resumed = { token, mustReplaceAuthenticator, identityConfirmedAt };
     if (found.expiresAt.getTime() > now.getTime() + SESSION_LIFETIME_MS - RENEWAL_INTERVAL_MS) {
-      return { token, expiresAt: found.expiresAt, mustReplaceAuthenticator, renewed: false };
+      return { ...resumed, expiresAt: found.expiresAt, renewed: false };
     }
     const expiresAt = nextExpiry();
     await this.database
       .update(session)
       .set({ lastSeenAt: now, expiresAt })
       .where(eq(session.id, found.id));
-    return { token, expiresAt, mustReplaceAuthenticator, renewed: true };
+    return { ...resumed, expiresAt, renewed: true };
   }
 
   /** Ends every session but the one of `token`. */
@@ -87,11 +93,22 @@ export class SessionService {
     await transaction.delete(session).where(ne(session.tokenHash, hashToken(token)));
   }
 
-  /** The session of `token` set up a new authenticator app: it reaches the whole app again. */
+  /**
+   * The session of `token` set up a new authenticator app: it reaches the whole app again. Its user
+   * just proved who they are, with the password, a recovery code and a code of the new app.
+   */
   async endAuthenticatorReplacement(transaction: Transaction, token: string): Promise<void> {
     await transaction
       .update(session)
-      .set({ mustReplaceAuthenticator: false })
+      .set({ mustReplaceAuthenticator: false, identityConfirmedAt: new Date() })
+      .where(eq(session.tokenHash, hashToken(token)));
+  }
+
+  /** The user just proved again who they are, on the device of `token`. */
+  async confirmIdentity(token: string): Promise<void> {
+    await this.database
+      .update(session)
+      .set({ identityConfirmedAt: new Date() })
       .where(eq(session.tokenHash, hashToken(token)));
   }
 
