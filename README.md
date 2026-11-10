@@ -19,8 +19,9 @@ not needed.
    ```
 
 2. Fill in `.env`. Generate the database password with `openssl rand -hex 32` and the secret key
-   with `openssl rand -base64 32`, and keep a copy of that key outside the machine. Keep the database
-   folder on an SSD, and the backup folder on another disk when the machine has one.
+   with `openssl rand -base64 32`, and keep a copy of that key outside the machine. Set `MAILBOX_URL`
+   to the HTTPS address you will open the app at (see below). Keep the database folder on an SSD,
+   and the backup folder on another disk when the machine has one.
 3. Create both folders, and give the backup folder to the user the worker runs as:
 
    ```bash
@@ -31,7 +32,9 @@ not needed.
 4. Start everything with `docker compose up --detach`.
 
 The app then listens on `127.0.0.1:3000` (or `MAILBOX_PORT`), reachable from the machine itself
-only. Put an HTTPS endpoint in front of it, such as `tailscale serve`, to reach it from other devices.
+only. Put an HTTPS endpoint in front of it, such as `tailscale serve`, to reach it from other devices,
+and open the app at the address set in `MAILBOX_URL`. Passkeys are tied to the host name of that
+address: changing it later stops every passkey from working.
 
 Each service has a memory and CPU limit (1.4 GB of memory in total), restarts on its own after a
 failure, and, for the api and the worker, runs without any Linux privilege on a read-only filesystem.
@@ -90,6 +93,7 @@ sets them from `.env`; the table below matters to run a service on its own.
 | -------------------- | ----------- | -------- | ----------- | -------------------------------------------------------------- |
 | `DATABASE_URL`       | api, worker | yes      |             | PostgreSQL connection string (`postgres://…`)                  |
 | `MAILBOX_SECRET_KEY` | api         | yes      |             | 32 bytes in base64 encrypting the secrets kept in the database |
+| `MAILBOX_URL`        | api         | yes      |             | HTTPS address the app is opened at (`http` for `localhost`)    |
 | `API_HOST`           | api         | no       | `127.0.0.1` | Address the api listens on (`0.0.0.0` inside a container)      |
 | `API_PORT`           | api         | no       | `3000`      | Port the api listens on                                        |
 | `WEB_DIRECTORY`      | api         | no       |             | Built web app (`apps/web/dist`) to serve; unset, API only      |
