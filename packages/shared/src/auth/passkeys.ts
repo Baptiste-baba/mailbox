@@ -5,8 +5,11 @@ import {
   passkeyRegistrationResponseSchema,
 } from './webauthn.ts';
 
+/** How the api names a passkey of the account. */
+export const passkeyIdSchema = z.uuid();
+
 const passkeySummarySchema = z.object({
-  id: z.uuid(),
+  id: passkeyIdSchema,
   name: z.string(),
   createdAt: z.iso.datetime(),
   /** Null until the passkey first signs in or confirms the identity. */

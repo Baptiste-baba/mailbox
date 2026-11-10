@@ -10,6 +10,7 @@ export {
   type PasskeyLoginRequest,
   type PasskeyRegistration,
   type PasskeySummary,
+  passkeyIdSchema,
   passkeyListSchema,
   passkeyLoginRequestSchema,
   passkeyRegistrationSchema,

@@ -2,7 +2,7 @@ import { isIP } from 'node:net';
 import * as z from 'zod';
 
 /** Where users open the app: passkeys belong to its host name, and only its pages may use them. */
-interface AppUrl {
+export interface AppUrl {
   /** What browsers report as the origin of the app's pages, such as https://mail.example.ts.net. */
   origin: string;
   /** The host name passkeys are tied to: the relying party id of WebAuthn. */
