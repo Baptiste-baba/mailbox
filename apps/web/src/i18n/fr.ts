@@ -1,6 +1,7 @@
 /** Every text shown in the interface: nothing displayed to the user is written anywhere else. */
 export const fr = {
   common: {
+    productName: 'MailBox',
     comingSoon: 'Bientôt disponible',
     retry: 'Réessayer',
     continue: 'Continuer',
@@ -28,10 +29,6 @@ export const fr = {
     newFolder: 'Nouveau',
     newFolderLabel: 'Nouveau dossier',
     foldersError: 'Impossible de charger tes dossiers.',
-    drafts: 'Brouillons',
-    sent: 'Envoyés',
-    archive: 'Archives',
-    security: 'Sécurité',
     settings: 'Réglages',
     crash: 'La navigation n’a pas pu s’afficher.',
   },
@@ -69,7 +66,6 @@ export const fr = {
     crash: 'Ce mail n’a pas pu s’afficher.',
   },
   auth: {
-    productName: 'MailBox',
     setupTitle: 'Installation',
     loginTitle: 'Connexion',
     loginIntro: 'Ravi de te revoir.',

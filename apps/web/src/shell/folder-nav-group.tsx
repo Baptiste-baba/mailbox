@@ -13,7 +13,7 @@ export function FolderNavGroup() {
       title={fr.sidebar.folders}
       action={
         <NavGroupAction
-          disabled
+          aria-disabled
           title={comingSoonHint(fr.sidebar.newFolderLabel)}
           aria-label={fr.sidebar.newFolderLabel}
         >

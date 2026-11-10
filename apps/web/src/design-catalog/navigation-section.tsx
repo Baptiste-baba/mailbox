@@ -1,5 +1,5 @@
-import { Kbd, NavGroup, NavGroupAction, NavItem, Skeleton, Swatch } from '@mailbox/ui';
-import { InboxIcon, SearchIcon, TextIcon } from 'lucide-react';
+import { Chip, Kbd, NavGroup, NavGroupAction, NavItem, Skeleton, Swatch } from '@mailbox/ui';
+import { InboxIcon, SearchIcon, SunIcon } from 'lucide-react';
 import type { ComponentProps } from 'react';
 import { CatalogSection, SampleName } from './catalog-section.tsx';
 
@@ -16,10 +16,10 @@ export function NavigationSection() {
     <CatalogSection title="Navigation">
       <div className="flex flex-col gap-2">
         <div className="flex items-start gap-4">
-          <div className="@container flex w-57 flex-col gap-3.5 rounded-md bg-page p-2.5">
+          <div className="@container flex w-68 flex-col rounded-md border border-line bg-chrome p-4">
             <SampleNavigation />
           </div>
-          <div className="@container flex w-14 flex-col gap-3.5 rounded-md bg-page px-2 py-2.5">
+          <div className="@container flex w-14 flex-col rounded-md border border-line bg-chrome px-2 py-4">
             <SampleNavigation />
           </div>
         </div>
@@ -37,9 +37,9 @@ export function NavigationSection() {
         <SampleName name='<Swatch shape="circle"> pour une boîte, shape="square" pour un dossier' />
       </div>
       <div className="flex flex-col gap-2">
-        <div className="flex w-57 items-center gap-2.25 px-2">
-          <Skeleton className="size-4" />
-          <Skeleton className="h-2.5 w-24" />
+        <div className="flex w-68 items-center gap-3 px-3">
+          <Skeleton className="size-4.5" />
+          <Skeleton className="h-3 w-28" />
         </div>
         <SampleName name="<Skeleton> · place d’un contenu en cours de chargement" />
       </div>
@@ -59,7 +59,7 @@ function SampleNavigation() {
           trailing={7}
           marker="accent"
         />
-        <NavItem icon={<TextIcon />} label="Briefing" disabled title="Bientôt disponible" />
+        <NavItem icon={<SunIcon />} label="Briefing" disabled title="Bientôt disponible" />
         <NavItem icon={<SearchIcon />} label="Recherche" href="#" trailing={<Kbd>⌘K</Kbd>} />
       </NavGroup>
       <NavGroup title="Boîtes" action={<NavGroupAction>Gérer</NavGroupAction>}>
@@ -76,8 +76,8 @@ function SampleNavigation() {
           label="Association"
           description="tresorerie@asso-exemple.example"
           href="#"
-          trailing={<span className="font-semibold text-danger">Reconnecter</span>}
-          marker="danger"
+          trailing={<Chip tone="warn">Reconnecter</Chip>}
+          marker="warn"
         />
       </NavGroup>
     </>

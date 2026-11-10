@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { fr } from '../../i18n/fr.ts';
+import { Brand } from '../../brand.tsx';
 
 interface AuthLayoutProps {
   title: string;
@@ -16,10 +16,8 @@ interface AuthLayoutProps {
 export function AuthLayout({ title, intro, progress, wide = false, children }: AuthLayoutProps) {
   return (
     <div className="flex min-h-dvh flex-col bg-chrome">
-      <header className="flex h-18 flex-none items-center gap-2.5 px-7">
-        {/* Decorative: the product name follows it. */}
-        <img src="/favicon.svg" alt="" className="size-7.5" />
-        <span className="text-brand font-semibold text-heading">{fr.auth.productName}</span>
+      <header className="flex h-18 flex-none items-center px-7">
+        <Brand />
       </header>
       <main className="flex flex-1 flex-col items-center gap-12 px-6 pt-[10vh] pb-16">
         <div className="flex max-w-120 flex-col gap-3 text-center">

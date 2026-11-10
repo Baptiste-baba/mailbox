@@ -1,5 +1,5 @@
 import type { MailboxSummary } from '@mailbox/shared';
-import { NavGroup, NavGroupAction, Swatch } from '@mailbox/ui';
+import { Chip, NavGroup, NavGroupAction, Swatch } from '@mailbox/ui';
 import { useQuery } from '@tanstack/react-query';
 import { LayoutGridIcon } from 'lucide-react';
 import { mailboxesQuery } from '../api/mailboxes-query.ts';
@@ -14,7 +14,7 @@ export function MailboxNavGroup() {
     <NavGroup
       title={fr.sidebar.mailboxes}
       action={
-        <NavGroupAction disabled title={comingSoonHint(fr.sidebar.manageMailboxes)}>
+        <NavGroupAction aria-disabled title={comingSoonHint(fr.sidebar.manageMailboxes)}>
           {fr.sidebar.manageMailboxes}
         </NavGroupAction>
       }
@@ -43,7 +43,7 @@ function MailboxLinks() {
     );
   }
   if (mailboxes.data.mailboxes.length === 0) {
-    return <p className="px-2 py-1 text-caption text-ink-2">{fr.sidebar.noMailbox}</p>;
+    return <p className="px-3 py-2 text-caption text-ink-2">{fr.sidebar.noMailbox}</p>;
   }
   return mailboxes.data.mailboxes.map((mailbox) => (
     <MailboxLink key={mailbox.id} mailbox={mailbox} />
@@ -69,12 +69,12 @@ function MailboxLink({ mailbox }: { mailbox: MailboxSummary }) {
       )}
       trailing={
         reconnect ? (
-          <span className="font-semibold text-danger">{fr.sidebar.reconnect}</span>
+          <Chip tone="warn">{fr.sidebar.reconnect}</Chip>
         ) : (
           mailbox.unreadCount || undefined
         )
       }
-      marker={reconnect ? 'danger' : mailbox.unreadCount > 0 ? 'accent' : undefined}
+      marker={reconnect ? 'warn' : mailbox.unreadCount > 0 ? 'accent' : undefined}
     />
   );
 }

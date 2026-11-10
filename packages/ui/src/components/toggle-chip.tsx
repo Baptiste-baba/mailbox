@@ -16,7 +16,7 @@ export function ToggleChip({ pressed, type = 'button', className, ...props }: To
         'h-5 flex-none rounded-sm px-1.5 text-caption font-semibold touch:h-11 touch:px-3',
         pressableClassNames,
         // Off, the chip is an outline; on, it is filled. The border stays, transparent, so the chip keeps its size.
-        'border border-line text-ink-2 enabled:not-aria-pressed:hover:text-ink aria-pressed:border-transparent aria-pressed:bg-primary aria-pressed:text-on-primary',
+        'border border-line text-ink-2 available:not-aria-pressed:hover:text-ink aria-pressed:border-transparent aria-pressed:bg-primary aria-pressed:text-on-primary',
         className,
       )}
       {...props}
