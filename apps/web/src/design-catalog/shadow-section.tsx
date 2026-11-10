@@ -1,23 +1,13 @@
 import { CatalogSection, SampleName } from './catalog-section.tsx';
 
-const shadows = [
-  { token: 'lift', className: 'shadow-lift', usage: 'Boutons secondaires' },
-  { token: 'card', className: 'shadow-card', usage: 'Cartes mail' },
-  { token: 'cardon', className: 'shadow-cardon', usage: 'Carte sélectionnée' },
-  { token: 'float', className: 'shadow-float', usage: 'Menus flottants' },
-  { token: 'press', className: 'shadow-press', usage: 'Bouton principal' },
-];
-
 export function ShadowSection() {
   return (
-    <CatalogSection title="Ombres">
-      <div className="flex flex-wrap gap-6 bg-well p-6">
-        {shadows.map((shadow) => (
-          <div key={shadow.token} className="flex w-28 flex-col gap-2">
-            <span className={`h-16 rounded-card bg-raise ${shadow.className}`} />
-            <SampleName name={`--${shadow.token} · ${shadow.usage}`} />
-          </div>
-        ))}
+    <CatalogSection title="Ombre">
+      <div className="flex flex-col gap-2">
+        <div className="bg-page p-6">
+          <span className="block h-20 w-48 rounded-xl border border-line bg-surface shadow-card" />
+        </div>
+        <SampleName name="shadow-card · une carte posée sur la page, avec son filet" />
       </div>
     </CatalogSection>
   );

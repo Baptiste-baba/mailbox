@@ -5,9 +5,9 @@ const SEGMENTS = [1, 2, 3, 4];
 function segmentColor(segment: number, score: PasswordScore, strongEnough: boolean): string {
   // A typed password always fills the first bar: the lowest score still shows something.
   if (segment > Math.max(score, 1)) {
-    return 'bg-mist2';
+    return 'bg-field';
   }
-  return strongEnough ? 'bg-klein' : 'bg-verm';
+  return strongEnough ? 'bg-primary' : 'bg-danger';
 }
 
 interface PasswordStrengthBarsProps {
@@ -15,7 +15,7 @@ interface PasswordStrengthBarsProps {
   strongEnough: boolean;
 }
 
-/** Four bars filling up with the score: vermilion while too weak, blue once strong enough. */
+/** Four bars filling up with the score: red while too weak, blue once strong enough. */
 export function PasswordStrengthBars({ score, strongEnough }: PasswordStrengthBarsProps) {
   return (
     <div aria-hidden="true" className="-mt-4 flex gap-1">

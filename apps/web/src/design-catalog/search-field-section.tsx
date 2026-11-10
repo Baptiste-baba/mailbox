@@ -5,12 +5,7 @@ import { CatalogSection, SampleName } from './catalog-section.tsx';
 function AiSearchToggle() {
   const [on, setOn] = useState(false);
   return (
-    <ToggleChip
-      variant="gradient"
-      pressed={on}
-      onClick={() => setOn(!on)}
-      title="Recherche IA (⌘I)"
-    >
+    <ToggleChip pressed={on} onClick={() => setOn(!on)} title="Recherche IA (⌘I)">
       IA
     </ToggleChip>
   );

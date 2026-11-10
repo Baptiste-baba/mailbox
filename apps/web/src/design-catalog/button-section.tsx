@@ -11,7 +11,6 @@ const variants: { variant: ButtonVariant; label: string }[] = [
   { variant: 'secondary', label: 'Reformuler' },
   { variant: 'text', label: 'Tout ranger' },
   { variant: 'neutralText', label: 'Raccourcir' },
-  { variant: 'gradient', label: 'Réécrire' },
 ];
 
 const sizes: { size: ButtonSize; height: string }[] = [
@@ -43,7 +42,7 @@ export function ButtonSection() {
       ))}
       <div className="flex flex-col gap-2">
         <div className="flex flex-wrap items-center gap-3">
-          <div className="w-57 rounded-md bg-mist p-2.5">
+          <div className="w-57 rounded-md bg-page p-2.5">
             <Button variant="primary" size="lg" shortcut="C" className="w-full">
               <PencilIcon />
               Nouveau mail

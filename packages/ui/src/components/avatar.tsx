@@ -5,9 +5,9 @@ import { joinClassNames } from '../join-class-names.ts';
 type AvatarTone = 'neutral' | 'accent' | 'danger';
 
 const toneClassNames: Record<AvatarTone, string> = {
-  neutral: 'bg-avatar text-ink2',
-  accent: 'bg-klein text-onk',
-  danger: 'bg-vermbg text-verm',
+  neutral: 'bg-tint text-tint-ink',
+  accent: 'bg-primary text-on-primary',
+  danger: 'bg-danger-tint text-danger',
 };
 
 type AvatarProps = {
@@ -22,7 +22,7 @@ export function Avatar({ tone = 'neutral', className, ...content }: AvatarProps)
     <span
       aria-hidden="true"
       className={joinClassNames(
-        'grid size-7.5 flex-none place-items-center rounded-full text-micro font-semibold [&>svg]:icon-15',
+        'grid size-7.5 flex-none place-items-center rounded-full text-caption font-semibold [&>svg]:icon-15',
         toneClassNames[tone],
         className,
       )}

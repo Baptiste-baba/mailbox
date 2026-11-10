@@ -11,7 +11,7 @@ const colorClassNames: Record<SwatchColor, string> = {
 
 const shapeClassNames: Record<SwatchShape, string> = {
   circle: 'size-2 rounded-full',
-  square: 'size-2.25 rounded-3xs',
+  square: 'size-2.25 rounded-xs',
 };
 
 interface SwatchProps {

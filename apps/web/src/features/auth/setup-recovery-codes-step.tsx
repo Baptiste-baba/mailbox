@@ -32,7 +32,7 @@ export function SetupRecoveryCodesStep({
     >
       <ul
         aria-label={fr.setup.recoveryListLabel}
-        className="grid grid-cols-2 gap-x-6 gap-y-2 rounded-lg bg-mist2 px-5 py-4 text-base font-medium tracking-wide"
+        className="grid grid-cols-2 gap-x-6 gap-y-2 rounded-md bg-field px-5 py-4 text-base font-medium tracking-wide"
       >
         {recoveryCodes.map((code) => (
           <li key={code}>{code}</li>

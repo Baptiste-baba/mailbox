@@ -1,24 +1,31 @@
-/* Scale from the design handoff (direction E): Geist only, 13 px base. */
+/* Geist only. Fields use 16 px text: below that, Safari on iPhone zooms in on focus. */
 
 @theme {
   --font-*: initial;
   --font-sans: "Geist Variable", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
 
   --text-*: initial;
-  --text-micro: 11px;
-  --text-label: 11.5px;
-  --text-meta: 12px;
-  --text-base: 13px;
-  --text-base--line-height: 1.42;
-  --text-mail: 14.5px;
-  --text-mail--line-height: 1.65;
-  --text-compose: 15px;
-  --text-compose--line-height: 1.7;
-  --text-heading: 15px;
-  --text-heading--letter-spacing: -0.01em;
-  /* Text of a field on a touch screen: below 16 px, Safari on iPhone zooms in on focus. */
-  --text-touch: 16px;
-  --text-title: 24px;
+  --text-micro: 12px;
+  --text-micro--line-height: 16px;
+  --text-caption: 13px;
+  --text-caption--line-height: 18px;
+  --text-small: 14px;
+  --text-small--line-height: 20px;
+  --text-base: 15px;
+  --text-base--line-height: 22px;
+  /* Text of a mail, and of the fields. */
+  --text-body: 16px;
+  --text-body--line-height: 26px;
+  /* Subject of the open mail. */
+  --text-subject: 26px;
+  --text-subject--line-height: 1.25;
+  --text-subject--letter-spacing: -0.015em;
+  /* Title of a page, such as the current view of the mail list. */
+  --text-title: 32px;
+  --text-title--line-height: 1.15;
   --text-title--letter-spacing: -0.02em;
-  --text-greeting: 27px;
+  /* Title of a screen on its own, such as sign-in. */
+  --text-display: 40px;
+  --text-display--line-height: 1.15;
+  --text-display--letter-spacing: -0.02em;
 }

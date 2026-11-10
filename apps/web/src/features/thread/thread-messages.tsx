@@ -29,7 +29,7 @@ export function ThreadMessages({ thread, ownAddress, reply }: ThreadMessagesProp
     <ol
       aria-label={fr.thread.messagesLabel}
       // The rail runs through the centre of the avatars, visible in the gaps between the cards.
-      className="relative flex flex-1 flex-col gap-2.5 before:absolute before:top-6 before:bottom-6 before:left-7.75 before:w-px before:bg-frost2"
+      className="relative flex flex-1 flex-col gap-2.5 before:absolute before:top-6 before:bottom-6 before:left-7.75 before:w-px before:bg-line"
     >
       {thread.messages.map((message, position) => {
         const latest = position === thread.messages.length - 1;

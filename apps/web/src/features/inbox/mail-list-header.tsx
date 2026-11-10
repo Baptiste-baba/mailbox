@@ -23,7 +23,9 @@ export function MailListHeader({ filters }: { filters: ThreadFilters }) {
     <PaneHeader className="gap-2 pr-3 pl-4.5">
       <h1 className="truncate text-heading font-bold">{title}</h1>
       {unreadCount !== undefined && unreadCount > 0 && (
-        <span className="flex-none text-meta text-ink3">{fr.common.unreadCount(unreadCount)}</span>
+        <span className="flex-none text-caption text-ink-2">
+          {fr.common.unreadCount(unreadCount)}
+        </span>
       )}
       <div className="ml-auto flex gap-0.5">
         <IconButton

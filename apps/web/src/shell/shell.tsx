@@ -16,7 +16,7 @@ export function Shell() {
   const onSidebarResize = useCollapseOnNarrowWindow(sidebar);
   return (
     // The columns take the height of their parent: the window, so that only the columns scroll.
-    <div className="h-dvh min-h-160 bg-paper">
+    <div className="h-dvh min-h-160 bg-chrome">
       <ResizableColumns id="shell">
         <ResizableColumn
           id="sidebar"
@@ -27,7 +27,7 @@ export function Shell() {
           maxSize={320}
           collapsible
           collapsedSize={56}
-          className="bg-mist"
+          className="bg-chrome"
         >
           <CatchBoundary getResetKey={() => 'sidebar'} errorComponent={SidebarCrash}>
             <Sidebar />

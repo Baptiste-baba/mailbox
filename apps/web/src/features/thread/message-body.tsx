@@ -22,7 +22,7 @@ export function MessageBody({ message }: { message: Message }) {
   return (
     <div className="flex flex-col gap-2.5 pt-1.5">
       {paragraphsOf(message).map((paragraph) => (
-        <p key={paragraph.id} className="max-w-reading text-mail break-words whitespace-pre-line">
+        <p key={paragraph.id} className="max-w-reading text-body break-words whitespace-pre-line">
           {paragraph.text}
         </p>
       ))}

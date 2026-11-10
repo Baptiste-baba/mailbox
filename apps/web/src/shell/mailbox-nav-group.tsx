@@ -43,7 +43,7 @@ function MailboxLinks() {
     );
   }
   if (mailboxes.data.mailboxes.length === 0) {
-    return <p className="px-2 py-1 text-meta text-ink3">{fr.sidebar.noMailbox}</p>;
+    return <p className="px-2 py-1 text-caption text-ink-2">{fr.sidebar.noMailbox}</p>;
   }
   return mailboxes.data.mailboxes.map((mailbox) => (
     <MailboxLink key={mailbox.id} mailbox={mailbox} />
@@ -69,7 +69,7 @@ function MailboxLink({ mailbox }: { mailbox: MailboxSummary }) {
       )}
       trailing={
         reconnect ? (
-          <span className="font-semibold text-verm">{fr.sidebar.reconnect}</span>
+          <span className="font-semibold text-danger">{fr.sidebar.reconnect}</span>
         ) : (
           mailbox.unreadCount || undefined
         )

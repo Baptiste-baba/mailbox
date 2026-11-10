@@ -10,7 +10,7 @@ export function Skeleton({ className }: SkeletonProps) {
   return (
     <span
       aria-hidden="true"
-      className={joinClassNames('block rounded-xs bg-mist2 motion-safe:animate-pulse', className)}
+      className={joinClassNames('block rounded-sm bg-field motion-safe:animate-pulse', className)}
     />
   );
 }

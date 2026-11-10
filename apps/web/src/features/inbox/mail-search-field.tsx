@@ -14,7 +14,6 @@ export function MailSearchField() {
         title={comingSoonHint(fr.inbox.searchLabel)}
         trailing={
           <ToggleChip
-            variant="gradient"
             pressed={false}
             disabled
             title={comingSoonHint(fr.inbox.aiSearch, shortcuts.aiSearch.label)}

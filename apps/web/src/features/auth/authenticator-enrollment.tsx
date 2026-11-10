@@ -16,7 +16,9 @@ export function AuthenticatorEnrollment({ enrollment }: { enrollment: TotpEnroll
     <>
       <QrCode value={enrollment.otpauthUri} label={fr.authenticator.qrLabel} className="size-45" />
       <div className="flex flex-col gap-1.5">
-        <span className="text-meta font-semibold text-ink2">{fr.authenticator.secretLabel}</span>
+        <span className="text-caption font-semibold text-ink-2">
+          {fr.authenticator.secretLabel}
+        </span>
         <div className="flex items-center justify-between gap-3">
           <code className="font-sans text-base font-medium tracking-wide break-all">
             {groupedSecret(enrollment.secret)}

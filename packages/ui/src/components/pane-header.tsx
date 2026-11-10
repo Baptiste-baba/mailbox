@@ -11,7 +11,7 @@ export function PaneHeader({ children, className }: PaneHeaderProps) {
   return (
     <header
       className={joinClassNames(
-        'flex h-13 flex-none items-center gap-1 px-3.5 shadow-hairline-bottom',
+        'flex h-13 flex-none items-center gap-1 px-3.5 border-b border-line',
         className,
       )}
     >

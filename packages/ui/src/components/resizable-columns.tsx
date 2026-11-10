@@ -75,8 +75,8 @@ export function ColumnResizeHandle() {
     <Separator
       className={joinClassNames(
         'relative z-10 -mx-1.5 w-3',
-        'before:absolute before:inset-y-0 before:left-1/2 before:w-px before:-translate-x-1/2 before:shadow-hairline-end',
-        'data-[separator=active]:before:bg-klein data-[separator=focus]:before:bg-klein data-[separator=hover]:before:bg-ring',
+        'before:absolute before:inset-y-0 before:left-1/2 before:w-px before:-translate-x-1/2 before:bg-line',
+        'data-[separator=active]:before:bg-primary data-[separator=focus]:before:bg-primary data-[separator=hover]:before:bg-ring',
       )}
     />
   );

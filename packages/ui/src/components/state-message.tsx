@@ -17,8 +17,8 @@ export function StateMessage({ message, action, layout = 'block', className }: S
     <div
       className={joinClassNames(
         block
-          ? 'flex flex-col items-center gap-3 text-center text-ink3'
-          : 'flex flex-wrap items-center gap-x-2 gap-y-1 text-meta text-ink3',
+          ? 'flex flex-col items-center gap-3 text-center text-ink-2'
+          : 'flex flex-wrap items-center gap-x-2 gap-y-1 text-caption text-ink-2',
         className,
       )}
     >

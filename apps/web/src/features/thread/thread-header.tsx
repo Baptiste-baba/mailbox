@@ -12,10 +12,10 @@ interface ThreadHeaderProps {
 export function ThreadHeader({ thread, mailbox }: ThreadHeaderProps) {
   return (
     <header className="flex flex-col gap-2">
-      <h2 className="text-title leading-tight font-bold break-words">
+      <h2 className="text-subject font-semibold break-words">
         {thread.subject || fr.inbox.noSubject}
       </h2>
-      <div className="flex flex-wrap items-center gap-x-3.5 gap-y-1 text-meta text-ink3">
+      <div className="flex flex-wrap items-center gap-x-3.5 gap-y-1 text-caption text-ink-2">
         <span>{participantsLine(thread.messages, mailbox?.address)}</span>
         {mailbox !== undefined && (
           <span className="flex items-center gap-1.25" title={mailbox.address}>

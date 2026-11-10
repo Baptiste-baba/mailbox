@@ -16,10 +16,10 @@ export function NavigationSection() {
     <CatalogSection title="Navigation">
       <div className="flex flex-col gap-2">
         <div className="flex items-start gap-4">
-          <div className="@container flex w-57 flex-col gap-3.5 rounded-md bg-mist p-2.5">
+          <div className="@container flex w-57 flex-col gap-3.5 rounded-md bg-page p-2.5">
             <SampleNavigation />
           </div>
-          <div className="@container flex w-14 flex-col gap-3.5 rounded-md bg-mist px-2 py-2.5">
+          <div className="@container flex w-14 flex-col gap-3.5 rounded-md bg-page px-2 py-2.5">
             <SampleNavigation />
           </div>
         </div>
@@ -76,7 +76,7 @@ function SampleNavigation() {
           label="Association"
           description="tresorerie@asso-exemple.example"
           href="#"
-          trailing={<span className="font-semibold text-verm">Reconnecter</span>}
+          trailing={<span className="font-semibold text-danger">Reconnecter</span>}
           marker="danger"
         />
       </NavGroup>

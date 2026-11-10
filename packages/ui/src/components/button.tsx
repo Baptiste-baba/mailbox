@@ -3,21 +3,19 @@ import { joinClassNames } from '../join-class-names.ts';
 import { pressableClassNames } from '../pressable-class-names.ts';
 import { Kbd } from './kbd.tsx';
 
-type ButtonVariant = 'primary' | 'secondary' | 'text' | 'neutralText' | 'gradient';
+type ButtonVariant = 'primary' | 'secondary' | 'text' | 'neutralText';
 type ButtonSize = 'lg' | 'md' | 'sm' | 'xs';
 
-// The design handoff has no hover state: these reuse its own tokens.
+// Hover states reuse the colour tokens.
 const variantClassNames: Record<ButtonVariant, string> = {
-  primary: 'bg-klein font-semibold text-onk shadow-press enabled:hover:bg-kleintx',
-  secondary: 'bg-paper font-medium text-ink shadow-lift enabled:hover:bg-mist2',
-  text: 'font-medium text-klein enabled:hover:bg-mist2',
-  neutralText: 'font-medium text-ink enabled:hover:bg-mist2',
-  gradient:
-    'bg-linear-to-r/srgb from-g1 to-g-fill-end font-medium text-onk shadow-glow enabled:hover:from-kleintx',
+  primary: 'bg-primary font-semibold text-on-primary enabled:hover:bg-primary-hover',
+  secondary: 'border border-line bg-surface font-medium text-ink enabled:hover:bg-field',
+  text: 'font-medium text-link enabled:hover:bg-field',
+  neutralText: 'font-medium text-ink enabled:hover:bg-field',
 };
 
 const sizeClassNames: Record<ButtonSize, string> = {
-  lg: 'h-8.5 rounded-lg',
+  lg: 'h-8.5 rounded-md',
   md: 'h-7 rounded-md',
   sm: 'h-6.5 rounded-md',
   xs: 'h-5.5 rounded-md',
@@ -50,7 +48,6 @@ export function Button({
   children,
   ...props
 }: ButtonProps) {
-  const onAccent = variant === 'primary' || variant === 'gradient';
   return (
     <button
       type={type}
@@ -67,7 +64,11 @@ export function Button({
       {children}
       {shortcut !== undefined && (
         // Shown for sighted users only: read aloud, it would be appended to the button's name.
-        <Kbd surface={onAccent ? 'accent' : 'plain'} aria-hidden="true" className="ml-auto">
+        <Kbd
+          surface={variant === 'primary' ? 'accent' : 'plain'}
+          aria-hidden="true"
+          className="ml-auto"
+        >
           {shortcut}
         </Kbd>
       )}

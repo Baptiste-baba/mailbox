@@ -24,7 +24,7 @@ export function BarButton({
     <button
       type={type}
       className={joinClassNames(
-        'flex h-11 w-full items-center gap-2.5 rounded-lg bg-well pr-2 pl-3.5 text-left text-ink2 shadow-hairline enabled:hover:text-ink [&>svg]:icon-15',
+        'flex h-11 w-full items-center gap-2.5 rounded-md bg-field pr-2 pl-3.5 text-left text-ink-2 border border-line enabled:hover:text-ink [&>svg]:icon-15',
         pressableClassNames,
         className,
       )}
