@@ -1,12 +1,17 @@
-import { account, type Database, passkey, session } from '@mailbox/db';
+import { type Database, session } from '@mailbox/db';
 import { passkeyRequestOptionsSchema, totpEnrollmentSchema } from '@mailbox/shared';
 import { sql } from 'drizzle-orm';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { callAuth, errorCode, sessionCookieFrom } from './auth-requests.ts';
 import { totpCode, wrongTotpCode } from './authenticator-app.ts';
-import { createTestPasskey, signChallenge, type TestPasskey } from './passkey-authenticator.ts';
+import { signChallenge, type TestPasskey } from './passkey-authenticator.ts';
 import { type RunningApi, startApi } from './start-api.ts';
-import { createTestAccount, TEST_PASSWORD, TEST_USERNAME } from './test-account.ts';
+import {
+  createTestAccount,
+  storeTestPasskey,
+  TEST_PASSWORD,
+  TEST_USERNAME,
+} from './test-account.ts';
 import { openTestDatabase, resetAuthTables } from './test-database.ts';
 
 let api: RunningApi;
@@ -29,15 +34,7 @@ afterAll(async () => {
 beforeEach(async () => {
   await resetAuthTables(database);
   ({ setupCookie: cookie, totpSecret, recoveryCodes } = await createTestAccount(api, database));
-  const [owner] = await database.select({ passkeyUserId: account.passkeyUserId }).from(account);
-  const userHandle = Buffer.from(owner?.passkeyUserId.replaceAll('-', '') ?? '', 'hex');
-  testPasskey = createTestPasskey(userHandle.toString('base64url'));
-  await database.insert(passkey).values({
-    credentialId: testPasskey.credentialId,
-    publicKey: testPasskey.publicKey,
-    signCount: 0,
-    name: 'iPhone',
-  });
+  testPasskey = await storeTestPasskey(database);
 });
 
 /** As if the last proof of identity on every device dated from eleven minutes ago. */
