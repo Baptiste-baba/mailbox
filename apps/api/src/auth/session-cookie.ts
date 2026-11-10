@@ -1,3 +1,4 @@
+import { AppError } from '@mailbox/shared';
 import type { CookieOptions, Request, Response } from 'express';
 import type { StartedSession } from './session.service.ts';
 
@@ -22,6 +23,16 @@ export function readSessionToken(request: Request): string | undefined {
     .find((pair) => pair.startsWith(prefix));
   const token = cookie?.slice(prefix.length);
   return token === '' ? undefined : token;
+}
+
+/** The session token of a request the session guard let through, on a route that needs one. */
+export function requireSessionToken(request: Request): string {
+  const token = readSessionToken(request);
+  // The session guard lets no request through without a session: this only narrows the type.
+  if (token === undefined) {
+    throw new AppError('UNAUTHENTICATED', 'Sign in first');
+  }
+  return token;
 }
 
 /** Hands the session to the browser, until the session itself expires. */

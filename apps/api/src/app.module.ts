@@ -22,7 +22,7 @@ export function createAppModule(config: ApiConfig): DynamicModule {
       LoggerModule.forRoot(createLoggerOptions(config.logLevel)),
       DatabaseModule.register(config.databaseUrl),
       HealthModule,
-      createAuthModule(config.secretKey),
+      createAuthModule(config.secretKey, config.appUrl),
       MailboxesModule,
       FoldersModule,
       ThreadsModule,
