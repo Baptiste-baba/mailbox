@@ -1,5 +1,4 @@
 import { Avatar } from '@mailbox/ui';
-import { ShieldAlertIcon } from 'lucide-react';
 import { CatalogSection, SampleName } from './catalog-section.tsx';
 
 const names = ['Paul Martin', 'Claire Dubois', 'La Lettre Tech', 'Atelier', 'élodie durand'];
@@ -18,9 +17,9 @@ export function AvatarSection() {
       <div className="flex flex-col gap-2">
         <div className="flex flex-wrap items-center gap-3">
           <Avatar name="Alex Moreau" tone="accent" />
-          <Avatar icon={<ShieldAlertIcon />} tone="danger" />
+          <Avatar name="Alex Moreau" tone="accent" size="sm" />
         </div>
-        <SampleName name='tone="accent" pour soi, tone="danger" avec une icône pour un mail suspect' />
+        <SampleName name='tone="accent" pour soi, puis size="sm" dans un fil' />
       </div>
     </CatalogSection>
   );

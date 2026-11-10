@@ -21,15 +21,7 @@ describe('SegmentedControl', () => {
   test('selects the option clicked', async () => {
     const screen = await render(<ToneChoice />);
 
-    // Each label is also written invisibly, in bold, to reserve its width: click the visible one.
-    const visibleLabel = screen
-      .getByText('Formel', { exact: true })
-      .elements()
-      .find((element) => element.checkVisibility({ visibilityProperty: true }));
-    if (visibleLabel === undefined) {
-      throw new Error('No visible label reads Formel');
-    }
-    await userEvent.click(visibleLabel);
+    await userEvent.click(screen.getByText('Formel', { exact: true }));
 
     const group = screen.getByRole('radiogroup', { name: 'Ton' });
     await expect.element(group.getByRole('radio', { name: 'Formel' })).toBeChecked();

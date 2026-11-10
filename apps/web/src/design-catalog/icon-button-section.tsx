@@ -10,7 +10,6 @@ import {
   Maximize2Icon,
   PanelRightIcon,
   PaperclipIcon,
-  TrashIcon,
 } from 'lucide-react';
 import { CatalogSection, SampleName } from './catalog-section.tsx';
 
@@ -47,14 +46,11 @@ export function IconButtonSection() {
           <IconButton label="Non lus seulement" shortcut="U" pressed>
             <CircleSmallIcon />
           </IconButton>
-          <IconButton label="Supprimer le brouillon" variant="danger">
-            <TrashIcon />
-          </IconButton>
           <IconButton label="Archiver" shortcut="E" disabled>
             <ArchiveIcon />
           </IconButton>
         </div>
-        <SampleName name='pressed={false}, pressed, variant="danger", puis désactivé' />
+        <SampleName name="pressed={false}, pressed, puis désactivé" />
       </div>
     </CatalogSection>
   );
