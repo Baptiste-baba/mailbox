@@ -1,14 +1,24 @@
-import { setupRequestSchema, type TotpEnrollment } from '@mailbox/shared';
+import { MIN_PASSWORD_LENGTH, setupRequestSchema, type TotpEnrollment } from '@mailbox/shared';
 import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 import { fr } from '../../i18n/fr.ts';
 import type { Credentials } from './credentials.ts';
-import type { PasswordScore } from './password-checker.ts';
+import { MAX_PASSWORD_SCORE, type PasswordScore } from './password-checker.ts';
 import { startEnrollment } from './setup-requests.ts';
 import { usePasswordScore } from './use-password-score.ts';
 
 /** "Excellente" only: hard to guess even from a stolen copy of the database. */
-export const MIN_PASSWORD_SCORE: PasswordScore = 4;
+const MIN_PASSWORD_SCORE = MAX_PASSWORD_SCORE;
+
+/** Long enough for the server, which refuses shorter ones. */
+export function isLongEnough(password: string): boolean {
+  return setupRequestSchema.shape.password.safeParse(password).success;
+}
+
+/** Hard enough to guess; unknown while the dictionaries load. */
+export function isStrongEnough(score: PasswordScore | undefined): boolean {
+  return score !== undefined && score >= MIN_PASSWORD_SCORE;
+}
 
 interface AccountErrors {
   username?: string;
@@ -25,9 +35,9 @@ function accountErrors(
   if (!setupRequestSchema.shape.username.safeParse(account.username).success) {
     errors.username = fr.setup.usernameRequired;
   }
-  if (!setupRequestSchema.shape.password.safeParse(account.password).success) {
-    errors.password = fr.setup.passwordTooShort;
-  } else if (score !== undefined && score < MIN_PASSWORD_SCORE) {
+  if (!isLongEnough(account.password)) {
+    errors.password = fr.setup.passwordTooShort(MIN_PASSWORD_LENGTH);
+  } else if (score !== undefined && !isStrongEnough(score)) {
     errors.password = fr.setup.passwordTooWeak;
   }
   if (confirmation !== account.password) {

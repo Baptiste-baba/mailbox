@@ -3,7 +3,7 @@ import { Chip, NavGroup, NavGroupAction, Swatch } from '@mailbox/ui';
 import { useQuery } from '@tanstack/react-query';
 import { LayoutGridIcon } from 'lucide-react';
 import { mailboxesQuery } from '../api/mailboxes-query.ts';
-import { comingSoonHint, hint } from '../hint.ts';
+import { comingSoon, hint } from '../hint.ts';
 import { fr } from '../i18n/fr.ts';
 import { NavItemSkeletons, SidebarError } from './sidebar-message.tsx';
 import { SidebarNavLink } from './sidebar-nav-link.tsx';
@@ -14,7 +14,7 @@ export function MailboxNavGroup() {
     <NavGroup
       title={fr.sidebar.mailboxes}
       action={
-        <NavGroupAction aria-disabled title={comingSoonHint(fr.sidebar.manageMailboxes)}>
+        <NavGroupAction {...comingSoon(fr.sidebar.manageMailboxes)}>
           {fr.sidebar.manageMailboxes}
         </NavGroupAction>
       }

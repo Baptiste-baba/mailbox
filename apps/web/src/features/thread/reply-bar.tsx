@@ -1,7 +1,7 @@
 import type { Message } from '@mailbox/shared';
 import { BarButton, Button } from '@mailbox/ui';
 import { ReplyIcon, SendHorizontalIcon } from 'lucide-react';
-import { comingSoonHint } from '../../hint.ts';
+import { comingSoon } from '../../hint.ts';
 import { fr } from '../../i18n/fr.ts';
 import { shortcuts } from '../../shortcuts.ts';
 import { replyRecipients } from './participants.ts';
@@ -18,18 +18,12 @@ export function ReplyBar({ latestMessage, ownAddress }: ReplyBarProps) {
     <div className="flex flex-none gap-2.5 border-t border-line px-4 py-3.5">
       <BarButton
         icon={<ReplyIcon />}
-        aria-disabled
-        title={comingSoonHint(label, shortcuts.reply.label)}
+        {...comingSoon(label, shortcuts.reply.label)}
         className="flex-1"
       >
         {label}
       </BarButton>
-      <Button
-        variant="primary"
-        aria-disabled
-        title={comingSoonHint(fr.thread.send)}
-        className="h-11"
-      >
+      <Button variant="primary" size="field" {...comingSoon(fr.thread.send)}>
         {fr.thread.send}
         <SendHorizontalIcon />
       </Button>

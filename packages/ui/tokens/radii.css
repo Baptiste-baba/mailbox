@@ -1,4 +1,4 @@
-/* The bigger the element, the rounder: 10 px for controls, 12 px for rows and panels, 16 px for cards. */
+/* The bigger the element, the rounder: 10 px for controls, 12 px for panels inside a card, 16 px for cards. */
 
 @theme {
   --radius-*: initial;

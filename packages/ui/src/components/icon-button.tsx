@@ -2,9 +2,8 @@ import type { ComponentProps } from 'react';
 import { joinClassNames } from '../join-class-names.ts';
 import { pressableClassNames } from '../pressable-class-names.ts';
 
-interface IconButtonProps
-  extends Omit<ComponentProps<'button'>, 'aria-label' | 'aria-pressed' | 'title'> {
-  /** What the button does: its accessible name, also shown on hover. */
+interface IconButtonProps extends Omit<ComponentProps<'button'>, 'aria-label' | 'aria-pressed'> {
+  /** What the button does: its accessible name, also shown on hover unless `title` says more. */
   label: string;
   /** Keyboard shortcut added to the hover hint, such as E. */
   shortcut?: string | undefined;
@@ -17,6 +16,7 @@ export function IconButton({
   label,
   shortcut,
   pressed,
+  title = shortcut === undefined ? label : `${label} (${shortcut})`,
   type = 'button',
   className,
   ...props
@@ -26,7 +26,7 @@ export function IconButton({
       type={type}
       aria-label={label}
       aria-pressed={pressed}
-      title={shortcut === undefined ? label : `${label} (${shortcut})`}
+      title={title}
       className={joinClassNames(
         'grid size-10 flex-none place-items-center rounded-md touch:size-11 [&>svg]:icon-18',
         pressableClassNames,

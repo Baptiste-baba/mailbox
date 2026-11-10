@@ -3,17 +3,10 @@ import { joinClassNames } from '../join-class-names.ts';
 
 type StepState = 'done' | 'current' | 'upcoming';
 
-// The number only repeats the order of the list, read as such: it is hidden from screen readers.
 const circleClassNames: Record<StepState, string> = {
   done: 'bg-primary text-on-primary',
   current: 'bg-primary text-on-primary ring-4 ring-halo ring-offset-2 ring-offset-chrome',
   upcoming: 'bg-muted text-on-primary',
-};
-
-const labelClassNames: Record<StepState, string> = {
-  done: 'text-ink',
-  current: 'text-ink',
-  upcoming: 'text-ink-2',
 };
 
 function stateOf(index: number, current: number): StepState {
@@ -52,16 +45,15 @@ interface StepperProps {
   steps: readonly string[];
   /** Index of the step the user stands at. */
   current: number;
-  className?: string;
 }
 
 /**
  * Where the user stands in a sequence of steps: numbered circles on a line, the done ones ticked,
  * the current one ringed. Drawn on the `chrome` background, which the ring leaves a gap of.
  */
-export function Stepper({ label, steps, current, className }: StepperProps) {
+export function Stepper({ label, steps, current }: StepperProps) {
   return (
-    <ol aria-label={label} className={joinClassNames('flex', className)}>
+    <ol aria-label={label} className="flex">
       {steps.map((step, index) => {
         const state = stateOf(index, current);
         return (
@@ -73,7 +65,8 @@ export function Stepper({ label, steps, current, className }: StepperProps) {
               lineClassName(index, steps.length, current),
             )}
           >
-            {/* Above the line, which runs through its centre. */}
+            {/* Above the line, which runs through its centre. The number only repeats the order of
+                the list, read as such: it is hidden from screen readers. */}
             <span
               aria-hidden="true"
               className={joinClassNames(
@@ -83,7 +76,7 @@ export function Stepper({ label, steps, current, className }: StepperProps) {
             >
               {state === 'done' ? <CheckIcon /> : index + 1}
             </span>
-            <span className={labelClassNames[state]}>{step}</span>
+            <span className={state === 'upcoming' ? 'text-ink-2' : 'text-ink'}>{step}</span>
           </li>
         );
       })}

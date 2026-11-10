@@ -12,7 +12,7 @@ interface SearchFieldProps extends Omit<ComponentProps<'input'>, 'type' | 'class
 
 /**
  * A search field: a magnifier, the input and optional controls, in one filled well. Marked
- * `aria-disabled` and read-only, it keeps its look but takes nothing: search does not exist yet.
+ * `aria-disabled` and read-only, it keeps its look but takes nothing.
  */
 export function SearchField({
   label,
@@ -43,7 +43,7 @@ export function SearchField({
         type="search"
         enterKeyHint={enterKeyHint}
         // The browser's own clear button cannot follow the design: Escape clears the field instead.
-        className="min-w-0 flex-1 bg-transparent text-base text-ink outline-none placeholder:text-ink-2 disabled:cursor-not-allowed aria-disabled:cursor-not-allowed touch:text-body [&::-webkit-search-cancel-button]:appearance-none"
+        className="min-w-0 flex-1 bg-transparent text-base text-ink outline-none placeholder:text-ink-2 disabled:cursor-not-allowed touch:text-body [&::-webkit-search-cancel-button]:appearance-none"
         {...inputProps}
       />
       {trailing}

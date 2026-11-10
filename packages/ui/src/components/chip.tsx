@@ -20,18 +20,16 @@ interface ChipProps {
   /** `sm` inside a dense block, such as a card of a list. */
   size?: ChipSize;
   children: ReactNode;
-  className?: string;
 }
 
 /** A short status on a rounded pill, such as "Reconnecter" or "7 non lus". */
-export function Chip({ tone, size = 'md', children, className }: ChipProps) {
+export function Chip({ tone, size = 'md', children }: ChipProps) {
   return (
     <span
       className={joinClassNames(
         'inline-flex flex-none items-center gap-1.25 rounded-full text-caption font-medium whitespace-nowrap',
         sizeClassNames[size],
         toneClassNames[tone],
-        className,
       )}
     >
       {children}

@@ -4,7 +4,7 @@ import { pressableClassNames } from '../pressable-class-names.ts';
 import { Kbd } from './kbd.tsx';
 
 type ButtonVariant = 'primary' | 'secondary' | 'text';
-type ButtonSize = 'lg' | 'md' | 'sm';
+type ButtonSize = 'lg' | 'field' | 'md' | 'sm';
 
 // Hover states reuse the colour tokens. The border of `secondary` is drawn within its height, so every
 // variant of a size lines up.
@@ -14,13 +14,20 @@ const variantClassNames: Record<ButtonVariant, string> = {
   text: 'text-link available:hover:bg-field',
 };
 
+// `field` is as tall as the fields and bars (44 px), for a button that stands among them.
 const sizeClassNames: Record<ButtonSize, string> = {
   lg: 'h-12 text-body [&>svg]:icon-18',
+  field: 'h-11 text-base [&>svg]:icon-18',
   md: 'h-10 text-base [&>svg]:icon-18',
   sm: 'h-8 text-small [&>svg]:icon-16',
 };
 
-const paddingClassNames: Record<ButtonSize, string> = { lg: 'px-5', md: 'px-4', sm: 'px-3' };
+const paddingClassNames: Record<ButtonSize, string> = {
+  lg: 'px-5',
+  field: 'px-4',
+  md: 'px-4',
+  sm: 'px-3',
+};
 
 function paddingClassName(variant: ButtonVariant, size: ButtonSize): string {
   return variant === 'text' ? 'px-2' : paddingClassNames[size];

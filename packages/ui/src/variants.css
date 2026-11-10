@@ -2,4 +2,4 @@
 @custom-variant touch (@media (pointer: coarse));
 
 /* `available:` applies to a control that can be used now: neither disabled nor marked aria-disabled. */
-@custom-variant available (&:enabled:not([aria-disabled="true"]));
+@custom-variant available (&:not(:disabled, [aria-disabled="true"]));

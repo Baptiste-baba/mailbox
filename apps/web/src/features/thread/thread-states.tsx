@@ -2,6 +2,7 @@ import { Skeleton, StateMessage } from '@mailbox/ui';
 import type { ErrorComponentProps } from '@tanstack/react-router';
 import { fr } from '../../i18n/fr.ts';
 import { ThreadFrame } from './thread-frame.tsx';
+import { ThreadToolbar } from './thread-toolbar.tsx';
 
 /** Why the thread pane shows no thread, centred in its card, with what to do about it. */
 export function ThreadMessage({ message, onRetry }: { message: string; onRetry?: () => void }) {
@@ -26,11 +27,12 @@ export function ThreadCrash({ reset }: ErrorComponentProps) {
   return <ThreadMessage message={fr.thread.crash} onRetry={reset} />;
 }
 
-/** The shape of a thread while it loads. */
+/** The shape of a thread while it loads, under its toolbar: nothing moves once it arrives. */
 export function ThreadSkeleton() {
   return (
     <ThreadFrame>
-      <div aria-hidden="true" className="flex flex-col gap-6 px-9 pt-22">
+      <ThreadToolbar />
+      <div aria-hidden="true" className="flex flex-col gap-6 px-9 py-7">
         <div className="flex flex-col gap-3">
           <Skeleton className="h-6 w-3/5" />
           <Skeleton className="h-3.5 w-2/5" />
