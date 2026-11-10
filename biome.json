@@ -80,6 +80,8 @@
     {
       "includes": [
         "packages/shared/src/auth/webauthn.ts",
+        "apps/api/src/auth/passkey-assertion.service.ts",
+        "apps/api/test/passkey-authenticator.ts",
         "apps/api/test/passkeys-contract.test.ts"
       ],
       "linter": {
