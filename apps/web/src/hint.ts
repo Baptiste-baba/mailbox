@@ -9,3 +9,11 @@ export function hint(...parts: (string | false | undefined)[]): string {
 export function comingSoonHint(name: string, shortcut?: string): string {
   return hint(name, shortcut, fr.common.comingSoon);
 }
+
+/**
+ * Props of a control shown before what it does exists: it keeps its look but does nothing, and its
+ * hover hint says so. Spread on any button, link or field.
+ */
+export function comingSoon(name: string, shortcut?: string) {
+  return { 'aria-disabled': true, title: comingSoonHint(name, shortcut) } as const;
+}

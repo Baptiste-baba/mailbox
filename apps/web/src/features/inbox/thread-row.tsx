@@ -55,7 +55,8 @@ function ThreadRowMeta({
   hasAttachments: boolean;
 }) {
   return (
-    <span className="mt-1.5 flex items-center gap-2 text-caption leading-none text-ink-2">
+    // As high as the chip, with or without one, so that every card has the height of the estimate.
+    <span className="mt-1.5 flex h-5 items-center gap-2 text-caption leading-none text-ink-2">
       {mailbox !== undefined && (
         <Chip tone="tint" size="sm">
           <Swatch color={mailbox.color} shape="circle" />

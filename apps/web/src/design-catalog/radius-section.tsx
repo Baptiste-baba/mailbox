@@ -4,7 +4,7 @@ const radii = [
   { name: 'rounded-xs · 3 px · pastilles carrées', className: 'rounded-xs' },
   { name: 'rounded-sm · 6 px · touches', className: 'rounded-sm' },
   { name: 'rounded-md · 10 px · contrôles', className: 'rounded-md' },
-  { name: 'rounded-lg · 12 px · lignes et encadrés', className: 'rounded-lg' },
+  { name: 'rounded-lg · 12 px · encadrés dans une carte', className: 'rounded-lg' },
   { name: 'rounded-xl · 16 px · cartes', className: 'rounded-xl' },
 ];
 

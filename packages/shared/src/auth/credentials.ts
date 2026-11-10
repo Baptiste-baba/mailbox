@@ -2,8 +2,11 @@ import * as z from 'zod';
 
 export const usernameSchema = z.string().trim().min(1).max(64);
 
+/** Shortest password accepted at setup. */
+export const MIN_PASSWORD_LENGTH = 12;
+
 /** The password chosen at setup: long enough to resist guessing, bounded to keep hashing cheap. */
-export const newPasswordSchema = z.string().min(12).max(256);
+export const newPasswordSchema = z.string().min(MIN_PASSWORD_LENGTH).max(256);
 
 /** A password typed to sign in: its length says nothing, the hash comparison decides. */
 export const passwordSchema = z.string().min(1).max(256);

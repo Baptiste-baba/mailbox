@@ -1,6 +1,6 @@
 import { Kbd, NavItem } from '@mailbox/ui';
 import type { ReactNode } from 'react';
-import { comingSoonHint } from '../hint.ts';
+import { comingSoon } from '../hint.ts';
 
 interface ComingSoonNavItemProps {
   icon: ReactNode;
@@ -15,8 +15,7 @@ export function ComingSoonNavItem({ icon, label, shortcut }: ComingSoonNavItemPr
       icon={icon}
       label={label}
       trailing={shortcut === undefined ? undefined : <Kbd>{shortcut}</Kbd>}
-      disabled
-      title={comingSoonHint(label, shortcut)}
+      {...comingSoon(label, shortcut)}
     />
   );
 }

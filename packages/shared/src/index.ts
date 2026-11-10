@@ -1,4 +1,5 @@
 export { type AuthStatus, authStatusSchema } from './auth/auth-status.ts';
+export { MIN_PASSWORD_LENGTH } from './auth/credentials.ts';
 export { type LoginRequest, loginRequestSchema, type SecondFactor } from './auth/login.ts';
 export {
   RECOVERY_CODE_COUNT,

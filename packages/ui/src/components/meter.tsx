@@ -7,11 +7,10 @@ interface MeterProps {
   max: number;
   /** The value in words, such as "bonne", read in place of the number. */
   valueText?: string | undefined;
-  className?: string;
 }
 
 /** A measure on a scale: the browser's own meter, drawn as a bar filling up in green. */
-export function Meter({ label, value, max, valueText, className }: MeterProps) {
+export function Meter({ label, value, max, valueText }: MeterProps) {
   return (
     <meter
       aria-label={label}
@@ -25,7 +24,6 @@ export function Meter({ label, value, max, valueText, className }: MeterProps) {
         '[&::-webkit-meter-bar]:h-1.5 [&::-webkit-meter-bar]:rounded-full [&::-webkit-meter-bar]:border-0 [&::-webkit-meter-bar]:bg-field [&::-webkit-meter-bar]:bg-none',
         '[&::-webkit-meter-optimum-value]:rounded-full [&::-webkit-meter-optimum-value]:bg-success [&::-webkit-meter-optimum-value]:bg-none',
         '[&::-moz-meter-bar]:rounded-full [&::-moz-meter-bar]:bg-success',
-        className,
       )}
     />
   );

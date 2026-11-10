@@ -110,7 +110,7 @@ function VirtualThreadList({
                 ref={virtualizer.measureElement}
                 data-index={row.index}
                 // The focused row goes on top, or the row after it would paint over its focus ring.
-                className="absolute inset-x-4 top-0 has-focus:z-10"
+                className="absolute inset-x-4 top-0 focus-within:z-10"
                 style={{ transform: `translateY(${row.start}px)` }}
               >
                 <ThreadRow

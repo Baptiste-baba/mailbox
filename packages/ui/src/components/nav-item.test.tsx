@@ -14,8 +14,8 @@ describe('NavItem', () => {
       .toHaveAttribute('href', '/inbox');
   });
 
-  test('stops being a link once disabled', async () => {
-    const screen = await render(<NavItem icon={icon} label="Briefing" href="/briefing" disabled />);
+  test('is no link without a destination, such as one that does not exist yet', async () => {
+    const screen = await render(<NavItem icon={icon} label="Briefing" aria-disabled />);
 
     expect(screen.getByRole('link').query()).toBeNull();
     await expect.element(screen.getByText('Briefing')).toBeVisible();

@@ -1,7 +1,7 @@
 import type { ComponentProps } from 'react';
 import { joinClassNames } from '../join-class-names.ts';
 
-/** The raised surface of a mail: the design keeps cards for mail and nothing else. */
+/** A raised surface with its border, such as the card of the open thread. */
 export function Card({ className, ...props }: ComponentProps<'div'>) {
   return (
     <div

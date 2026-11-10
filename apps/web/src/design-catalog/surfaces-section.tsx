@@ -34,7 +34,7 @@ export function SurfacesSection() {
             </span>
           </RowLink>
         </div>
-        <SampleName name="<RowLink> · ligne de liste, teintée quand elle est la page courante" />
+        <SampleName name="<RowLink> · carte d’une liste, encadrée de bleu quand elle est la page courante" />
       </div>
       <div className="flex flex-col gap-2">
         <div className="rounded-md bg-page p-4">

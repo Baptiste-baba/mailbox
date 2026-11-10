@@ -59,7 +59,7 @@ function SampleNavigation() {
           trailing={7}
           marker="accent"
         />
-        <NavItem icon={<SunIcon />} label="Briefing" disabled title="Bientôt disponible" />
+        <NavItem icon={<SunIcon />} label="Briefing" aria-disabled title="Bientôt disponible" />
         <NavItem icon={<SearchIcon />} label="Recherche" href="#" trailing={<Kbd>⌘K</Kbd>} />
       </NavGroup>
       <NavGroup title="Boîtes" action={<NavGroupAction>Gérer</NavGroupAction>}>

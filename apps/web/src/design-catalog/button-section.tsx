@@ -14,6 +14,7 @@ const variants: { variant: ButtonVariant; label: string }[] = [
 
 const sizes: { size: ButtonSize; height: string }[] = [
   { size: 'lg', height: '48 px' },
+  { size: 'field', height: '44 px' },
   { size: 'md', height: '40 px' },
   { size: 'sm', height: '32 px' },
 ];
@@ -41,7 +42,7 @@ export function ButtonSection() {
       <div className="flex flex-col gap-2">
         <div className="flex flex-wrap items-center gap-3">
           <div className="w-60">
-            <Button variant="primary" shortcut="C" className="h-11 w-full">
+            <Button variant="primary" size="field" shortcut="C" className="w-full">
               <PencilLineIcon />
               Nouveau mail
             </Button>

@@ -14,6 +14,11 @@
     -webkit-font-smoothing: antialiased;
   }
 
+  /* Shown but not usable yet: it keeps its look, only the pointer says it does nothing. */
+  [aria-disabled="true"] {
+    cursor: not-allowed;
+  }
+
   /* An outline follows the corner radius; the gap keeps it apart from the element's own colours. */
   :focus-visible {
     outline: 2px solid var(--ring);

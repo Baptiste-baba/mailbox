@@ -27,7 +27,6 @@ export function Shell() {
           maxSize={320}
           collapsible
           collapsedSize={56}
-          className="bg-chrome"
         >
           <CatchBoundary getResetKey={() => 'sidebar'} errorComponent={SidebarCrash}>
             <Sidebar />

@@ -2,6 +2,9 @@ import { queryOptions } from '@tanstack/react-query';
 import type { Score } from '@zxcvbn-ts/core';
 
 export type PasswordScore = Score;
+
+/** The top of the scale: "excellente". */
+export const MAX_PASSWORD_SCORE: PasswordScore = 4;
 export type PasswordChecker = (password: string, userInputs: string[]) => PasswordScore;
 
 // Several hundred kilobytes of dictionaries: loaded on the setup screen only, never with the app.
