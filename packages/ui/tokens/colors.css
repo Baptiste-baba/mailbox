@@ -13,8 +13,6 @@
   /* Filled fields, current navigation item, hovered rows. */
   --field: #f1f5f9;
   --line: #e2e8f0;
-  /* Between the rows of a list. */
-  --line-soft: #edf1f6;
   --ink: #1e293b;
   /* Secondary text: dates, addresses, start of a mail, placeholders. */
   --ink-2: #5a6880;
@@ -27,8 +25,6 @@
   --link: #3640ff;
   --tint: #dbe8ff;
   --tint-ink: #3640ff;
-  /* The open mail in the list. */
-  --selected: #eff4ff;
   /* Keyboard focus. */
   --ring: #3640ff;
   --danger: #b91c1c;
@@ -57,7 +53,6 @@
   --surface: #15183c;
   --field: #1d2148;
   --line: #262a5c;
-  --line-soft: #1e2250;
   --ink: #eceeff;
   --ink-2: #a3a8cc;
   --heading: #f4f5ff;
@@ -67,7 +62,6 @@
   --link: #929bff;
   --tint: #1c2165;
   --tint-ink: #b8beff;
-  --selected: #1c1f4e;
   --ring: #929bff;
   --danger: #f87171;
   --danger-tint: #3b1219;
@@ -91,7 +85,6 @@
   --color-surface: var(--surface);
   --color-field: var(--field);
   --color-line: var(--line);
-  --color-line-soft: var(--line-soft);
   --color-ink: var(--ink);
   --color-ink-2: var(--ink-2);
   --color-heading: var(--heading);
@@ -101,7 +94,6 @@
   --color-link: var(--link);
   --color-tint: var(--tint);
   --color-tint-ink: var(--tint-ink);
-  --color-selected: var(--selected);
   --color-ring: var(--ring);
   --color-danger: var(--danger);
   --color-danger-tint: var(--danger-tint);

@@ -4,13 +4,13 @@ import { fr } from '../../i18n/fr.ts';
 
 const SKELETON_ROW_IDS = Array.from({ length: 8 }, (_, index) => `skeleton-row-${index}`);
 
-/** Rows in the shape of threads while the first page loads. */
+/** Cards in the shape of threads while the first page loads. */
 export function ThreadListSkeleton() {
   return (
-    <div aria-hidden="true" className="flex flex-col px-3 pt-1">
+    <div aria-hidden="true" className="flex flex-col gap-2 px-4 pt-1">
       {SKELETON_ROW_IDS.map((rowId) => (
-        <div key={rowId} className="flex gap-3.5 px-3 py-3.5">
-          <Skeleton className="size-10 rounded-full" />
+        <div key={rowId} className="flex gap-3 rounded-xl border border-line px-3.5 py-3">
+          <Skeleton className="size-10 self-center rounded-full" />
           <div className="flex flex-1 flex-col gap-2.5 pt-1">
             <Skeleton className="h-3.5 w-2/5" />
             <Skeleton className="h-3.5 w-4/5" />

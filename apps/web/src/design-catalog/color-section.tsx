@@ -9,7 +9,6 @@ const colorGroups = [
       { token: 'chrome', className: 'bg-chrome' },
       { token: 'surface', className: 'bg-surface' },
       { token: 'field', className: 'bg-field' },
-      { token: 'selected', className: 'bg-selected' },
       { token: 'tint', className: 'bg-tint' },
     ],
   },

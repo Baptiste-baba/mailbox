@@ -14,7 +14,7 @@ export function MailSearchField({ place }: { place: string }) {
       aria-disabled
       title={comingSoonHint(label, shortcuts.searchList.label)}
       trailing={<Kbd>{shortcuts.searchList.label}</Kbd>}
-      className="mt-4 mb-2"
+      className="mt-3 mb-2"
     />
   );
 }
