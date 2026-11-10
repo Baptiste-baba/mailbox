@@ -1,5 +1,6 @@
 import type { Thread } from '@mailbox/shared';
 import { afterEach, describe, expect, test, vi } from 'vitest';
+import { userEvent } from 'vitest/browser';
 import { fakeApi, serverError, testMailboxes, testThread } from '../../testing/fake-api.ts';
 import { refreshAndFail } from '../../testing/refresh-with-failure.ts';
 import { renderApp } from '../../testing/render-app.tsx';
@@ -61,6 +62,27 @@ describe('thread pane', () => {
     await expect
       .poll(() => screen.getByRole('button', { expanded: true }).elements().length)
       .toBe(2);
+  });
+
+  // Regression: opening or folding a message replaced its button, and the focus fell to the page.
+  test('keeps the focus on a message as it opens and folds', async () => {
+    fakeApi({
+      threadPages: () => ({ threads: [testThread('thread-a', false)], nextCursor: null }),
+      thread: () => contract,
+    });
+    const { screen } = await renderApp('/inbox/thread-a');
+    const earlier = screen.getByRole('button', { name: /Première version du contrat/ });
+    await expect.element(earlier).toBeVisible();
+    const toggle = earlier.element();
+    toggle.focus();
+
+    await userEvent.keyboard('{Enter}');
+    await expect.poll(() => toggle.getAttribute('aria-expanded')).toBe('true');
+    expect(document.activeElement).toBe(toggle);
+    await userEvent.keyboard('{Enter}');
+
+    await expect.poll(() => toggle.getAttribute('aria-expanded')).toBe('false');
+    expect(document.activeElement).toBe(toggle);
   });
 });
 
