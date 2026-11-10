@@ -13,10 +13,10 @@ export function openTestDatabase(): Database {
   });
 }
 
-/** Back to a fresh instance: no account, no session, no setup code, no failed attempt. */
+/** Back to a fresh instance: no account, no passkey, no session, no setup code, no failed attempt. */
 export async function resetAuthTables(database: Database): Promise<void> {
   await database.execute(
-    sql`truncate account, recovery_code, session, auth_attempt, setup_code restart identity`,
+    sql`truncate account, passkey, recovery_code, session, auth_attempt, setup_code restart identity`,
   );
 }
 
