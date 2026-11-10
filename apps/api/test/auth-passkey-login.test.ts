@@ -1,11 +1,11 @@
 import { generateKeyPairSync } from 'node:crypto';
-import { account, type Database, passkey } from '@mailbox/db';
+import { type Database, passkey } from '@mailbox/db';
 import { type PasskeyAuthenticationResponse, passkeyRequestOptionsSchema } from '@mailbox/shared';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { authStatusOf, callAuth, errorCode, sessionCookieFrom } from './auth-requests.ts';
 import { createTestPasskey, signChallenge, type TestPasskey } from './passkey-authenticator.ts';
 import { type RunningApi, startApi } from './start-api.ts';
-import { signInOnFreshInstance } from './test-account.ts';
+import { signInOnFreshInstance, storeTestPasskey } from './test-account.ts';
 import { openTestDatabase } from './test-database.ts';
 
 let api: RunningApi;
@@ -25,16 +25,7 @@ afterAll(async () => {
 
 beforeEach(async () => {
   cookie = await signInOnFreshInstance(api, database);
-  const [owner] = await database.select({ passkeyUserId: account.passkeyUserId }).from(account);
-  // The user handle is the 16 bytes of the account's passkey user id.
-  const userHandle = Buffer.from(owner?.passkeyUserId.replaceAll('-', '') ?? '', 'hex');
-  testPasskey = createTestPasskey(userHandle.toString('base64url'));
-  await database.insert(passkey).values({
-    credentialId: testPasskey.credentialId,
-    publicKey: testPasskey.publicKey,
-    signCount: 0,
-    name: 'iPhone',
-  });
+  testPasskey = await storeTestPasskey(database);
 });
 
 async function challengeFor(path: string, sessionCookie?: string): Promise<string> {
@@ -119,7 +110,9 @@ describe('signing in with a passkey, refused', () => {
       await signIn(signChallenge(testPasskey, challenge, { signingKey: privateKey })),
     );
   });
+});
 
+describe('signing in with a passkey, refused passkeys', () => {
   it('refuses a passkey the account does not have', async () => {
     const unknown = createTestPasskey(testPasskey.userHandle);
     const challenge = await challengeFor('/passkey-login/options');
@@ -135,6 +128,15 @@ describe('signing in with a passkey, refused', () => {
     );
 
     await expectRefused(await signIn(response));
+  });
+
+  it('refuses an answer that is not a passkey', async () => {
+    const challenge = await challengeFor('/passkey-login/options');
+    const response = { ...signChallenge(testPasskey, challenge), type: 'password' };
+
+    expect(
+      await errorCode(await callAuth(api, 'POST', '/passkey-login', { body: { response } })),
+    ).toBe('VALIDATION_FAILED');
   });
 });
 

@@ -1,7 +1,8 @@
-import type { Database } from '@mailbox/db';
+import { account, type Database, passkey } from '@mailbox/db';
 import { setupResponseSchema, totpEnrollmentSchema } from '@mailbox/shared';
 import { callAuth, sessionCookieFrom } from './auth-requests.ts';
 import { totpCode } from './authenticator-app.ts';
+import { createTestPasskey, type TestPasskey } from './passkey-authenticator.ts';
 import type { RunningApi } from './start-api.ts';
 import { insertSetupCode, resetAuthTables } from './test-database.ts';
 
@@ -42,4 +43,22 @@ export async function createTestAccount(api: RunningApi, database: Database): Pr
 export async function signInOnFreshInstance(api: RunningApi, database: Database): Promise<string> {
   await resetAuthTables(database);
   return (await createTestAccount(api, database)).setupCookie;
+}
+
+/** The user handle of the test account's passkeys: the 16 bytes of its passkey user id. */
+export async function testUserHandle(database: Database): Promise<string> {
+  const [owner] = await database.select({ passkeyUserId: account.passkeyUserId }).from(account);
+  return Buffer.from(owner?.passkeyUserId.replaceAll('-', '') ?? '', 'hex').toString('base64url');
+}
+
+/** A passkey of the test account, stored as if the user had added it earlier. */
+export async function storeTestPasskey(database: Database): Promise<TestPasskey> {
+  const testPasskey = createTestPasskey(await testUserHandle(database));
+  await database.insert(passkey).values({
+    credentialId: testPasskey.credentialId,
+    publicKey: testPasskey.publicKey,
+    signCount: 0,
+    name: 'iPhone',
+  });
+  return testPasskey;
 }
