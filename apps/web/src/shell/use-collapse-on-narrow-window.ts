@@ -4,8 +4,11 @@ import { type RefObject, useEffect, useRef } from 'react';
 /** Below this width the sidebar, the list and the thread no longer fit side by side at full size. */
 const NARROW_WINDOW = '(max-width: 1139px)';
 
-/** Share of the window the sidebar takes until the user resizes it: 272 px of a 1440 px window. */
-export const SIDEBAR_DEFAULT_SIZE = '19%';
+/**
+ * Share of the window the sidebar takes until the user resizes it: about 280 px in a 1280 px window,
+ * the size the app opens at, where the name of a mailbox fits beside "Reconnecter".
+ */
+export const SIDEBAR_DEFAULT_SIZE = '22%';
 
 /**
  * Folds the sidebar to its icons while the window is too narrow, and gives it back the share of the
