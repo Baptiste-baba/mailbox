@@ -138,8 +138,9 @@ describe('passkey routes, identity confirmation', () => {
       body: { method: 'email', address: 'alex@example.com' },
     });
 
-    expect(withPassword.status).toBe(204);
-    expect(unknown.status).toBe(400);
+    // Every proof is refused until the confirmation is written; a malformed one never reaches it.
+    expect(await errorCode(withPassword)).toBe('INVALID_CREDENTIALS');
+    expect(await errorCode(unknown)).toBe('VALIDATION_FAILED');
   });
 });
 
