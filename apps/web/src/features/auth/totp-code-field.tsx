@@ -18,6 +18,7 @@ export function TotpCodeField({ value, onChange, error }: TotpCodeFieldProps) {
   return (
     <TextField
       label={fr.authenticator.codeLabel}
+      placeholder={fr.authenticator.codePlaceholder}
       error={error}
       value={value}
       onChange={(event) => onChange(event.target.value.trim())}

@@ -6,7 +6,11 @@ import { PasswordField } from './password-field.tsx';
 describe('PasswordField', () => {
   test('hides the password, and shows it in clear on demand', async () => {
     const screen = await render(
-      <PasswordField label="Mot de passe" revealLabel="Afficher le mot de passe" />,
+      <PasswordField
+        label="Mot de passe"
+        placeholder="Ton mot de passe"
+        revealLabel="Afficher le mot de passe"
+      />,
     );
     const field = screen.getByLabelText('Mot de passe', { exact: true });
     const reveal = screen.getByRole('button', { name: 'Afficher le mot de passe' });

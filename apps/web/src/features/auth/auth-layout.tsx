@@ -3,22 +3,34 @@ import { fr } from '../../i18n/fr.ts';
 
 interface AuthLayoutProps {
   title: string;
+  /** A line under the title, such as a greeting or what the page is for. */
+  intro?: string | undefined;
+  /** Where the user stands in a sequence of steps: shown under the title, wider than the form. */
+  progress?: ReactNode;
+  /** The content takes the width of the progress, for a step laid out in two columns. */
+  wide?: boolean;
   children?: ReactNode;
 }
 
-/** The pages before the app, setup and sign-in: one narrow column, flat on the page, under the logo. */
-export function AuthLayout({ title, children }: AuthLayoutProps) {
+/** The pages before the app, setup and sign-in: the logo at the top, then one centred column. */
+export function AuthLayout({ title, intro, progress, wide = false, children }: AuthLayoutProps) {
   return (
-    <main className="flex min-h-dvh justify-center bg-chrome px-6 pt-[12vh] pb-12">
-      <div className="flex w-full max-w-90 flex-col gap-8">
-        <div className="flex items-center gap-2.5">
-          {/* Decorative: the product name follows it. */}
-          <img src="/favicon.svg" alt="" className="size-7 rounded-md" />
-          <span className="text-heading font-semibold">{fr.auth.productName}</span>
+    <div className="flex min-h-dvh flex-col bg-chrome">
+      <header className="flex h-18 flex-none items-center gap-2.5 px-7">
+        {/* Decorative: the product name follows it. */}
+        <img src="/favicon.svg" alt="" className="size-7.5" />
+        <span className="text-brand font-semibold text-heading">{fr.auth.productName}</span>
+      </header>
+      <main className="flex flex-1 flex-col items-center gap-12 px-6 pt-[10vh] pb-16">
+        <div className="flex max-w-120 flex-col gap-3 text-center">
+          <h1 className="text-display font-semibold text-heading">{title}</h1>
+          {intro !== undefined && <p className="text-body text-ink-2">{intro}</p>}
         </div>
-        <h1 className="text-title font-semibold text-heading">{title}</h1>
-        {children}
-      </div>
-    </main>
+        {progress !== undefined && <div className="w-full max-w-180">{progress}</div>}
+        <div className={`flex w-full flex-col gap-9 ${wide ? 'max-w-180' : 'max-w-120'}`}>
+          {children}
+        </div>
+      </main>
+    </div>
   );
 }

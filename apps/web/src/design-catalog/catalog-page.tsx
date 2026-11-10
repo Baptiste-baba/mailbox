@@ -10,6 +10,7 @@ import { RadiusSection } from './radius-section.tsx';
 import { SearchFieldSection } from './search-field-section.tsx';
 import { SegmentedControlSection } from './segmented-control-section.tsx';
 import { ShadowSection } from './shadow-section.tsx';
+import { StepperSection } from './stepper-section.tsx';
 import { SurfacesSection } from './surfaces-section.tsx';
 import { ToggleChipSection } from './toggle-chip-section.tsx';
 import { TypographySection } from './typography-section.tsx';
@@ -44,6 +45,7 @@ export function CatalogPage() {
             <ToggleChipSection />
             <SearchFieldSection />
             <FormSection />
+            <StepperSection />
             <NavigationSection />
             <SurfacesSection />
           </CatalogPart>

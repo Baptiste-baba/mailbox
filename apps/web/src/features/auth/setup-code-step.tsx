@@ -43,7 +43,7 @@ export function SetupCodeStep({ initialCode, rejection, onDone }: SetupCodeStepP
           setCode(event.target.value);
           setError(undefined);
         }}
-        placeholder="XXXX-XXXX-XXXX"
+        placeholder={fr.auth.groupedCodePlaceholder}
         autoComplete="off"
         autoCapitalize="characters"
         spellCheck={false}

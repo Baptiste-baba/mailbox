@@ -24,7 +24,11 @@ export function ReplaceAuthenticatorPage() {
   const continueTo = useContinueTo();
   const secret = useNewAuthenticatorSecret();
   return (
-    <AuthLayout title={fr.login.replaceTitle}>
+    <AuthLayout
+      title={fr.login.replaceTitle}
+      wide
+      intro={`${fr.login.replaceIntro} ${fr.login.recoveryCodesLeft(recoveryCodesLeft)}`}
+    >
       {secret.enrollment === undefined ? (
         <StateMessage
           message={
@@ -41,7 +45,6 @@ export function ReplaceAuthenticatorPage() {
       ) : (
         <NewAuthenticatorForm
           enrollment={secret.enrollment}
-          recoveryCodesLeft={recoveryCodesLeft}
           onDone={() => continueTo(redirect ?? '/')}
         />
       )}
@@ -51,15 +54,10 @@ export function ReplaceAuthenticatorPage() {
 
 interface NewAuthenticatorFormProps {
   enrollment: TotpEnrollment;
-  recoveryCodesLeft: number;
   onDone: () => void;
 }
 
-function NewAuthenticatorForm({
-  enrollment,
-  recoveryCodesLeft,
-  onDone,
-}: NewAuthenticatorFormProps) {
+function NewAuthenticatorForm({ enrollment, onDone }: NewAuthenticatorFormProps) {
   const form = useTotpConfirmation({
     send: (totpCode) => replaceAuthenticator({ totpSecret: enrollment.secret, totpCode }),
     onConfirmed: onDone,
@@ -67,7 +65,6 @@ function NewAuthenticatorForm({
   });
   return (
     <AuthStepLayout
-      intro={`${fr.login.replaceIntro} ${fr.login.recoveryCodesLeft(recoveryCodesLeft)}`}
       onSubmit={form.submit}
       error={form.formError}
       actions={
@@ -76,8 +73,9 @@ function NewAuthenticatorForm({
         </Button>
       }
     >
-      <AuthenticatorEnrollment enrollment={enrollment} />
-      <TotpCodeField value={form.code} onChange={form.changeCode} error={form.codeError} />
+      <AuthenticatorEnrollment enrollment={enrollment}>
+        <TotpCodeField value={form.code} onChange={form.changeCode} error={form.codeError} />
+      </AuthenticatorEnrollment>
     </AuthStepLayout>
   );
 }

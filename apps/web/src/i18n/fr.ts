@@ -72,8 +72,13 @@ export const fr = {
     productName: 'MailBox',
     setupTitle: 'Installation',
     loginTitle: 'Connexion',
+    loginIntro: 'Ravi de te revoir.',
     usernameLabel: 'Nom d’utilisateur',
+    usernamePlaceholder: 'alex',
     passwordLabel: 'Mot de passe',
+    passwordPlaceholder: 'Ton mot de passe',
+    /** The form of the setup code and of the recovery codes. */
+    groupedCodePlaceholder: 'XXXX-XXXX-XXXX',
     revealPassword: 'Afficher le mot de passe',
     sessionEnded: 'Ta session a pris fin. Reconnecte-toi.',
     tooManyAttempts: (wait: string) => `Trop d’essais. Réessaie dans ${wait}.`,
@@ -89,9 +94,10 @@ export const fr = {
     copied: 'Copié',
     copyFailed: 'Copie impossible',
     codeLabel: 'Code à 6 chiffres affiché par l’application',
+    codePlaceholder: '123456',
     codeFormat: 'Le code a 6 chiffres.',
     codeRejected:
-      'Code incorrect. Tape le code affiché en ce moment ; s’il est refusé encore, vérifie l’heure de ton téléphone.',
+      'Code incorrect. Tape le code affiché en ce moment\u00a0; s’il est refusé encore, vérifie l’heure de ton téléphone.',
   },
   login: {
     signIn: 'Se connecter',
@@ -107,12 +113,12 @@ export const fr = {
     recoveryFormat: 'Le code a la forme XXXX-XXXX-XXXX.',
     recoveryRejected: 'Code de secours inconnu ou déjà utilisé.',
     useAuthenticator: 'Utiliser l’application d’authentification',
-    lostAccess: 'Accès perdu ?',
+    lostAccess: 'Accès perdu\u00a0?',
     lostAccessHelp:
-      'Sans ton application d’authentification, utilise un de tes codes de secours. Sans eux non plus, réinitialise l’accès depuis le serveur, comme l’explique la documentation de MailBox : tes mails et tes réglages sont conservés.',
+      'Sans ton application d’authentification, utilise un de tes codes de secours. Sans eux non plus, réinitialise l’accès depuis le serveur, comme l’explique la documentation de MailBox\u00a0: tes mails et tes réglages sont conservés.',
     replaceTitle: 'Nouvelle application d’authentification',
     replaceIntro:
-      'Tu t’es connecté avec un code de secours : configure une nouvelle application d’authentification pour continuer. Tes autres appareils seront déconnectés.',
+      'Tu t’es connecté avec un code de secours\u00a0: configure une nouvelle application d’authentification pour continuer. Tes autres appareils seront déconnectés.',
     recoveryCodesLeft: (count: number) => {
       if (count === 0) {
         return 'Tu n’as plus de code de secours.';
@@ -131,7 +137,7 @@ export const fr = {
     codeIntro:
       'Ce code prouve que c’est bien toi qui installes MailBox. Le serveur l’affiche dans ses journaux à chaque démarrage.',
     codeLabel: 'Code d’installation',
-    codeHint: 'Avec Docker : docker compose logs api',
+    codeHint: 'Avec Docker\u00a0: docker compose logs api',
     codeFormat: 'Le code a la forme XXXX-XXXX-XXXX.',
     codeRejected:
       'Ce code est inconnu ou a expiré. Redémarre le serveur pour en afficher un nouveau.',
@@ -141,19 +147,26 @@ export const fr = {
     passwordTooShort: 'Au moins 12 caractères.',
     passwordTooWeak:
       'Trop facile à deviner. Une phrase de plusieurs mots est plus sûre, et plus facile à retenir.',
-    passwordStrength: (level: string) => `Solidité : ${level}`,
+    strengthLabel: 'Robustesse du mot de passe',
     strengthLevels: ['très faible', 'faible', 'moyenne', 'bonne', 'excellente'],
+    requirementsLabel: 'Au moins\u00a0:',
+    requirementLength: '12 caractères',
+    requirementStrength: 'robustesse excellente',
+    requirementMet: 'atteint',
+    requirementMissing: 'pas encore atteint',
+    newPasswordPlaceholder: 'Une phrase de plusieurs mots',
     confirmLabel: 'Confirme le mot de passe',
+    confirmPlaceholder: 'Le même mot de passe',
     confirmMismatch: 'Les deux mots de passe sont différents.',
     authenticatorTitle: 'Application d’authentification',
     authenticatorIntro:
-      'Scanne ce QR code avec ton application d’authentification : celle de ton gestionnaire de mots de passe, Google Authenticator ou une autre.',
+      'Scanne ce QR code avec ton application d’authentification\u00a0: celle de ton gestionnaire de mots de passe, Google Authenticator ou une autre.',
     createAccount: 'Créer le compte',
     alreadyDone: 'Le compte vient d’être créé, depuis un autre appareil. Connecte-toi.',
     signIn: 'Se connecter',
     recoveryTitle: 'Codes de secours',
     recoveryIntro:
-      'Chaque code te connecte une fois sans ton application d’authentification. Garde-les en lieu sûr, par exemple dans ton gestionnaire de mots de passe : ils ne seront plus affichés.',
+      'Chaque code te connecte une fois sans ton application d’authentification. Garde-les en lieu sûr, par exemple dans ton gestionnaire de mots de passe\u00a0: ils ne seront plus affichés.',
     recoveryListLabel: 'Tes codes de secours',
     copyCodes: 'Copier les codes',
     download: 'Télécharger',

@@ -11,11 +11,13 @@ const route = getRouteApi('/login');
 export function LoginPage() {
   const { redirect, reason } = route.useSearch();
   const flow = useLoginFlow(redirect);
+  // The second factor step says what it asks for itself.
+  const greeting = reason === 'ended' ? fr.auth.sessionEnded : fr.auth.loginIntro;
   return (
-    <AuthLayout title={fr.auth.loginTitle}>
-      {reason === 'ended' && flow.step.name === 'password' && (
-        <p className="text-ink-2">{fr.auth.sessionEnded}</p>
-      )}
+    <AuthLayout
+      title={fr.auth.loginTitle}
+      intro={flow.step.name === 'password' ? greeting : undefined}
+    >
       <LoginCurrentStep flow={flow} />
       <LostAccess />
     </AuthLayout>

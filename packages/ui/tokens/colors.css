@@ -31,6 +31,12 @@
   --ring: #3640ff;
   --danger: #b91c1c;
   --danger-tint: #fef2f2;
+  /* A requirement met. */
+  --success: #15803d;
+  /* Ring around the current step. */
+  --halo: #bed4ff;
+  /* Circle of a step still to come. */
+  --muted: #94a3b8;
   /* Colours a mailbox or a folder can take. */
   --navy: #131653;
   --azur: #3640ff;
@@ -59,6 +65,9 @@
   --ring: #929bff;
   --danger: #f87171;
   --danger-tint: #3b1219;
+  --success: #4ade80;
+  --halo: #343c9e;
+  --muted: #3d4275;
   --navy: #c3c8ff;
   --azur: #6e78ff;
   --ciel: #8a94ff;
@@ -87,6 +96,9 @@
   --color-ring: var(--ring);
   --color-danger: var(--danger);
   --color-danger-tint: var(--danger-tint);
+  --color-success: var(--success);
+  --color-halo: var(--halo);
+  --color-muted: var(--muted);
   --color-navy: var(--navy);
   --color-azur: var(--azur);
   --color-ciel: var(--ciel);
