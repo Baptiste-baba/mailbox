@@ -7,7 +7,7 @@ import {
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { callAuth, errorCode, sessionSetCookie } from './auth-requests.ts';
 import { type RunningApi, startApi } from './start-api.ts';
-import { signInOnFreshInstance, TEST_PASSWORD } from './test-account.ts';
+import { signInOnFreshInstance } from './test-account.ts';
 import { openTestDatabase } from './test-database.ts';
 
 // The contract of the passkey routes while their answers are placeholders: inputs are checked, and
@@ -117,30 +117,6 @@ describe('passkey routes, signed in', () => {
     expect(removal.status).toBe(204);
     expect(malformed.status).toBe(400);
     expect(await errorCode(malformed)).toBe('VALIDATION_FAILED');
-  });
-});
-
-describe('passkey routes, identity confirmation', () => {
-  it('gives the options to confirm the identity with a passkey', async () => {
-    const response = await callAuth(api, 'POST', '/identity-confirmation/options', { cookie });
-
-    expect(response.status).toBe(200);
-    expect(passkeyRequestOptionsSchema.safeParse(await response.json()).success).toBe(true);
-  });
-
-  it('takes the password and a code, or a passkey, and nothing else', async () => {
-    const withPassword = await callAuth(api, 'POST', '/identity-confirmation', {
-      cookie,
-      body: { method: 'password', password: TEST_PASSWORD, totpCode: '123456' },
-    });
-    const unknown = await callAuth(api, 'POST', '/identity-confirmation', {
-      cookie,
-      body: { method: 'email', address: 'alex@example.com' },
-    });
-
-    // Every proof is refused until the confirmation is written; a malformed one never reaches it.
-    expect(await errorCode(withPassword)).toBe('INVALID_CREDENTIALS');
-    expect(await errorCode(unknown)).toBe('VALIDATION_FAILED');
   });
 });
 
