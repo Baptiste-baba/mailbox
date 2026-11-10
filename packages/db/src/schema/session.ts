@@ -16,6 +16,8 @@ export const session = pgTable(
      * a new app is set up.
      */
     mustReplaceAuthenticator: boolean().notNull().default(false),
+    /** When the user last proved who they are on this device: changing passkeys needs it recent. */
+    identityConfirmedAt: timestamp({ withTimezone: true }),
   },
   (table) => [index('session_expires_at_idx').on(table.expiresAt)],
 );
