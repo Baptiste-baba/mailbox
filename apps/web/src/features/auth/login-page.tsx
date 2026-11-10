@@ -13,8 +13,8 @@ export function LoginPage() {
   const flow = useLoginFlow(redirect);
   return (
     <AuthLayout title={fr.auth.loginTitle}>
-      {reason === 'expired' && flow.step.name === 'password' && (
-        <p className="text-ink2">{fr.auth.sessionExpired}</p>
+      {reason === 'ended' && flow.step.name === 'password' && (
+        <p className="text-ink2">{fr.auth.sessionEnded}</p>
       )}
       <LoginCurrentStep flow={flow} />
       <LostAccess />

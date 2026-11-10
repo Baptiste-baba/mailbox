@@ -6,7 +6,7 @@ import { SecretBox } from './secret-box.ts';
 import { SessionService } from './session.service.ts';
 import { TotpService } from './totp.service.ts';
 
-/** Changes to the signed-in account: a new authenticator app, after a recovery code for instance. */
+/** The new authenticator app of a session opened with a recovery code. */
 @Injectable()
 export class AccountService {
   constructor(
@@ -29,26 +29,31 @@ export class AccountService {
   }
 
   /**
-   * The new app replaces the former one at once: codes of the former app stop working.
+   * The new app replaces the former one at once: codes of the former app stop working, and only
+   * the session of `sessionToken`, which set it up, stays open.
    * @throws AppError INVALID_SECOND_FACTOR when the code does not match the new secret,
    * UNAUTHENTICATED while no account exists.
    */
-  async replaceTotp(confirmation: TotpConfirmation): Promise<void> {
+  async replaceTotp(confirmation: TotpConfirmation, sessionToken: string): Promise<void> {
     const step = this.totp.matchingStep(confirmation.totpSecret, confirmation.totpCode);
     if (step === undefined) {
       throw new AppError('INVALID_SECOND_FACTOR', 'The code does not match the authenticator app');
     }
-    const replaced = await this.database
-      .update(account)
-      .set({
-        totpSecretEncrypted: this.secretBox.seal(confirmation.totpSecret),
-        totpLastUsedStep: step,
-        updatedAt: new Date(),
-      })
-      .returning({ id: account.id });
-    if (replaced.length === 0) {
-      throw new AppError('UNAUTHENTICATED', 'No account yet');
-    }
-    await this.sessions.endAuthenticatorReplacement();
+    await this.database.transaction(async (transaction) => {
+      const replaced = await transaction
+        .update(account)
+        .set({
+          totpSecretEncrypted: this.secretBox.seal(confirmation.totpSecret),
+          totpLastUsedStep: step,
+          updatedAt: new Date(),
+        })
+        .returning({ id: account.id });
+      if (replaced.length === 0) {
+        throw new AppError('UNAUTHENTICATED', 'No account yet');
+      }
+      // The app is replaced when a device was lost: a session open on it must end with it.
+      await this.sessions.endAllBut(transaction, sessionToken);
+      await this.sessions.endAuthenticatorReplacement(transaction, sessionToken);
+    });
   }
 }

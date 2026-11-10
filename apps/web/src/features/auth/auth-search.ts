@@ -15,7 +15,7 @@ export const loginSearchSchema = z.object({
   /** Where to go once signed in. */
   redirect: pathInAppSchema,
   /** Why the sign-in is asked again. */
-  reason: z.literal('expired').optional().catch(undefined),
+  reason: z.literal('ended').optional().catch(undefined),
 });
 
 /** Where to go once the new authenticator app is set up. */

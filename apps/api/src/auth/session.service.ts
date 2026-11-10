@@ -1,7 +1,7 @@
 import { randomBytes } from 'node:crypto';
-import { type Database, session } from '@mailbox/db';
+import { type Database, session, type Transaction } from '@mailbox/db';
 import { Inject, Injectable } from '@nestjs/common';
-import { and, eq, gt, lte } from 'drizzle-orm';
+import { and, eq, gt, lte, ne } from 'drizzle-orm';
 import { DATABASE } from '../database/database.module.ts';
 import { hashToken } from './token-hash.ts';
 
@@ -82,12 +82,17 @@ export class SessionService {
     return { token, expiresAt, mustReplaceAuthenticator, renewed: true };
   }
 
-  /** A new authenticator app is set up: the sessions opened with a recovery code are free again. */
-  async endAuthenticatorReplacement(): Promise<void> {
-    await this.database
+  /** Ends every session but the one of `token`. */
+  async endAllBut(transaction: Transaction, token: string): Promise<void> {
+    await transaction.delete(session).where(ne(session.tokenHash, hashToken(token)));
+  }
+
+  /** The session of `token` set up a new authenticator app: it reaches the whole app again. */
+  async endAuthenticatorReplacement(transaction: Transaction, token: string): Promise<void> {
+    await transaction
       .update(session)
       .set({ mustReplaceAuthenticator: false })
-      .where(eq(session.mustReplaceAuthenticator, true));
+      .where(eq(session.tokenHash, hashToken(token)));
   }
 
   async end(token: string): Promise<void> {

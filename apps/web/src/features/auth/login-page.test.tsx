@@ -164,6 +164,7 @@ describe('sign-in with a recovery code', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Se connecter' }));
 
     await expect.element(screen.getByText(/Il te reste 2 codes de secours/)).toBeVisible();
+    await expect.element(screen.getByText(/Tes autres appareils seront déconnectés/)).toBeVisible();
     expect(router.state.location.pathname).toBe('/new-authenticator');
     await userEvent.fill(screen.getByLabelText(/Code à 6 chiffres/), '123456');
     await userEvent.click(screen.getByRole('button', { name: 'Enregistrer et continuer' }));

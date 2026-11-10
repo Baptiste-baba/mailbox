@@ -49,7 +49,8 @@ docker compose logs api | grep "setup code"
 Then choose a username and a password, set up an authenticator app (the one of your password
 manager, Google Authenticator or any other app showing 6-digit codes) and keep the ten recovery
 codes somewhere safe. Signing in asks for the password and a code of the app; a recovery code works
-once in place of the app, and asks to set up a new one. A session lasts 30 days after its last use.
+once in place of the app, and asks to set up a new one. Setting up a new app signs out every other
+device, in case one of them was lost. A session lasts 30 days after its last use.
 
 Sessions only work over HTTPS, such as `tailscale serve` gives, or on `localhost`.
 

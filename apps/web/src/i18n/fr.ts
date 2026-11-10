@@ -75,7 +75,7 @@ export const fr = {
     usernameLabel: 'Nom d’utilisateur',
     passwordLabel: 'Mot de passe',
     revealPassword: 'Afficher le mot de passe',
-    sessionExpired: 'Ta session a expiré. Reconnecte-toi.',
+    sessionEnded: 'Ta session a pris fin. Reconnecte-toi.',
     tooManyAttempts: (wait: string) => `Trop d’essais. Réessaie dans ${wait}.`,
     waitSeconds: (seconds: number) => `${seconds} s`,
     waitMinutes: (minutes: number) => `${minutes} min`,
@@ -112,7 +112,7 @@ export const fr = {
       'Sans ton application d’authentification, utilise un de tes codes de secours. Sans eux non plus, réinitialise l’accès depuis le serveur, comme l’explique la documentation de MailBox : tes mails et tes réglages sont conservés.',
     replaceTitle: 'Nouvelle application d’authentification',
     replaceIntro:
-      'Tu t’es connecté avec un code de secours : configure une nouvelle application d’authentification pour continuer.',
+      'Tu t’es connecté avec un code de secours : configure une nouvelle application d’authentification pour continuer. Tes autres appareils seront déconnectés.',
     recoveryCodesLeft: (count: number) => {
       if (count === 0) {
         return 'Tu n’as plus de code de secours.';

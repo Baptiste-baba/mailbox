@@ -2,15 +2,16 @@ import { AppError } from '@mailbox/shared';
 import { type CanActivate, type ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import type { Request, Response } from 'express';
-import { OPEN_DURING_AUTHENTICATOR_REPLACEMENT } from './authenticator-replacement.decorator.ts';
+import { AUTHENTICATOR_REPLACEMENT_ROUTE } from './authenticator-replacement.decorator.ts';
 import { IS_PUBLIC } from './public.decorator.ts';
 import { SessionService } from './session.service.ts';
 import { readSessionToken, writeSessionCookie } from './session-cookie.ts';
 
 /**
  * Refuses every request without a valid session, except on routes marked `@Public()`. A request
- * with a session pushes its end back now and then, and the cookie follows. A session opened with a recovery code
- * only reaches the routes that replace the authenticator app.
+ * with a session pushes its end back now and then, and the cookie follows. A session opened with a
+ * recovery code only reaches the routes that replace the authenticator app, and only such a session
+ * reaches them.
  */
 @Injectable()
 export class SessionGuard implements CanActivate {
@@ -21,7 +22,8 @@ export class SessionGuard implements CanActivate {
 
   /**
    * @throws AppError UNAUTHENTICATED without a session, or when it expired;
-   * AUTHENTICATOR_REPLACEMENT_REQUIRED for a session that must replace its authenticator app first.
+   * AUTHENTICATOR_REPLACEMENT_REQUIRED for a session that must replace its authenticator app first;
+   * AUTHENTICATOR_REPLACEMENT_NOT_REQUIRED for any other session on the replacement routes.
    */
   async canActivate(context: ExecutionContext): Promise<boolean> {
     if (this.isMarked(context, IS_PUBLIC)) {
@@ -36,13 +38,17 @@ export class SessionGuard implements CanActivate {
     if (session.renewed) {
       writeSessionCookie(http.getResponse<Response>(), session);
     }
-    if (
-      session.mustReplaceAuthenticator &&
-      !this.isMarked(context, OPEN_DURING_AUTHENTICATOR_REPLACEMENT)
-    ) {
+    const replacementRoute = this.isMarked(context, AUTHENTICATOR_REPLACEMENT_ROUTE);
+    if (session.mustReplaceAuthenticator && !replacementRoute) {
       throw new AppError(
         'AUTHENTICATOR_REPLACEMENT_REQUIRED',
         'Set up a new authenticator app first',
+      );
+    }
+    if (!session.mustReplaceAuthenticator && replacementRoute) {
+      throw new AppError(
+        'AUTHENTICATOR_REPLACEMENT_NOT_REQUIRED',
+        'Only a session opened with a recovery code replaces the authenticator app',
       );
     }
     return true;
