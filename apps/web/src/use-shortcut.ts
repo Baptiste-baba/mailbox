@@ -2,9 +2,13 @@ import { useEffect, useEffectEvent } from 'react';
 import { type ShortcutId, shortcuts } from './shortcuts.ts';
 
 function isTyping(target: EventTarget | null): boolean {
+  // A radio only takes arrows and space: a letter pressed on it is still a shortcut.
+  if (target instanceof HTMLInputElement) {
+    return target.type !== 'radio';
+  }
   return (
     target instanceof HTMLElement &&
-    (target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName))
+    (target.isContentEditable || ['TEXTAREA', 'SELECT'].includes(target.tagName))
   );
 }
 

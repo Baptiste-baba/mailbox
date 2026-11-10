@@ -67,6 +67,25 @@ describe('mail list, filter', () => {
     await filter.getByText('Tous').click();
     await expect.element(screen.getByText('Sujet thread-a')).toBeVisible();
   });
+
+  // Regression: a tab clicked kept the focus on its radio, where letters were taken for typing.
+  test('still answers U and J once a tab is chosen', async () => {
+    fakeApi({
+      threadPages: (url) => ({
+        threads: url.searchParams.get('unreadOnly') === 'true' ? [] : threads,
+        nextCursor: null,
+      }),
+    });
+    const { screen, router } = await renderApp('/inbox');
+    await screen.getByRole('radiogroup', { name: 'Afficher' }).getByText('Non lus').click();
+    await expect.element(screen.getByText('Aucun mail non lu.')).toBeVisible();
+
+    await userEvent.keyboard('u');
+    await expect.element(screen.getByText('Sujet thread-a')).toBeVisible();
+    await userEvent.keyboard('j');
+
+    await expect.poll(() => router.state.location.pathname).toBe('/inbox/thread-a');
+  });
 });
 
 describe('mail list, focused row', () => {
