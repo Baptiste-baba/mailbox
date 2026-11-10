@@ -1,6 +1,5 @@
 import { account, type Database, passkey } from '@mailbox/db';
 import {
-  AppError,
   type PasskeyAuthenticationResponse,
   type PasskeyRequestOptions,
   passkeyRequestOptionsSchema,
@@ -13,6 +12,7 @@ import {
 } from '@simplewebauthn/server';
 import { eq, sql } from 'drizzle-orm';
 import { DATABASE } from '../database/database.module.ts';
+import { invalidPasskey } from './invalid-passkey.ts';
 import {
   CHALLENGE_LIFETIME_MS,
   type ChallengePurpose,
@@ -25,11 +25,6 @@ import { RelyingParty } from './relying-party.ts';
 type AssertionPurpose = Extract<ChallengePurpose, 'signIn' | 'identityConfirmation'>;
 
 type StoredPasskey = typeof passkey.$inferSelect;
-
-/** Whatever was wrong, the client only learns that the passkey was refused. */
-function invalidPasskey(cause?: unknown): AppError {
-  return new AppError('INVALID_PASSKEY', 'This passkey is not accepted', { cause });
-}
 
 /** Asks a passkey to sign a challenge of the api, then checks its signature and records its use. */
 @Injectable()
