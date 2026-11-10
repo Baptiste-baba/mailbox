@@ -1,5 +1,5 @@
 /* The theme is the `light` or `dark` class of an ancestor. Every text colour reaches AA contrast on
-   every background it is drawn on. */
+   every background it is drawn on, save the one noted at `--muted`. */
 
 .light {
   /* Native controls (check boxes, scroll bars) follow the theme. */
@@ -36,7 +36,8 @@
   --success: #15803d;
   /* Ring around the current step. */
   --halo: #bed4ff;
-  /* Circle of a step still to come. */
+  /* Circle of a step still to come. Its white number stays below AA (2.6:1), a choice kept for the
+     look: the name of the step, beside it, says the same in a readable colour. */
   --muted: #94a3b8;
   /* Colours a mailbox or a folder can take. */
   --navy: #131653;
