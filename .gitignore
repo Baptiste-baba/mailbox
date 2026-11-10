@@ -8,6 +8,9 @@ CLAUDE.md
 .backups/
 # Design handoff with personal data in mockups, kept local.
 docs/design/
+# Screens of another product and the redesign mockups, kept local.
+docs/Design-Domuse/
+docs/redesign/
 dist-desktop/
 # Default data folders of compose.yaml when run from the repository.
 data/
