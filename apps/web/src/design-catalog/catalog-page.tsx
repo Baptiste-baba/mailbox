@@ -2,6 +2,7 @@ import { AvatarSection } from './avatar-section.tsx';
 import { ButtonSection } from './button-section.tsx';
 import { CatalogPart } from './catalog-section.tsx';
 import { ColorSection } from './color-section.tsx';
+import { DialogSection } from './dialog-section.tsx';
 import { FormSection } from './form-section.tsx';
 import { IconButtonSection } from './icon-button-section.tsx';
 import { KbdSection } from './kbd-section.tsx';
@@ -46,6 +47,7 @@ export function CatalogPage() {
             <StepperSection />
             <NavigationSection />
             <SurfacesSection />
+            <DialogSection />
           </CatalogPart>
         </section>
       ))}

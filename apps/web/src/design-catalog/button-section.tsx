@@ -9,6 +9,7 @@ type ButtonSize = NonNullable<ComponentProps<typeof Button>['size']>;
 const variants: { variant: ButtonVariant; label: string }[] = [
   { variant: 'primary', label: 'Répondre' },
   { variant: 'secondary', label: 'Reformuler' },
+  { variant: 'danger', label: 'Retirer' },
   { variant: 'text', label: 'Tout ranger' },
 ];
 
