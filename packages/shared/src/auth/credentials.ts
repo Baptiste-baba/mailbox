@@ -14,6 +14,9 @@ export const passwordSchema = z.string().min(1).max(256);
 /** The secret of an authenticator app as the server issues it: 160 bits in base32. */
 export const totpSecretSchema = z.string().regex(/^[A-Z2-7]{32}$/);
 
+/** The name the user gives a passkey, such as "iPhone", to tell it from the others. */
+export const passkeyNameSchema = z.string().trim().min(1).max(64);
+
 /** A code of the authenticator app. */
 export const totpCodeSchema = z.string().regex(/^\d{6}$/);
 

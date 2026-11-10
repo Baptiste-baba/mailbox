@@ -1,9 +1,9 @@
 import { createHmac, randomBytes, timingSafeEqual } from 'node:crypto';
 import type { TotpEnrollment } from '@mailbox/shared';
 import { Injectable } from '@nestjs/common';
+import { APP_NAME } from './app-name.ts';
 import { decodeBase32, encodeBase32 } from './base32.ts';
 
-const ISSUER = 'MailBox';
 // 160 bits, the secret length RFC 4226 recommends.
 const SECRET_LENGTH = 20;
 const STEP_SECONDS = 30;
@@ -26,10 +26,10 @@ function codeAt(key: Buffer, step: number): string {
 export class TotpService {
   createEnrollment(username: string): TotpEnrollment {
     const secret = encodeBase32(randomBytes(SECRET_LENGTH));
-    const label = `${encodeURIComponent(ISSUER)}:${encodeURIComponent(username)}`;
+    const label = `${encodeURIComponent(APP_NAME)}:${encodeURIComponent(username)}`;
     return {
       secret,
-      otpauthUri: `otpauth://totp/${label}?secret=${secret}&issuer=${encodeURIComponent(ISSUER)}`,
+      otpauthUri: `otpauth://totp/${label}?secret=${secret}&issuer=${encodeURIComponent(APP_NAME)}`,
     };
   }
 
