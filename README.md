@@ -53,15 +53,16 @@ Then choose a username and a password, set up an authenticator app (the one of y
 manager, Google Authenticator or any other app showing 6-digit codes) and keep the ten recovery
 codes somewhere safe. Signing in asks for the password and a code of the app; a recovery code works
 once in place of the app, and asks to set up a new one. Setting up a new app signs out every other
-device, in case one of them was lost. A session lasts 30 days after its last use.
+device and removes every passkey, in case one of them was lost. A session lasts 30 days after its
+last use.
 
 Sessions only work over HTTPS, such as `tailscale serve` gives, or on `localhost`.
 
 ### Lost access
 
 Without the password, or without both the authenticator app and the recovery codes, reset the
-access from the server. This erases the password, the authenticator app, the recovery codes and
-every session, keeps mailboxes and mail, and prints a new setup code:
+access from the server. This erases the password, the authenticator app, the passkeys, the
+recovery codes and every session, keeps mailboxes and mail, and prints a new setup code:
 
 ```bash
 docker compose exec api node dist/reset-auth.js

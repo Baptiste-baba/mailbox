@@ -1,4 +1,4 @@
-import { account, type Database } from '@mailbox/db';
+import { account, type Database, passkey } from '@mailbox/db';
 import { AppError, type TotpConfirmation, type TotpEnrollment } from '@mailbox/shared';
 import { Inject, Injectable } from '@nestjs/common';
 import { DATABASE } from '../database/database.module.ts';
@@ -29,8 +29,8 @@ export class AccountService {
   }
 
   /**
-   * The new app replaces the former one at once: codes of the former app stop working, and only
-   * the session of `sessionToken`, which set it up, stays open.
+   * The new app replaces the former one at once: codes of the former app stop working, every
+   * passkey is removed, and only the session of `sessionToken`, which set it up, stays open.
    * @throws AppError INVALID_SECOND_FACTOR when the code does not match the new secret,
    * UNAUTHENTICATED while no account exists.
    */
@@ -51,7 +51,9 @@ export class AccountService {
       if (replaced.length === 0) {
         throw new AppError('UNAUTHENTICATED', 'No account yet');
       }
-      // The app is replaced when a device was lost: a session open on it must end with it.
+      // The app is replaced when a device was lost: a session open on it, and a passkey kept on it,
+      // must end with it. New passkeys can be added once signed in again.
+      await transaction.delete(passkey);
       await this.sessions.endAllBut(transaction, sessionToken);
       await this.sessions.endAuthenticatorReplacement(transaction, sessionToken);
     });

@@ -1,4 +1,4 @@
-import type { Database } from '@mailbox/db';
+import { type Database, passkey } from '@mailbox/db';
 import { totpEnrollmentSchema } from '@mailbox/shared';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { authStatusOf, callAuth, errorCode, sessionCookieFrom } from './auth-requests.ts';
@@ -6,6 +6,7 @@ import { totpCode, wrongTotpCode } from './authenticator-app.ts';
 import { type RunningApi, startApi } from './start-api.ts';
 import {
   createTestAccount,
+  storeTestPasskey,
   TEST_PASSWORD,
   TEST_USERNAME,
   type TestAccount,
@@ -142,6 +143,24 @@ describe('a new authenticator app', () => {
     expect(replacement.status).toBe(401);
     expect(await errorCode(replacement)).toBe('INVALID_SECOND_FACTOR');
     expect((await getMailboxes(testAccount.setupCookie)).status).toBe(200);
+  });
+});
+
+describe('a new authenticator app, and the passkeys', () => {
+  it('removes every passkey: one of them may be on the lost device', async () => {
+    await storeTestPasskey(database);
+
+    expect((await replaceAuthenticator(recoveryCookie)).status).toBe(204);
+
+    expect(await database.select().from(passkey)).toEqual([]);
+  });
+
+  it('keeps the passkeys when the code of the new app does not match', async () => {
+    await storeTestPasskey(database);
+
+    expect((await replaceAuthenticator(recoveryCookie, wrongTotpCode)).status).toBe(401);
+
+    expect(await database.select().from(passkey)).toHaveLength(1);
   });
 });
 
