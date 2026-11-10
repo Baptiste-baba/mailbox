@@ -22,7 +22,8 @@ export function MailListHeader({ filters }: { filters: ThreadFilters }) {
   useShortcut('unreadOnly', () => showUnreadOnly(!filters.unreadOnly));
   const { title, unreadCount, place } = useViewSummary(filters);
   return (
-    <div className="flex-none px-6 pt-7">
+    // Keeps the room of the list's scroll bar, so that tabs, search and cards share their edges.
+    <div className="flex-none overflow-hidden px-4 pt-5 [scrollbar-gutter:stable]">
       <div className="flex items-center gap-3">
         <h1 className="truncate text-title font-semibold text-heading">{title}</h1>
         {unreadCount !== undefined && unreadCount > 0 && (
@@ -35,7 +36,7 @@ export function MailListHeader({ filters }: { filters: ThreadFilters }) {
         options={filterOptions}
         value={filters.unreadOnly ? 'unread' : 'all'}
         onChange={(filter) => showUnreadOnly(filter === 'unread')}
-        className="mt-5"
+        className="mt-4"
       />
       <MailSearchField place={place} />
     </div>

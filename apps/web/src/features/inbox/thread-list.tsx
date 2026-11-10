@@ -9,18 +9,13 @@ import { LoadMoreError, ThreadListMessage, ThreadListSkeleton } from './thread-l
 import { ThreadRow } from './thread-row.tsx';
 import { useThreadKeyboard } from './use-thread-keyboard.ts';
 
-const ROW_HEIGHT_ESTIMATE = 114;
+const ROW_HEIGHT_ESTIMATE = 116;
+/** Room between two cards. */
+const ROW_GAP = 8;
 /** Room above the first row, so that its focus ring is not cut by the scroll area. */
 const LIST_PADDING_TOP = 4;
 /** The next page is asked for while this many rows remain below the visible ones. */
 const LOAD_AHEAD_ROWS = 10;
-
-/**
- * A line between two rows, from the text to the edge: hidden next to the open thread, which stands
- * out by its tint alone.
- */
-const ROW_SEPARATOR =
-  'before:absolute before:top-0 before:right-3 before:left-16.5 before:h-px before:bg-line-soft has-aria-[current=page]:before:hidden [li:has([aria-current=page])+&]:before:hidden';
 
 /**
  * The threads of the current view, or why there is none to show. Threads already shown stay on
@@ -65,6 +60,19 @@ interface VirtualThreadListProps {
   onRetryLoadMore: (() => void) | undefined;
 }
 
+/** Asks for the next page while the last row in view is close to the end of the list. */
+function useLoadAhead(
+  loadMore: (() => void) | undefined,
+  lastVisibleIndex: number,
+  count: number,
+): void {
+  useEffect(() => {
+    if (loadMore !== undefined && lastVisibleIndex >= count - LOAD_AHEAD_ROWS) {
+      loadMore();
+    }
+  }, [loadMore, lastVisibleIndex, count]);
+}
+
 // Only the rows in view, and a few around, are in the page: the list stays fluid at any length.
 function VirtualThreadList({
   threads,
@@ -80,19 +88,18 @@ function VirtualThreadList({
     estimateSize: () => ROW_HEIGHT_ESTIMATE,
     getItemKey: (index) => threads[index]?.id ?? index,
     paddingStart: LIST_PADDING_TOP,
+    gap: ROW_GAP,
     overscan: 6,
   });
   const rows = virtualizer.getVirtualItems();
-  const lastVisibleIndex = rows.at(-1)?.index ?? 0;
-  useEffect(() => {
-    if (loadMore !== undefined && lastVisibleIndex >= threads.length - LOAD_AHEAD_ROWS) {
-      loadMore();
-    }
-  }, [loadMore, lastVisibleIndex, threads.length]);
+  useLoadAhead(loadMore, rows.at(-1)?.index ?? 0, threads.length);
   useThreadKeyboard(threads, filters.view, (index) => virtualizer.scrollToIndex(index));
   const now = new Date();
   return (
-    <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto overscroll-none pb-3">
+    <div
+      ref={scrollRef}
+      className="min-h-0 flex-1 overflow-y-auto overscroll-none pb-3 [scrollbar-gutter:stable]"
+    >
       <ol className="relative" style={{ height: virtualizer.getTotalSize() }}>
         {rows.map((row) => {
           const thread = threads[row.index];
@@ -103,7 +110,7 @@ function VirtualThreadList({
                 ref={virtualizer.measureElement}
                 data-index={row.index}
                 // The focused row goes on top, or the row after it would paint over its focus ring.
-                className={`absolute inset-x-3 top-0 has-focus:z-10 ${row.index === 0 ? '' : ROW_SEPARATOR}`}
+                className="absolute inset-x-4 top-0 has-focus:z-10"
                 style={{ transform: `translateY(${row.start}px)` }}
               >
                 <ThreadRow

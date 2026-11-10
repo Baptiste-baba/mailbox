@@ -1,5 +1,5 @@
 import type { MailboxSummary, ThreadSummary, ThreadView } from '@mailbox/shared';
-import { Avatar, RowLink, Swatch } from '@mailbox/ui';
+import { Avatar, Chip, RowLink, Swatch } from '@mailbox/ui';
 import { createLink } from '@tanstack/react-router';
 import { PaperclipIcon } from 'lucide-react';
 import { formatListDate } from '../../dates/format-mail-date.ts';
@@ -19,7 +19,7 @@ export function ThreadRow({ thread, view, mailbox, now }: ThreadRowProps) {
   const sender = thread.sender.name || thread.sender.address;
   return (
     <ThreadRowLink to="/$view/$id" params={{ view, id: thread.id }} search={(previous) => previous}>
-      <Avatar name={sender} />
+      <Avatar name={sender} className="self-center" />
       <span className="flex min-w-0 flex-1 flex-col">
         <span className="flex items-baseline gap-2">
           <span className={`truncate ${thread.unread ? 'font-semibold' : 'font-medium'}`}>
@@ -55,12 +55,12 @@ function ThreadRowMeta({
   hasAttachments: boolean;
 }) {
   return (
-    <span className="mt-2 flex items-center gap-2 text-caption leading-none text-ink-2">
+    <span className="mt-1.5 flex items-center gap-2 text-caption leading-none text-ink-2">
       {mailbox !== undefined && (
-        <span className="flex items-center gap-2">
+        <Chip tone="tint" size="sm">
           <Swatch color={mailbox.color} shape="circle" />
           {mailbox.name}
-        </span>
+        </Chip>
       )}
       {hasAttachments && (
         <span className="flex items-center">

@@ -8,18 +8,28 @@ const toneClassNames: Record<ChipTone, string> = {
   warn: 'bg-warn-tint text-warn',
 };
 
+type ChipSize = 'md' | 'sm';
+
+const sizeClassNames: Record<ChipSize, string> = {
+  md: 'h-6 px-2.25',
+  sm: 'h-5 px-2',
+};
+
 interface ChipProps {
   tone: ChipTone;
+  /** `sm` inside a dense block, such as a card of a list. */
+  size?: ChipSize;
   children: ReactNode;
   className?: string;
 }
 
 /** A short status on a rounded pill, such as "Reconnecter" or "7 non lus". */
-export function Chip({ tone, children, className }: ChipProps) {
+export function Chip({ tone, size = 'md', children, className }: ChipProps) {
   return (
     <span
       className={joinClassNames(
-        'inline-flex h-6 flex-none items-center gap-1.25 rounded-full px-2.25 text-caption font-medium whitespace-nowrap',
+        'inline-flex flex-none items-center gap-1.25 rounded-full text-caption font-medium whitespace-nowrap',
+        sizeClassNames[size],
         toneClassNames[tone],
         className,
       )}
