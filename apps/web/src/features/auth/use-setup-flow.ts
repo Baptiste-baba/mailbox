@@ -6,7 +6,7 @@ import { authErrorMessage } from './auth-error-message.ts';
 import type { Credentials } from './credentials.ts';
 import { useContinueTo } from './use-continue-to.ts';
 
-export type SetupStep =
+type SetupStep =
   | { index: 0; rejection: string | undefined }
   | { index: 1 }
   | { index: 2; enrollment: TotpEnrollment }
