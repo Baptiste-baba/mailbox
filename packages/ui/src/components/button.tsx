@@ -3,7 +3,7 @@ import { joinClassNames } from '../join-class-names.ts';
 import { pressableClassNames } from '../pressable-class-names.ts';
 import { Kbd } from './kbd.tsx';
 
-type ButtonVariant = 'primary' | 'secondary' | 'text' | 'neutralText';
+type ButtonVariant = 'primary' | 'secondary' | 'text';
 type ButtonSize = 'lg' | 'md' | 'sm';
 
 // Hover states reuse the colour tokens. The border of `secondary` is drawn within its height, so every
@@ -12,7 +12,6 @@ const variantClassNames: Record<ButtonVariant, string> = {
   primary: 'bg-primary text-on-primary available:hover:bg-primary-hover',
   secondary: 'border border-line bg-surface text-ink available:hover:bg-field',
   text: 'text-link available:hover:bg-field',
-  neutralText: 'text-ink available:hover:bg-field',
 };
 
 const sizeClassNames: Record<ButtonSize, string> = {
@@ -24,7 +23,7 @@ const sizeClassNames: Record<ButtonSize, string> = {
 const paddingClassNames: Record<ButtonSize, string> = { lg: 'px-5', md: 'px-4', sm: 'px-3' };
 
 function paddingClassName(variant: ButtonVariant, size: ButtonSize): string {
-  return variant === 'text' || variant === 'neutralText' ? 'px-2' : paddingClassNames[size];
+  return variant === 'text' ? 'px-2' : paddingClassNames[size];
 }
 
 interface ButtonProps extends ComponentProps<'button'> {

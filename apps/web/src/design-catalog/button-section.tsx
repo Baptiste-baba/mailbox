@@ -10,7 +10,6 @@ const variants: { variant: ButtonVariant; label: string }[] = [
   { variant: 'primary', label: 'Répondre' },
   { variant: 'secondary', label: 'Reformuler' },
   { variant: 'text', label: 'Tout ranger' },
-  { variant: 'neutralText', label: 'Raccourcir' },
 ];
 
 const sizes: { size: ButtonSize; height: string }[] = [

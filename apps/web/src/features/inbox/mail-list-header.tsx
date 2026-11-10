@@ -31,7 +31,6 @@ export function MailListHeader({ filters }: { filters: ThreadFilters }) {
         )}
       </div>
       <SegmentedControl
-        variant="tabs"
         label={fr.inbox.filterLabel}
         options={filterOptions}
         value={filters.unreadOnly ? 'unread' : 'all'}
