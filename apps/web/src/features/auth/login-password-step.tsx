@@ -18,6 +18,7 @@ export function LoginPasswordStep(options: PasswordLoginOptions) {
     >
       <TextField
         label={fr.auth.usernameLabel}
+        placeholder={fr.auth.usernamePlaceholder}
         value={form.values.username}
         onChange={(event) => form.set.username(event.target.value)}
         autoComplete="username"
@@ -27,6 +28,7 @@ export function LoginPasswordStep(options: PasswordLoginOptions) {
       />
       <PasswordField
         label={fr.auth.passwordLabel}
+        placeholder={fr.auth.passwordPlaceholder}
         revealLabel={fr.auth.revealPassword}
         value={form.values.password}
         onChange={(event) => form.set.password(event.target.value)}

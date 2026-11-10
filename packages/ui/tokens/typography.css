@@ -16,6 +16,10 @@
   /* Text of a mail, and of the fields. */
   --text-body: 16px;
   --text-body--line-height: 26px;
+  /* Name of the app next to its logo. */
+  --text-brand: 19px;
+  --text-brand--line-height: 24px;
+  --text-brand--letter-spacing: -0.01em;
   /* Subject of the open mail. */
   --text-subject: 26px;
   --text-subject--line-height: 1.25;

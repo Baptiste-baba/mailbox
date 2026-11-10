@@ -29,8 +29,9 @@ export function SetupAuthenticatorStep({ onBack, ...options }: SetupAuthenticato
         </>
       }
     >
-      <AuthenticatorEnrollment enrollment={options.enrollment} />
-      <TotpCodeField value={form.code} onChange={form.changeCode} error={form.codeError} />
+      <AuthenticatorEnrollment enrollment={options.enrollment}>
+        <TotpCodeField value={form.code} onChange={form.changeCode} error={form.codeError} />
+      </AuthenticatorEnrollment>
     </AuthStepLayout>
   );
 }

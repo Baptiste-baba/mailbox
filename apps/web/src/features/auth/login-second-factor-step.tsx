@@ -40,7 +40,7 @@ export function LoginSecondFactorStep({ onBack, ...options }: LoginSecondFactorS
           error={form.codeError}
           value={form.code}
           onChange={(event) => form.changeCode(event.target.value)}
-          placeholder="XXXX-XXXX-XXXX"
+          placeholder={fr.auth.groupedCodePlaceholder}
           autoComplete="off"
           autoCapitalize="characters"
           spellCheck={false}

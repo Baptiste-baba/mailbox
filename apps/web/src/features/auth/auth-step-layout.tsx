@@ -6,7 +6,7 @@ interface AuthStepLayoutProps {
   onSubmit: () => void;
   /** Why the step cannot go on, beyond the errors of its fields. */
   error?: string | undefined;
-  /** The buttons at the end of the step. */
+  /** The buttons at the end of the step, the main one first. */
   actions: ReactNode;
   children: ReactNode;
 }
@@ -25,20 +25,20 @@ export function AuthStepLayout({
     onSubmit();
   };
   return (
-    <form noValidate onSubmit={submit} className="flex flex-col gap-6">
+    <form noValidate onSubmit={submit} className="flex flex-col gap-8">
       {(title !== undefined || intro !== undefined) && (
-        <div className="flex flex-col gap-1.5">
-          {title !== undefined && <h2 className="text-heading font-semibold">{title}</h2>}
-          {intro !== undefined && <p className="text-ink-2">{intro}</p>}
+        <div className="flex flex-col gap-2 text-center">
+          {title !== undefined && <h2 className="text-subject font-semibold">{title}</h2>}
+          {intro !== undefined && <p className="text-body text-ink-2">{intro}</p>}
         </div>
       )}
-      {children}
+      <div className="flex flex-col gap-4">{children}</div>
       {error !== undefined && (
-        <p role="alert" className="text-danger">
+        <p role="alert" className="rounded-md bg-danger-tint px-4 py-3 text-small text-danger">
           {error}
         </p>
       )}
-      <div className="flex flex-col gap-2">{actions}</div>
+      <div className="flex w-full max-w-120 flex-col gap-2 self-center">{actions}</div>
     </form>
   );
 }

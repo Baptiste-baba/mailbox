@@ -5,6 +5,8 @@ export interface TextFieldProps
   extends Omit<ComponentProps<'input'>, 'className' | 'aria-invalid' | 'aria-describedby'> {
   /** Shown inside the field, above what is typed, and its accessible name. */
   label: string;
+  /** An example of what to type, in grey in the empty field: every field shows one. */
+  placeholder: string;
   /** Help under the field, such as what to type in it; the error takes its place when there is one. */
   hint?: string | undefined;
   /** Why the value is refused: shown in red under the field, and read aloud with it. */

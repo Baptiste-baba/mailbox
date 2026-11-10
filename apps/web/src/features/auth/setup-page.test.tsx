@@ -99,6 +99,29 @@ describe('setup, checks before anything is sent', () => {
   });
 });
 
+describe('setup, password requirements', () => {
+  test('shows the requirements of the password, met as it gets long and hard to guess', async () => {
+    const { screen } = await openSetup();
+    await enterCode(screen);
+    const password = screen.getByLabelText('Mot de passe', { exact: true });
+    const requirement = (name: string) => screen.getByRole('listitem').filter({ hasText: name });
+
+    await userEvent.fill(password, 'azertyuiop123');
+    await expect.element(requirement('12 caractères')).toHaveTextContent('12 caractères (atteint)');
+    await expect
+      .element(requirement('robustesse excellente'))
+      .toHaveTextContent('robustesse excellente (pas encore atteint)');
+
+    await userEvent.fill(password, STRONG_PASSWORD);
+    await expect
+      .element(requirement('robustesse excellente'))
+      .toHaveTextContent('robustesse excellente (atteint)');
+    await expect
+      .element(screen.getByRole('meter', { name: 'Robustesse du mot de passe' }))
+      .toHaveAttribute('aria-valuetext', 'excellente');
+  });
+});
+
 describe('setup, when the server refuses', () => {
   test('goes back to the code once the server refuses it, keeping what was typed', async () => {
     const { screen } = await openSetup({ setupEnrollment: apiError(401, 'INVALID_SETUP_CODE') });

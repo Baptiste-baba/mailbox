@@ -1,20 +1,12 @@
 import { Button, PasswordField, TextField } from '@mailbox/ui';
 import { fr } from '../../i18n/fr.ts';
 import { AuthStepLayout } from './auth-step-layout.tsx';
-import type { PasswordScore } from './password-checker.ts';
-import { PasswordStrengthBars } from './password-strength.tsx';
+import { PasswordRequirements } from './password-requirements.tsx';
 import {
-  MIN_PASSWORD_SCORE,
   type SetupAccountForm,
   type SetupAccountFormOptions,
   useSetupAccountForm,
 } from './use-setup-account-form.ts';
-
-function strengthHint(score: PasswordScore | undefined): string | undefined {
-  return score === undefined
-    ? undefined
-    : fr.setup.passwordStrength(fr.setup.strengthLevels[score] ?? '');
-}
 
 interface SetupAccountStepProps extends SetupAccountFormOptions {
   onBack: () => void;
@@ -42,6 +34,7 @@ export function SetupAccountStep({ onBack, ...options }: SetupAccountStepProps) 
     >
       <TextField
         label={fr.auth.usernameLabel}
+        placeholder={fr.auth.usernamePlaceholder}
         error={form.errors.username}
         value={form.values.username}
         onChange={(event) => form.set.username(event.target.value)}
@@ -57,23 +50,23 @@ export function SetupAccountStep({ onBack, ...options }: SetupAccountStepProps) 
 
 /** The new password, rated as it is typed, then typed again. */
 function NewPasswordFields({ form }: { form: SetupAccountForm }) {
-  const { score } = form;
   return (
     <>
-      <PasswordField
-        label={fr.auth.passwordLabel}
-        revealLabel={fr.auth.revealPassword}
-        hint={strengthHint(score)}
-        error={form.errors.password}
-        value={form.values.password}
-        onChange={(event) => form.set.password(event.target.value)}
-        autoComplete="new-password"
-      />
-      {score !== undefined && (
-        <PasswordStrengthBars score={score} strongEnough={score >= MIN_PASSWORD_SCORE} />
-      )}
+      <div className="flex flex-col gap-2">
+        <PasswordField
+          label={fr.auth.passwordLabel}
+          placeholder={fr.setup.newPasswordPlaceholder}
+          revealLabel={fr.auth.revealPassword}
+          error={form.errors.password}
+          value={form.values.password}
+          onChange={(event) => form.set.password(event.target.value)}
+          autoComplete="new-password"
+        />
+        <PasswordRequirements password={form.values.password} score={form.score} />
+      </div>
       <PasswordField
         label={fr.setup.confirmLabel}
+        placeholder={fr.setup.confirmPlaceholder}
         revealLabel={fr.auth.revealPassword}
         error={form.errors.confirmation}
         value={form.values.confirmation}

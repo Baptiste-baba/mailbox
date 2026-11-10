@@ -30,40 +30,45 @@ export function SetupRecoveryCodesStep({
         </Button>
       }
     >
-      <ul
-        aria-label={fr.setup.recoveryListLabel}
-        className="grid grid-cols-2 gap-x-6 gap-y-2 rounded-md bg-field px-5 py-4 text-base font-medium tracking-wide"
-      >
-        {recoveryCodes.map((code) => (
-          <li key={code}>{code}</li>
-        ))}
-      </ul>
-      <div className="-mt-3 flex gap-2">
-        <CopyButton
-          text={asText}
-          label={fr.setup.copyCodes}
-          copiedLabel={fr.authenticator.copied}
-          failedLabel={fr.authenticator.copyFailed}
-        />
-        <Button
-          variant="secondary"
-          size="sm"
-          onClick={() =>
-            downloadTextFile(
-              fr.setup.downloadFileName,
-              `${fr.setup.downloadHeading(username)}\n\n${asText}\n`,
-            )
-          }
+      <div className="grid grid-cols-[1fr_auto] items-center gap-8">
+        <ul
+          aria-label={fr.setup.recoveryListLabel}
+          className="grid grid-cols-2 gap-x-6 gap-y-2 rounded-lg bg-field px-6 py-4 text-center text-body font-medium tracking-wide"
         >
-          <DownloadIcon />
-          {fr.setup.download}
-        </Button>
+          {recoveryCodes.map((code) => (
+            <li key={code}>{code}</li>
+          ))}
+        </ul>
+        <div className="flex flex-col gap-3">
+          <CopyButton
+            text={asText}
+            label={fr.setup.copyCodes}
+            copiedLabel={fr.authenticator.copied}
+            failedLabel={fr.authenticator.copyFailed}
+            className="w-full"
+          />
+          <Button
+            variant="secondary"
+            size="sm"
+            className="w-full"
+            onClick={() =>
+              downloadTextFile(
+                fr.setup.downloadFileName,
+                `${fr.setup.downloadHeading(username)}\n\n${asText}\n`,
+              )
+            }
+          >
+            <DownloadIcon />
+            {fr.setup.download}
+          </Button>
+          <Checkbox
+            className="mt-2"
+            label={fr.setup.savedConfirmation}
+            checked={saved}
+            onChange={(event) => setSaved(event.target.checked)}
+          />
+        </div>
       </div>
-      <Checkbox
-        label={fr.setup.savedConfirmation}
-        checked={saved}
-        onChange={(event) => setSaved(event.target.checked)}
-      />
     </AuthStepLayout>
   );
 }
