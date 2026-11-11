@@ -1,4 +1,4 @@
-import { Button, Dialog, DialogActions } from '@mailbox/ui';
+import { Button, Dialog, DialogConfirmation } from '@mailbox/ui';
 import { useState } from 'react';
 import { CatalogSection, SampleName } from './catalog-section.tsx';
 
@@ -18,20 +18,17 @@ export function DialogSection() {
         title="Retirer la passkey « iPhone » ?"
         closeLabel="Fermer"
       >
-        <p className="text-center text-ink-2">
-          Elle ne pourra plus te connecter. Supprime-la aussi de ton gestionnaire de mots de passe,
-          qui continuera de la proposer.
-        </p>
-        <DialogActions>
-          <Button variant="danger" size="lg" onClick={close}>
-            Retirer
-          </Button>
-          <Button variant="secondary" size="lg" onClick={close}>
-            Annuler
-          </Button>
-        </DialogActions>
+        <DialogConfirmation
+          message="Elle ne pourra plus te connecter. Supprime-la aussi de ton gestionnaire de mots de passe, qui continuera de la proposer."
+          error={undefined}
+          confirmLabel="Retirer"
+          cancelLabel="Annuler"
+          onConfirm={close}
+          onCancel={close}
+          pending={false}
+        />
       </Dialog>
-      <SampleName name="<Dialog> · titre, croix et contenu, sur la page voilée ; <DialogActions> · les boutons empilés, le principal d’abord" />
+      <SampleName name="<Dialog> · titre, croix et contenu, sur la page voilée ; <DialogConfirmation> · ce que fait l’action, puis l’action rouge et le retour" />
     </CatalogSection>
   );
 }

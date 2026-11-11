@@ -1,5 +1,5 @@
 import type { PasskeySummary } from '@mailbox/shared';
-import { Alert, Button, Dialog, DialogActions } from '@mailbox/ui';
+import { Dialog, DialogConfirmation } from '@mailbox/ui';
 import { fr } from '../../i18n/fr.ts';
 import { IdentityConfirmationForm } from './identity-confirmation-form.tsx';
 import { useRemovePasskey } from './use-remove-passkey.ts';
@@ -43,21 +43,14 @@ function RemovePasskeyConfirmation({
     );
   }
   return (
-    <>
-      <p className="text-center text-ink-2">{fr.passkey.removeText}</p>
-      {removal.error !== undefined && (
-        <div className="mt-4">
-          <Alert>{removal.error}</Alert>
-        </div>
-      )}
-      <DialogActions>
-        <Button variant="danger" size="lg" onClick={removal.remove} disabled={removal.pending}>
-          {fr.passkey.remove}
-        </Button>
-        <Button variant="secondary" size="lg" onClick={onDone}>
-          {fr.common.cancel}
-        </Button>
-      </DialogActions>
-    </>
+    <DialogConfirmation
+      message={fr.passkey.removeText}
+      error={removal.error}
+      confirmLabel={fr.passkey.remove}
+      cancelLabel={fr.common.cancel}
+      onConfirm={removal.remove}
+      onCancel={onDone}
+      pending={removal.pending}
+    />
   );
 }
