@@ -77,3 +77,27 @@ describe('signing out the other devices, when it does not happen', () => {
     expect(screen.getByText('Tes autres appareils sont déconnectés.').query()).toBeNull();
   });
 });
+
+describe('signing out the other devices, the dialog closed meanwhile', () => {
+  // Regression: closing the dialog while the request ran lost the confirmation message.
+  test('says so once done, the dialog closed or not', async () => {
+    let answer: (() => void) | undefined;
+    fakeApi({
+      logoutOthers: () =>
+        new Promise((resolve) => {
+          answer = () => resolve(done());
+        }),
+    });
+    const { screen } = await renderApp('/settings');
+    const dialog = await askToSignOutOthers(screen);
+    await dialog.getByRole('button', { name: 'Déconnecter', exact: true }).click();
+    await vi.waitFor(() => expect(answer).toBeDefined());
+    await dialog.getByRole('button', { name: 'Fermer' }).click();
+
+    answer?.();
+
+    await expect
+      .element(screen.getByRole('status').getByText('Tes autres appareils sont déconnectés.'))
+      .toBeVisible();
+  });
+});

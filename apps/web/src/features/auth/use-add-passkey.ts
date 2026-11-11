@@ -24,20 +24,22 @@ export function useAddPasskey(onAdded: () => void) {
   const [name, setName] = useState('');
   const [nameError, setNameError] = useState<string>();
   const [error, setError] = useState<string>();
-  const add = useMutation({ mutationFn: createAndAddPasskey });
+  const add = useMutation({
+    mutationFn: createAndAddPasskey,
+    // Given here rather than to mutate(): they run even when the dialog was closed meanwhile.
+    onSuccess: async () => {
+      await queryClient.invalidateQueries(passkeysQuery);
+      onAdded();
+    },
+    onError: (failure, checkedName) => {
+      if (!gate.holds(failure, () => run(checkedName))) {
+        setError(passkeyCreationErrorMessage(failure));
+      }
+    },
+  });
   const run = (checkedName: string) => {
     setError(undefined);
-    add.mutate(checkedName, {
-      onSuccess: async () => {
-        await queryClient.invalidateQueries(passkeysQuery);
-        onAdded();
-      },
-      onError: (failure) => {
-        if (!gate.holds(failure, () => run(checkedName))) {
-          setError(passkeyCreationErrorMessage(failure));
-        }
-      },
-    });
+    add.mutate(checkedName);
   };
   return {
     gate,
