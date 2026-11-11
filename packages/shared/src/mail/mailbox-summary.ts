@@ -3,7 +3,7 @@ import { paletteColorSchema } from './palette-color.ts';
 
 const mailboxStatusSchema = z.enum(['connected', 'reconnectRequired']);
 
-const mailboxSummarySchema = z.object({
+export const mailboxSummarySchema = z.object({
   id: z.string().min(1),
   /** Name the user gave the mailbox, such as "Perso". */
   name: z.string().min(1),

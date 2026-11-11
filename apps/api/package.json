@@ -14,6 +14,7 @@
   "dependencies": {
     "@mailbox/config": "workspace:*",
     "@mailbox/db": "workspace:*",
+    "@mailbox/providers": "workspace:*",
     "@mailbox/shared": "workspace:*",
     "@nestjs/common": "12.3.2",
     "@nestjs/core": "12.3.2",

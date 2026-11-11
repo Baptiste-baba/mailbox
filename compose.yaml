@@ -65,6 +65,8 @@ services:
       DATABASE_URL: postgres://mailbox:${POSTGRES_PASSWORD}@postgres:5432/mailbox
       MAILBOX_SECRET_KEY: ${MAILBOX_SECRET_KEY:?Set MAILBOX_SECRET_KEY in .env}
       MAILBOX_URL: ${MAILBOX_URL:?Set MAILBOX_URL in .env}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
       LOG_LEVEL: ${LOG_LEVEL:-info}
       # The port below only listens on this machine: whatever reaches the api is a local HTTPS endpoint,
       # through Docker's gateway. Its X-Forwarded-For tells which device signs in.

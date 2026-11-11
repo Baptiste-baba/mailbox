@@ -1,3 +1,4 @@
+import { SecretBox } from '@mailbox/db';
 import { type DynamicModule, Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import type { AppUrl } from '../config/app-url.ts';
@@ -16,7 +17,6 @@ import { PasskeysService } from './passkeys.service.ts';
 import { RecoveryCodesService } from './recovery-codes.service.ts';
 import { RelyingParty } from './relying-party.ts';
 import { SameSiteGuard } from './same-site.guard.ts';
-import { SecretBox } from './secret-box.ts';
 import { SessionGuard } from './session.guard.ts';
 import { SessionService } from './session.service.ts';
 import { SetupController } from './setup.controller.ts';
