@@ -1,5 +1,6 @@
+import { TextAlign } from '@tiptap/extension-text-align';
 import { Placeholder } from '@tiptap/extensions';
-import { EditorContent, useEditor } from '@tiptap/react';
+import { type Editor, EditorContent, useEditor } from '@tiptap/react';
 import { StarterKit } from '@tiptap/starter-kit';
 import { fr } from '../../i18n/fr.ts';
 
@@ -19,6 +20,7 @@ const extensions = [
     // A link opens from a mail being read, never from the one being written.
     link: { openOnClick: false, autolink: false, linkOnPaste: false },
   }),
+  TextAlign.configure({ types: ['paragraph'], alignments: ['left', 'center', 'right'] }),
   Placeholder.configure({ placeholder: fr.compose.bodyPlaceholder }),
 ];
 
@@ -29,18 +31,12 @@ const contentClassNames = [
   '[&_.is-editor-empty:first-child]:before:pointer-events-none [&_.is-editor-empty:first-child]:before:float-left [&_.is-editor-empty:first-child]:before:h-0 [&_.is-editor-empty:first-child]:before:text-ink-2 [&_.is-editor-empty:first-child]:before:content-[attr(data-placeholder)]',
 ].join(' ');
 
-interface ComposeBodyProps {
-  /** The message, as HTML. */
-  body: string;
-  onChange: (body: string) => void;
-}
-
 /**
- * The message itself, under the fields: it takes the rest of the pane and stops at the width of a
- * mail being read. ⌘B, ⌘I and ⌘U style the text, ⌘Z undoes, "- " or "1. " starts a list.
+ * The editor of the message, holding `body` as HTML and giving back every change. ⌘B, ⌘I and ⌘U
+ * style the text, ⌘Z undoes, "- " or "1. " starts a list.
  */
-export function ComposeBody({ body, onChange }: ComposeBodyProps) {
-  const editor = useEditor({
+export function useMessageEditor(body: string, onChange: (body: string) => void): Editor {
+  return useEditor({
     extensions,
     content: body,
     // Only lists start as they are typed: no other text turns into a style by surprise.
@@ -53,7 +49,11 @@ export function ComposeBody({ body, onChange }: ComposeBodyProps) {
         class: contentClassNames,
       },
     },
-    onUpdate: ({ editor: updated }) => onChange(updated.getHTML()),
+    onUpdate: ({ editor }) => onChange(editor.getHTML()),
   });
+}
+
+/** The message itself, under the fields: it takes the rest of the pane, at a reading width. */
+export function MessageEditor({ editor }: { editor: Editor }) {
   return <EditorContent editor={editor} className="flex min-h-40 flex-1 flex-col [&>div]:flex-1" />;
 }
