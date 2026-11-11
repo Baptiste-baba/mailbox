@@ -16,7 +16,14 @@ import { useCloseComposer } from './use-close-composer.ts';
  */
 export function ComposePane() {
   const close = useCloseComposer();
-  useShortcut('closeComposer', close);
+  useShortcut('closeComposer', () => {
+    // Escape leaves the field first, as a click elsewhere does: a recipient still being typed
+    // becomes a chip, and stays in the draft.
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+    close();
+  });
   const { draft, change, discard } = useComposeDraft();
   return (
     <PaneCard>
