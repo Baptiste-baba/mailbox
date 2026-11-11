@@ -1,22 +1,23 @@
 import { IconButton, PaneCard, PaneMessage } from '@mailbox/ui';
 import type { ErrorComponentProps } from '@tanstack/react-router';
 import { XIcon } from 'lucide-react';
-import { useState } from 'react';
 import { fr } from '../../i18n/fr.ts';
 import { shortcuts } from '../../shortcuts.ts';
 import { useShortcut } from '../../use-shortcut.ts';
-import { type ComposeDraft, emptyDraft } from './compose-draft.ts';
+import { ComposeBody } from './compose-body.tsx';
+import { useComposeDraft } from './compose-draft-context.tsx';
 import { ComposeEnvelope } from './compose-envelope.tsx';
 import { ComposeFooter } from './compose-footer.tsx';
 import { useCloseComposer } from './use-close-composer.ts';
 
-/** The new mail being written, in a card filling the pane as an open thread does. */
+/**
+ * The new mail being written, in a card filling the pane as an open thread does. Closing it keeps
+ * what was written; the trash throws it away.
+ */
 export function ComposePane() {
   const close = useCloseComposer();
   useShortcut('closeComposer', close);
-  const [draft, setDraft] = useState(emptyDraft);
-  const change = (changes: Partial<ComposeDraft>) =>
-    setDraft((current) => ({ ...current, ...changes }));
+  const { draft, change, discard } = useComposeDraft();
   return (
     <PaneCard>
       <div className="flex flex-none items-center gap-3 border-b border-line py-3 pr-4 pl-6">
@@ -31,10 +32,16 @@ export function ComposePane() {
           <XIcon />
         </IconButton>
       </div>
-      <div className="min-h-0 flex-1 overflow-y-auto overscroll-none">
+      <div className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-none">
         <ComposeEnvelope draft={draft} onChange={change} />
+        <ComposeBody body={draft.body} onChange={(body) => change({ body })} />
       </div>
-      <ComposeFooter />
+      <ComposeFooter
+        onDiscard={() => {
+          discard();
+          close();
+        }}
+      />
     </PaneCard>
   );
 }
