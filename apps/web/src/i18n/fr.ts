@@ -119,6 +119,16 @@ export const fr = {
     codeRejected:
       'Code incorrect. Tape le code affiché en ce moment\u00a0; s’il est refusé encore, vérifie l’heure de ton téléphone.',
   },
+  passkey: {
+    signIn: 'Se connecter avec une passkey',
+    use: 'Utiliser une passkey',
+    or: 'ou',
+    rejected: 'Cette passkey n’est pas reconnue. Elle a peut-être été retirée de MailBox.',
+    wrongAddress:
+      'Les passkeys ne fonctionnent qu’à l’adresse de MailBox réglée sur le serveur. Ouvre MailBox à cette adresse.',
+    failed:
+      'La passkey n’a pas pu être utilisée. Réessaie, ou utilise un autre moyen de te connecter.',
+  },
   login: {
     signIn: 'Se connecter',
     missingCredentials: 'Saisis ton nom d’utilisateur et ton mot de passe.',
