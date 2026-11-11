@@ -36,7 +36,7 @@ describe('new mail, draft', () => {
       .toHaveValue('Dîner samedi');
     await expect
       .element(screen.getByRole('textbox', { name: 'Message' }))
-      .toHaveValue('Tu viens à 20 h ?');
+      .toHaveTextContent('Tu viens à 20 h ?');
   });
 
   test('throws the draft away with the trash, and closes', async () => {
@@ -52,7 +52,7 @@ describe('new mail, draft', () => {
 
     await screen.getByRole('button', { name: 'Nouveau mail' }).click();
     await expect.element(screen.getByRole('textbox', { name: 'Objet' })).toHaveValue('');
-    await expect.element(screen.getByRole('textbox', { name: 'Message' })).toHaveValue('');
+    await expect.element(screen.getByRole('textbox', { name: 'Message' })).toHaveTextContent('');
     await expect.element(screen.getByText('camille@exemple.fr')).not.toBeInTheDocument();
     await expect.element(screen.getByRole('textbox', { name: 'Cc' })).not.toBeInTheDocument();
   });
