@@ -58,3 +58,13 @@ export async function addVirtualAuthenticator(): Promise<VirtualAuthenticator> {
     },
   };
 }
+
+/**
+ * The browser waiting for the user to pick a passkey among the suggestions of a field, who never
+ * does: only the signal of the request ends it.
+ */
+export function waitForeverForPick(request?: CredentialRequestOptions): Promise<Credential | null> {
+  return new Promise((_resolve, reject) => {
+    request?.signal?.addEventListener('abort', () => reject(request.signal?.reason));
+  });
+}
