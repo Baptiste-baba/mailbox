@@ -13,6 +13,7 @@ export function LoginCurrentStep({ flow }: { flow: LoginFlow }) {
           rejection={step.rejection}
           onDone={flow.passwordChecked}
           onSetupRequired={flow.setupRequired}
+          onSignedIn={flow.signedIn}
         />
       );
     case 'secondFactor':
