@@ -38,6 +38,8 @@ export function usePasskeyLogin(onSignedIn: () => void, { suggest = false } = {}
     supported: passkeysSupported(),
     pending: login.isPending,
     error,
+    /** The form is sent: a former passkey failure no longer applies. */
+    clearError: () => setError(undefined),
     start: async () => {
       await suggestion.stop();
       signIn();

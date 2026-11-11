@@ -19,7 +19,10 @@ export function LoginPasswordStep({ onSignedIn, ...options }: LoginPasswordStepP
   const passkey = usePasskeyLogin(onSignedIn, { suggest: true });
   return (
     <AuthStepLayout
-      onSubmit={form.submit}
+      onSubmit={() => {
+        passkey.clearError();
+        form.submit();
+      }}
       error={passkey.error ?? form.error}
       actions={
         <>
