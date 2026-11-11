@@ -91,7 +91,9 @@ describe('new mail, recipients and subject', () => {
     await screen.getByRole('button', { name: 'Cci' }).click();
     await expect.element(screen.getByRole('textbox', { name: 'Cci' })).toHaveFocus();
   });
+});
 
+describe('new mail, Escape', () => {
   test('closes with Escape even while typing', async () => {
     fakeApi();
     const { screen } = await renderApp('/inbox/new');
@@ -102,5 +104,23 @@ describe('new mail, recipients and subject', () => {
     await expect
       .element(screen.getByRole('heading', { name: 'Nouveau mail' }))
       .not.toBeInTheDocument();
+  });
+
+  // Regression: Escape that closes the word list of an input method also closed the new mail.
+  test('leaves Escape to an input method composing a word', async () => {
+    fakeApi();
+    const { screen } = await renderApp('/inbox/new');
+    const subject = screen.getByRole('textbox', { name: 'Objet' });
+    await userEvent.type(subject, 'nihon');
+
+    subject
+      .element()
+      .dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'Escape', isComposing: true, bubbles: true }),
+      );
+    // Closing would take the field away before the typing goes on.
+    await userEvent.type(subject, ' san');
+
+    await expect.element(subject).toHaveValue('nihon san');
   });
 });

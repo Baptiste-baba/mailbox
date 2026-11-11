@@ -10,7 +10,30 @@ import { joinClassNames } from '../join-class-names.ts';
 import { BareInput } from './bare-input.tsx';
 
 /** What ends a value as it is typed or pasted: a comma, a semicolon or a new line. */
-const SEPARATORS = /[,;\n]/;
+const SEPARATORS = new Set([',', ';', '\n']);
+
+/**
+ * Cuts a text into values at its separators, except inside quotes or angle brackets, where they
+ * belong to the value: "Roussel, Camille" <camille@exemple.fr> stays whole.
+ */
+function splitValues(text: string): string[] {
+  const values = [''];
+  let quoted = false;
+  let bracketed = false;
+  for (const character of text) {
+    if (character === '"') {
+      quoted = !quoted;
+    } else if (character === '<' || character === '>') {
+      bracketed = character === '<';
+    }
+    if (SEPARATORS.has(character) && !quoted && !bracketed) {
+      values.push('');
+    } else {
+      values[values.length - 1] += character;
+    }
+  }
+  return values;
+}
 
 interface ChipFieldProps
   extends Omit<
@@ -83,36 +106,44 @@ export function ChipField({
   );
 }
 
+/** The entries that are not among the values yet, trimmed, without blanks nor twice the same. */
+function newEntries(values: string[], entries: string[]): string[] {
+  const fresh = entries.map((entry) => entry.trim()).filter((entry) => entry !== '');
+  return [...new Set(fresh)].filter((entry) => !values.includes(entry));
+}
+
 /** The text being typed, which turns into chips as values end, without twice the same value. */
 function useChipEntry(values: string[], onChange: (values: string[]) => void) {
   const [text, setText] = useState('');
   const add = (entries: string[]) => {
-    const fresh = entries.map((entry) => entry.trim()).filter((entry) => entry !== '');
-    const added = [...new Set(fresh)].filter((entry) => !values.includes(entry));
+    const added = newEntries(values, entries);
     if (added.length > 0) {
       onChange([...values, ...added]);
     }
   };
   const type = (typed: string) => {
-    const parts = typed.split(SEPARATORS);
+    const parts = splitValues(typed);
     // Whatever follows the last separator is still being typed.
     setText(parts.pop() ?? '');
     add(parts);
   };
-  const commit = () => {
-    add([text]);
+  const commit = (pastedWithIt: string[] = []) => {
+    add([text, ...pastedWithIt]);
     setText('');
   };
   // A field drops the new lines of what is pasted in it: a column of values would run together.
   const paste = (event: ClipboardEvent<HTMLInputElement>) => {
-    const pasted = event.clipboardData.getData('text/plain');
-    if (SEPARATORS.test(pasted)) {
+    const pasted = splitValues(event.clipboardData.getData('text/plain'));
+    if (pasted.length > 1) {
       event.preventDefault();
-      add([text, ...pasted.split(SEPARATORS)]);
-      setText('');
+      commit(pasted);
     }
   };
   const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+    // While an input method composes a word, its keys are its own.
+    if (event.nativeEvent.isComposing) {
+      return;
+    }
     if (event.key === 'Enter' && text.trim() !== '') {
       event.preventDefault();
       commit();
