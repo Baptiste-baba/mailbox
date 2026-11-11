@@ -8,7 +8,7 @@ export { Checkbox } from './components/checkbox.tsx';
 export { Chip } from './components/chip.tsx';
 export { ChipField } from './components/chip-field.tsx';
 export { CopyButton } from './components/copy-button.tsx';
-export { Dialog, DialogActions } from './components/dialog.tsx';
+export { Dialog, DialogActions, DialogConfirmation } from './components/dialog.tsx';
 export { Divider } from './components/divider.tsx';
 export { FieldLine } from './components/field-line.tsx';
 export { FileChip } from './components/file-chip.tsx';

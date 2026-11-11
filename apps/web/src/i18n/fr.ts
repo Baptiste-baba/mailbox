@@ -166,6 +166,11 @@ export const fr = {
     confirmTitle: 'Se déconnecter\u00a0?',
     confirmText:
       'Pour revenir, il te faudra ton mot de passe et un code de ton application d’authentification, ou une passkey.',
+    others: 'Déconnecter les autres appareils',
+    othersTitle: 'Déconnecter les autres appareils\u00a0?',
+    othersText: 'Tous tes autres appareils devront se reconnecter. Celui-ci reste connecté.',
+    othersAction: 'Déconnecter',
+    othersDone: 'Tes autres appareils sont déconnectés.',
   },
   settings: {
     title: 'Réglages',
