@@ -7,7 +7,7 @@ export class MailboxesController {
   constructor(private readonly mailboxes: MailboxesService) {}
 
   @Get()
-  list(): MailboxList {
+  list(): Promise<MailboxList> {
     return this.mailboxes.list();
   }
 }

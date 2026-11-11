@@ -12,7 +12,6 @@ export const sidebar = {
   folders: 'Dossiers',
   newFolder: 'Nouveau',
   newFolderLabel: 'Nouveau dossier',
-  foldersError: 'Impossible de charger tes dossiers.',
   settings: 'Réglages',
   crash: 'La navigation n’a pas pu s’afficher.',
 };

@@ -6,7 +6,6 @@ import type { ApiConfig } from './config/api-config.ts';
 import { DatabaseModule } from './database/database.module.ts';
 import { createValidationPipe } from './errors/create-validation-pipe.ts';
 import { GlobalExceptionFilter } from './errors/global-exception.filter.ts';
-import { FoldersModule } from './folders/folders.module.ts';
 import { HealthModule } from './health/health.module.ts';
 import { createHttpLoggerOptions } from './logging/logger-options.ts';
 import { MailboxesModule } from './mailboxes/mailboxes.module.ts';
@@ -24,7 +23,6 @@ export function createAppModule(config: ApiConfig): DynamicModule {
       HealthModule,
       createAuthModule(config.secretKey, config.appUrl),
       MailboxesModule,
-      FoldersModule,
       ThreadsModule,
     ],
     providers: [

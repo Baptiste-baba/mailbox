@@ -1,12 +1,8 @@
-import { NavGroup, NavGroupAction, Swatch } from '@mailbox/ui';
-import { useQuery } from '@tanstack/react-query';
-import { foldersQuery } from '../api/folders-query.ts';
+import { NavGroup, NavGroupAction } from '@mailbox/ui';
 import { comingSoon } from '../hint.ts';
 import { fr } from '../i18n/fr.ts';
-import { ComingSoonNavItem } from './coming-soon-nav-item.tsx';
-import { NavItemSkeletons, SidebarError } from './sidebar-message.tsx';
 
-/** "Dossiers": the folders the user created, shown before the feature that opens them exists. */
+/** "Dossiers": announced by its heading, and empty until the feature that fills it exists. */
 export function FolderNavGroup() {
   return (
     <NavGroup
@@ -19,27 +15,8 @@ export function FolderNavGroup() {
           {fr.sidebar.newFolder}
         </NavGroupAction>
       }
-    >
-      <FolderItems />
-    </NavGroup>
-  );
-}
-
-function FolderItems() {
-  const folders = useQuery(foldersQuery);
-  // What is shown stays when a refresh fails: only a first load that fails shows the error.
-  if (folders.data === undefined) {
-    return folders.isError ? (
-      <SidebarError message={fr.sidebar.foldersError} onRetry={() => folders.refetch()} />
-    ) : (
-      <NavItemSkeletons count={4} />
-    );
-  }
-  return folders.data.folders.map((folder) => (
-    <ComingSoonNavItem
-      key={folder.id}
-      icon={<Swatch color={folder.color} shape="square" />}
-      label={folder.name}
+      // Reduced to icons, the sidebar hides headings: nothing of the group would show but its line.
+      className="@max-rail:hidden"
     />
-  ));
+  );
 }

@@ -47,7 +47,6 @@ export {
   type TooManyAttemptsDetails,
   tooManyAttemptsDetailsSchema,
 } from './errors/too-many-attempts-details.ts';
-export { type FolderList, type FolderSummary, folderListSchema } from './mail/folder-summary.ts';
 export { type MailAddress, mailAddressSchema } from './mail/mail-address.ts';
 export {
   type MailboxList,

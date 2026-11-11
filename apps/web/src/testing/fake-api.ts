@@ -149,7 +149,6 @@ export function fakeApi({
     'GET /api/threads': ({ url }) => threadPages(url),
     'GET /api/threads/:id': ({ id }) => thread(id),
     'GET /api/mailboxes': () => mailboxes(),
-    'GET /api/folders': () => ({ folders: [] }),
     'GET /api/auth/status': () => authStatus(),
     'POST /api/auth/setup/totp-secret': ({ sent }) => setupEnrollment(sent),
     'POST /api/auth/setup': ({ sent }) => setup(sent),

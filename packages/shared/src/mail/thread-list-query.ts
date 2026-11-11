@@ -12,7 +12,7 @@ const THREAD_PAGE_MAX_SIZE = 100;
 // Query string values arrive as text: booleans and numbers are parsed from it.
 export const threadListQuerySchema = z.object({
   view: threadViewSchema,
-  mailboxId: z.string().min(1).optional(),
+  mailboxId: z.uuid().optional(),
   unreadOnly: z.stringbool().default(false),
   cursor: z.string().min(1).optional(),
   limit: z.coerce.number().int().min(1).max(THREAD_PAGE_MAX_SIZE).default(50),
