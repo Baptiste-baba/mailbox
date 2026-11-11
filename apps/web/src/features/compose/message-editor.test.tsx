@@ -2,20 +2,18 @@ import { useState } from 'react';
 import { describe, expect, test } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
+import { MODIFIER_KEY as MOD } from '../../testing/modifier-key.ts';
 import { FormatBar } from './format-bar.tsx';
 import { MessageEditor, useMessageEditor } from './message-editor.tsx';
-
-/** The key the editor reads as ⌘ on a Mac, Ctrl elsewhere. */
-const MOD = navigator.platform.startsWith('Mac') ? 'Meta' : 'Control';
 
 /** The message editor and its bar, the HTML it holds shown under it: what the mail will hold. */
 function Body() {
   const [body, setBody] = useState('');
-  const editor = useMessageEditor(body, setBody);
+  const editor = useMessageEditor(body, setBody, () => undefined);
   return (
     <>
       <MessageEditor editor={editor} />
-      <FormatBar editor={editor} />
+      <FormatBar editor={editor} onWriteLink={() => undefined} />
       <output>{body}</output>
     </>
   );

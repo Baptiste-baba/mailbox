@@ -3,6 +3,7 @@ import { type ChainedCommands, type Editor, useEditorState } from '@tiptap/react
 import {
   BoldIcon,
   ItalicIcon,
+  LinkIcon,
   ListIcon,
   ListOrderedIcon,
   RemoveFormattingIcon,
@@ -12,7 +13,7 @@ import {
   TextAlignStartIcon,
   UnderlineIcon,
 } from 'lucide-react';
-import { Fragment, type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { fr } from '../../i18n/fr.ts';
 import { type ShortcutId, shortcuts } from '../../shortcuts.ts';
 
@@ -104,36 +105,67 @@ const toggleGroups: FormatToggle[][] = [
 
 const toggles = toggleGroups.flat();
 
+interface ToggleGroupProps {
+  group: FormatToggle[];
+  /** Which styles the text at the cursor has, by toggle. */
+  active: Record<string, boolean>;
+  onApply: (apply: FormatToggle['apply']) => void;
+}
+
+/** One group of toggles, then the line that sets it apart from the next. */
+function ToggleGroup({ group, active, onApply }: ToggleGroupProps) {
+  return (
+    <>
+      {group.map((toggle) => (
+        <IconButton
+          key={toggle.id}
+          label={toggle.label}
+          shortcut={shortcuts[toggle.id].label}
+          pressed={active[toggle.id] ?? false}
+          onClick={() => onApply(toggle.apply)}
+        >
+          {toggle.icon}
+        </IconButton>
+      ))}
+      <ToolbarSeparator />
+    </>
+  );
+}
+
+interface FormatBarProps {
+  editor: Editor;
+  /** Asks for the link of the text at the cursor, to add, change or remove. */
+  onWriteLink: () => void;
+}
+
 /**
  * The formatting of the message, above the actions of the mail: each button lights up while the
  * text at the cursor has its style, and gives the keyboard back to the text once pressed.
  */
-export function FormatBar({ editor }: { editor: Editor }) {
+export function FormatBar({ editor, onWriteLink }: FormatBarProps) {
   const active = useEditorState({
     editor,
-    selector: ({ editor: current }) =>
-      Object.fromEntries(toggles.map((toggle) => [toggle.id, toggle.isActive(current)])),
+    selector: ({ editor: current }) => ({
+      styles: Object.fromEntries(toggles.map((toggle) => [toggle.id, toggle.isActive(current)])),
+      link: current.isActive('link'),
+    }),
   });
   const run = (apply: (chain: ChainedCommands) => ChainedCommands) =>
     apply(editor.chain().focus()).run();
   return (
     <Toolbar label={fr.compose.formatting} className="flex-none border-t border-line px-4 py-1.5">
       {toggleGroups.map((group) => (
-        <Fragment key={group[0]?.id}>
-          {group.map((toggle) => (
-            <IconButton
-              key={toggle.id}
-              label={toggle.label}
-              shortcut={shortcuts[toggle.id].label}
-              pressed={active[toggle.id] ?? false}
-              onClick={() => run(toggle.apply)}
-            >
-              {toggle.icon}
-            </IconButton>
-          ))}
-          <ToolbarSeparator />
-        </Fragment>
+        <ToggleGroup key={group[0]?.id} group={group} active={active.styles} onApply={run} />
       ))}
+      <IconButton
+        label={fr.compose.link}
+        shortcut={shortcuts.link.label}
+        pressed={active.link}
+        onClick={onWriteLink}
+      >
+        <LinkIcon />
+      </IconButton>
+      <ToolbarSeparator />
       <IconButton
         label={fr.compose.clearFormatting}
         onClick={() => run((chain) => chain.unsetAllMarks().unsetTextAlign().clearNodes())}

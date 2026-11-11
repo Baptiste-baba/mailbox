@@ -11,6 +11,7 @@ export type ShortcutId =
   | 'alignRight'
   | 'bulletList'
   | 'orderedList'
+  | 'link'
   | 'search'
   | 'searchList'
   | 'nextThread'
@@ -45,6 +46,7 @@ export const shortcuts: Record<ShortcutId, Shortcut> = {
   alignRight: { label: '⌘⇧R' },
   bulletList: { label: '⌘⇧8' },
   orderedList: { label: '⌘⇧7' },
+  link: { label: '⌘K' },
   search: { label: '⌘K' },
   searchList: { label: '/' },
   nextThread: { label: 'J', key: 'j' },
