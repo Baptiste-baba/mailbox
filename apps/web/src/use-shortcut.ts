@@ -12,18 +12,21 @@ function isTyping(target: EventTarget | null): boolean {
   );
 }
 
-/** Runs `handler` when the key of the shortcut is pressed, unless the user is typing text. */
+/**
+ * Runs `handler` when the key of the shortcut is pressed, unless the user is typing text and the
+ * shortcut does not work while typing.
+ */
 export function useShortcut(id: ShortcutId, handler: () => void): void {
   const onShortcut = useEffectEvent(handler);
   useEffect(() => {
-    const { key } = shortcuts[id];
+    const { key, whileTyping = false } = shortcuts[id];
     function onKeyDown(event: KeyboardEvent) {
       if (
         event.key !== key ||
         event.metaKey ||
         event.ctrlKey ||
         event.altKey ||
-        isTyping(event.target)
+        (isTyping(event.target) && !whileTyping)
       ) {
         return;
       }

@@ -18,12 +18,14 @@ interface Shortcut {
   label: string;
   /** The key that triggers it, for the shortcuts that work already. */
   key?: string;
+  /** Triggers even while the user is typing text, as Escape does. */
+  whileTyping?: boolean;
 }
 
 /** Every keyboard shortcut of the app. */
 export const shortcuts: Record<ShortcutId, Shortcut> = {
   newMail: { label: 'C', key: 'c' },
-  closeComposer: { label: 'Échap', key: 'Escape' },
+  closeComposer: { label: 'Échap', key: 'Escape', whileTyping: true },
   send: { label: '⌘↵' },
   search: { label: '⌘K' },
   searchList: { label: '/' },
