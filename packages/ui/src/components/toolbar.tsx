@@ -30,8 +30,11 @@ function targetIndex(key: string, index: number, count: number): number | undefi
   }
 }
 
+/** The controls of the toolbar itself, not those of a menu one of them opens. */
 function controlsOf(toolbar: HTMLElement | null): HTMLElement[] {
-  return toolbar === null ? [] : [...toolbar.querySelectorAll<HTMLElement>('button:enabled')];
+  return toolbar === null
+    ? []
+    : [...toolbar.querySelectorAll<HTMLElement>('button:enabled:not([popover] button)')];
 }
 
 /** Lets `current` alone, among the controls, take Tab. */
@@ -82,6 +85,11 @@ export function Toolbar({ label, children, className }: ToolbarProps) {
       {children}
     </div>
   );
+}
+
+/** Controls that belong together: a toolbar too narrow for all its controls wraps between groups. */
+export function ToolbarGroup({ children }: { children: ReactNode }) {
+  return <span className="flex items-center gap-0.5">{children}</span>;
 }
 
 /** A thin line between groups of controls in a toolbar. */

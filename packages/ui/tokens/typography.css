@@ -13,9 +13,10 @@
   --text-small--line-height: 20px;
   --text-base: 15px;
   --text-base--line-height: 22px;
-  /* Text of a mail, and of the fields. */
+  /* Text of a mail, and of the fields. Its line height is relative, 26 px at 16 px, so that a line
+     grows with the larger text a mail being written can have. */
   --text-body: 16px;
-  --text-body--line-height: 26px;
+  --text-body--line-height: 1.625;
   /* Name of the app next to its logo. */
   --text-brand: 19px;
   --text-brand--line-height: 24px;
