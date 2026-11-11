@@ -26,6 +26,19 @@ export class AccountCredentialsService {
     return stored;
   }
 
+  /**
+   * The account, for a signed-in session.
+   * @throws AppError UNAUTHENTICATED while none exists: a reset of the access ends every session
+   * with the account, so this only narrows the type.
+   */
+  async require(): Promise<StoredAccount> {
+    const stored = await this.find();
+    if (stored === undefined) {
+      throw new AppError('UNAUTHENTICATED', 'No account');
+    }
+    return stored;
+  }
+
   /** @throws AppError INVALID_SECOND_FACTOR for a wrong code, or one already used. */
   async checkTotpCode(stored: StoredAccount, code: string): Promise<void> {
     const secret = this.secretBox.open(stored.totpSecretEncrypted);

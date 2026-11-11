@@ -11,7 +11,9 @@ function formatTime(date: Date): string {
  */
 export function formatListDate(isoDate: string, now: Date): string {
   const date = new Date(isoDate);
-  const daysAgo = calendarDay(now).day - calendarDay(date).day;
+  const then = calendarDay(date);
+  const today = calendarDay(now);
+  const daysAgo = today.day - then.day;
   if (daysAgo <= 0) {
     return formatTime(date);
   }
@@ -21,7 +23,7 @@ export function formatListDate(isoDate: string, now: Date): string {
   if (daysAgo < 7) {
     return dateFormatter({ weekday: 'short' }).format(date);
   }
-  return formatShortDate(date, now);
+  return formatShortDate(date, then.year === today.year);
 }
 
 /** Date of an open message: the list date and the time, "hier, 18:42", or the time alone today. */

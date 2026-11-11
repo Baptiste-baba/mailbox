@@ -1,8 +1,9 @@
 import { passkeyRegistrationSchema } from '@mailbox/shared';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
+import { lastBodySentTo } from '../../testing/fake-api.ts';
 import { type AppScreen, renderApp } from '../../testing/render-app.tsx';
-import { lastBodySentTo, settingsApi } from '../../testing/settings-api.ts';
+import { settingsApi } from '../../testing/settings-api.ts';
 import {
   addVirtualAuthenticator,
   type VirtualAuthenticator,

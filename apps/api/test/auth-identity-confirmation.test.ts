@@ -1,18 +1,17 @@
-import { type Database, session } from '@mailbox/db';
-import { passkeyRequestOptionsSchema, totpEnrollmentSchema } from '@mailbox/shared';
-import { sql } from 'drizzle-orm';
+import type { Database } from '@mailbox/db';
+import { totpEnrollmentSchema } from '@mailbox/shared';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
-import { callAuth, errorCode, sessionCookieFrom } from './auth-requests.ts';
+import { callAuth, errorCode, passkeyChallenge } from './auth-requests.ts';
 import { totpCode, wrongTotpCode } from './authenticator-app.ts';
 import { signChallenge, type TestPasskey } from './passkey-authenticator.ts';
 import { type RunningApi, startApi } from './start-api.ts';
 import {
   createTestAccount,
+  signInElsewhere,
   storeTestPasskey,
   TEST_PASSWORD,
-  TEST_USERNAME,
 } from './test-account.ts';
-import { openTestDatabase, resetAuthTables } from './test-database.ts';
+import { letIdentityConfirmationAge, openTestDatabase, resetAuthTables } from './test-database.ts';
 
 let api: RunningApi;
 let database: Database;
@@ -37,9 +36,8 @@ beforeEach(async () => {
   testPasskey = await storeTestPasskey(database);
 });
 
-/** As if the last proof of identity on every device dated from eleven minutes ago. */
-async function letConfirmationAge(): Promise<void> {
-  await database.update(session).set({ identityConfirmedAt: sql`now() - interval '11 minutes'` });
+function letConfirmationAge(): Promise<void> {
+  return letIdentityConfirmationAge(database);
 }
 
 function askToAddPasskey(sessionCookie = cookie): Promise<Response> {
@@ -50,11 +48,8 @@ function confirm(body: unknown, sessionCookie = cookie): Promise<Response> {
   return callAuth(api, 'POST', '/identity-confirmation', { cookie: sessionCookie, body });
 }
 
-async function confirmationChallenge(sessionCookie = cookie): Promise<string> {
-  const response = await callAuth(api, 'POST', '/identity-confirmation/options', {
-    cookie: sessionCookie,
-  });
-  return passkeyRequestOptionsSchema.parse(await response.json()).challenge;
+function confirmationChallenge(sessionCookie = cookie): Promise<string> {
+  return passkeyChallenge(api, '/identity-confirmation/options', sessionCookie);
 }
 
 describe('recent identity confirmation', () => {
@@ -74,14 +69,10 @@ describe('recent identity confirmation', () => {
   });
 
   it('counts a new authenticator app set up after a recovery code as a confirmation', async () => {
-    const login = await callAuth(api, 'POST', '/login', {
-      body: {
-        username: TEST_USERNAME,
-        password: TEST_PASSWORD,
-        secondFactor: { kind: 'recoveryCode', code: recoveryCodes[0] },
-      },
+    const recoveryCookie = await signInElsewhere(api, {
+      kind: 'recoveryCode',
+      code: recoveryCodes[0],
     });
-    const recoveryCookie = sessionCookieFrom(login);
     const enrollment = await callAuth(api, 'POST', '/totp/secret', { cookie: recoveryCookie });
     const { secret } = totpEnrollmentSchema.parse(await enrollment.json());
 
@@ -154,14 +145,7 @@ describe('confirming the identity, refused', () => {
   });
 
   it('refuses a passkey challenge given to another session', async () => {
-    const login = await callAuth(api, 'POST', '/login', {
-      body: {
-        username: TEST_USERNAME,
-        password: TEST_PASSWORD,
-        secondFactor: { kind: 'totp', code: totpCode(totpSecret, 1) },
-      },
-    });
-    const otherCookie = sessionCookieFrom(login);
+    const otherCookie = await signInElsewhere(api, { kind: 'totp', code: totpCode(totpSecret, 1) });
     const challenge = await confirmationChallenge(otherCookie);
 
     const response = await confirm({
@@ -173,8 +157,7 @@ describe('confirming the identity, refused', () => {
   });
 
   it('refuses a passkey challenge given to sign in', async () => {
-    const options = await callAuth(api, 'POST', '/passkey-login/options');
-    const { challenge } = passkeyRequestOptionsSchema.parse(await options.json());
+    const challenge = await passkeyChallenge(api, '/passkey-login/options');
 
     const response = await confirm({
       method: 'passkey',

@@ -7,12 +7,14 @@ import { calendarDay, formatShortDate } from './calendar-day.ts';
  */
 export function formatDayPhrase(isoDate: string, now: Date): string {
   const date = new Date(isoDate);
-  const daysAgo = calendarDay(now).day - calendarDay(date).day;
+  const then = calendarDay(date);
+  const today = calendarDay(now);
+  const daysAgo = today.day - then.day;
   if (daysAgo <= 0) {
     return fr.dates.today;
   }
   if (daysAgo === 1) {
     return fr.dates.yesterday;
   }
-  return fr.dates.onDay(formatShortDate(date, now));
+  return fr.dates.onDay(formatShortDate(date, then.year === today.year));
 }

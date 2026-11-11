@@ -45,6 +45,17 @@ export async function signInOnFreshInstance(api: RunningApi, database: Database)
   return (await createTestAccount(api, database)).setupCookie;
 }
 
+/** Signs in on another device, with the password and a second factor: its `Cookie` header. */
+export async function signInElsewhere(
+  api: RunningApi,
+  secondFactor: { kind: string; code: string | undefined },
+): Promise<string> {
+  const login = await callAuth(api, 'POST', '/login', {
+    body: { username: TEST_USERNAME, password: TEST_PASSWORD, secondFactor },
+  });
+  return sessionCookieFrom(login);
+}
+
 /** The user handle of the test account's passkeys: the 16 bytes of its passkey user id. */
 export async function testUserHandle(database: Database): Promise<string> {
   const [owner] = await database.select({ passkeyUserId: account.passkeyUserId }).from(account);

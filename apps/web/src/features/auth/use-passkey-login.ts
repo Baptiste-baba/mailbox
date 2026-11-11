@@ -1,6 +1,5 @@
 import type { PasskeyAuthenticationResponse } from '@mailbox/shared';
 import { useMutation } from '@tanstack/react-query';
-import { useState } from 'react';
 import { logInWithPasskey, startPasskeyLogin } from './login-requests.ts';
 import { getPasskey, passkeysSupported } from './passkey-ceremony.ts';
 import { passkeyErrorMessage } from './passkey-error-message.ts';
@@ -12,37 +11,36 @@ async function signInWithPasskey(picked: PasskeyAuthenticationResponse | undefin
   await logInWithPasskey({ response });
 }
 
+interface PasskeyLoginOptions {
+  /** Offers the passkeys among the suggestions of the username field too. */
+  suggest?: boolean;
+  /** Says why the passkey did not sign in, in the step's error; undefined when nothing needs saying. */
+  onError: (message: string | undefined) => void;
+}
+
 /**
  * Signing in with a passkey alone: from a button, where the browser asks which one and to unlock
  * it, and, with `suggest`, from the suggestions of the username field.
  */
-export function usePasskeyLogin(onSignedIn: () => void, { suggest = false } = {}) {
-  const [error, setError] = useState<string>();
-  const [signingIn, setSigningIn] = useState(false);
-  const login = useMutation({ mutationFn: signInWithPasskey });
-  const signIn = (picked?: PasskeyAuthenticationResponse) => {
-    setError(undefined);
-    setSigningIn(true);
-    login.mutate(picked, {
-      onSuccess: onSignedIn,
-      onError: (failure) => {
-        setError(passkeyErrorMessage(failure));
-        // The suggestions come back, for another try.
-        setSigningIn(false);
-      },
-    });
-  };
-  const suggestion = useConditionalPasskey(suggest && !signingIn, signIn);
+export function usePasskeyLogin(
+  onSignedIn: () => void,
+  { suggest = false, onError }: PasskeyLoginOptions,
+) {
+  const login = useMutation({
+    mutationFn: signInWithPasskey,
+    onSuccess: onSignedIn,
+    onError: (failure) => onError(passkeyErrorMessage(failure)),
+  });
+  // No suggestion while signing in; after a failure, they come back for another try.
+  const signingIn = login.isPending || login.isSuccess;
+  const suggestion = useConditionalPasskey(suggest && !signingIn, (picked) => login.mutate(picked));
   return {
     /** False where the browser cannot use passkeys: nothing offers them there. */
     supported: passkeysSupported(),
     pending: login.isPending,
-    error,
-    /** The form is sent: a former passkey failure no longer applies. */
-    clearError: () => setError(undefined),
     start: async () => {
       await suggestion.stop();
-      signIn();
+      login.mutate(undefined);
     },
   };
 }

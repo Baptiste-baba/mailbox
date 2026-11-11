@@ -1,7 +1,7 @@
 import { type AuthStatus, passkeyLoginRequestSchema } from '@mailbox/shared';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import { apiError, fakeApi } from '../../testing/fake-api.ts';
+import { apiError, fakeApi, lastBodySentTo, noContent } from '../../testing/fake-api.ts';
 import { type AppScreen, renderApp } from '../../testing/render-app.tsx';
 import {
   addVirtualAuthenticator,
@@ -28,7 +28,7 @@ afterEach(async () => {
  * The api of a user who signs in with a passkey, which `answer` judges: once accepted, the status
  * says signed in, as the server's does. The password alone asks for the second factor.
  */
-function passkeyApi(answer: () => Response = () => new Response(null, { status: 204 })) {
+function passkeyApi(answer: () => Response = noContent) {
   let status: AuthStatus = { state: 'signedOut' };
   return fakeApi({
     authStatus: () => status,
@@ -74,8 +74,7 @@ describe('sign-in with a passkey', () => {
 
     await expect.element(screen.getByRole('heading', { name: 'Toutes les boîtes' })).toBeVisible();
     expect(router.state.location.pathname).toBe('/all');
-    const sent = fetchMock.mock.calls.find(([url]) => url === PASSKEY_LOGIN)?.[1];
-    const { response } = passkeyLoginRequestSchema.parse(JSON.parse(String(sent?.body)));
+    const { response } = passkeyLoginRequestSchema.parse(lastBodySentTo(fetchMock, PASSKEY_LOGIN));
     expect(response.id).toBe(authenticator.passkeyId);
   });
 
@@ -98,8 +97,7 @@ describe('sign-in with a passkey suggested in the username field', () => {
     const { router } = await renderApp('/login?redirect=%2Fall');
 
     await expect.poll(() => router.state.location.pathname).toBe('/all');
-    const sent = fetchMock.mock.calls.find(([url]) => url === PASSKEY_LOGIN)?.[1];
-    const { response } = passkeyLoginRequestSchema.parse(JSON.parse(String(sent?.body)));
+    const { response } = passkeyLoginRequestSchema.parse(lastBodySentTo(fetchMock, PASSKEY_LOGIN));
     expect(response.id).toBe(authenticator.passkeyId);
   });
 

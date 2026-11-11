@@ -4,10 +4,9 @@ import {
   type PasskeyRegistration,
   passkeyCreationOptionsSchema,
   passkeyListSchema,
-  passkeyRequestOptionsSchema,
 } from '@mailbox/shared';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
-import { callAuth, errorCode, sessionCookieFrom } from './auth-requests.ts';
+import { callAuth, errorCode, passkeyChallenge } from './auth-requests.ts';
 import { totpCode } from './authenticator-app.ts';
 import {
   createPasskeyResponse,
@@ -18,9 +17,8 @@ import {
 import { type RunningApi, startApi } from './start-api.ts';
 import {
   createTestAccount,
+  signInElsewhere,
   storeTestPasskey,
-  TEST_PASSWORD,
-  TEST_USERNAME,
   testUserHandle,
 } from './test-account.ts';
 import { openTestDatabase, resetAuthTables } from './test-database.ts';
@@ -67,8 +65,7 @@ async function listPasskeys() {
 }
 
 async function signInWith(testPasskey: TestPasskey): Promise<Response> {
-  const options = await callAuth(api, 'POST', '/passkey-login/options');
-  const { challenge } = passkeyRequestOptionsSchema.parse(await options.json());
+  const challenge = await passkeyChallenge(api, '/passkey-login/options');
   return callAuth(api, 'POST', '/passkey-login', {
     body: { response: signChallenge(testPasskey, challenge) },
   });
@@ -150,14 +147,8 @@ describe('adding a passkey, refused', () => {
 
 describe('adding a passkey, refused requests', () => {
   it('refuses a challenge given to another session', async () => {
-    const login = await callAuth(api, 'POST', '/login', {
-      body: {
-        username: TEST_USERNAME,
-        password: TEST_PASSWORD,
-        secondFactor: { kind: 'totp', code: totpCode(totpSecret, 1) },
-      },
-    });
-    const { challenge } = await creationOptions(sessionCookieFrom(login));
+    const otherCookie = await signInElsewhere(api, { kind: 'totp', code: totpCode(totpSecret, 1) });
+    const { challenge } = await creationOptions(otherCookie);
     const created = createTestPasskey(await testUserHandle(database));
 
     const added = await add('iPhone', createPasskeyResponse(created, challenge));

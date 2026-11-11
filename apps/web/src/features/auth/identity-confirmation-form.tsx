@@ -3,22 +3,21 @@ import { KeyRoundIcon } from 'lucide-react';
 import { fr } from '../../i18n/fr.ts';
 import { passkeysSupported } from './passkey-ceremony.ts';
 import { TotpCodeField } from './totp-code-field.tsx';
+import { useHasPasskey } from './use-has-passkey.ts';
 import { useIdentityConfirmation } from './use-identity-confirmation.ts';
 
 interface IdentityConfirmationFormProps {
-  /** The account has a passkey to confirm with. */
-  withPasskey: boolean;
   onConfirmed: () => void;
   onCancel: () => void;
 }
 
-/** In a dialog, before a change of how one signs in: a passkey, or the password and a code. */
-export function IdentityConfirmationForm({
-  withPasskey,
-  onConfirmed,
-  onCancel,
-}: IdentityConfirmationFormProps) {
+/**
+ * In a dialog, before a change of how one signs in: a passkey, when the account has one, or the
+ * password and a code.
+ */
+export function IdentityConfirmationForm({ onConfirmed, onCancel }: IdentityConfirmationFormProps) {
   const form = useIdentityConfirmation(onConfirmed);
+  const withPasskey = useHasPasskey();
   return (
     <form
       noValidate

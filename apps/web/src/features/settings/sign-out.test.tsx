@@ -1,6 +1,6 @@
 import type { AuthStatus } from '@mailbox/shared';
 import { afterEach, describe, expect, test, vi } from 'vitest';
-import { fakeApi, serverError } from '../../testing/fake-api.ts';
+import { fakeApi, noContent, serverError } from '../../testing/fake-api.ts';
 import { type AppScreen, renderApp } from '../../testing/render-app.tsx';
 
 const LOGOUT = '/api/auth/logout';
@@ -10,7 +10,7 @@ afterEach(() => {
 });
 
 /** The api of a signed-in user, whom `answer` signs out, as the server's status then says. */
-function signOutApi(answer: () => Response = () => new Response(null, { status: 204 })) {
+function signOutApi(answer: () => Response = noContent) {
   let status: AuthStatus = { state: 'signedIn', username: 'alex' };
   return fakeApi({
     authStatus: () => status,

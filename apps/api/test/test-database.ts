@@ -1,4 +1,4 @@
-import { createDatabase, type Database, setupCode } from '@mailbox/db';
+import { createDatabase, type Database, session, setupCode } from '@mailbox/db';
 import { sql } from 'drizzle-orm';
 import { hashToken } from '../src/auth/token-hash.ts';
 
@@ -27,4 +27,9 @@ export async function insertSetupCode(
   expiresAt: Date,
 ): Promise<void> {
   await database.insert(setupCode).values({ codeHash: hashToken(code), expiresAt });
+}
+
+/** As if the last proof of identity on every device dated from eleven minutes ago. */
+export async function letIdentityConfirmationAge(database: Database): Promise<void> {
+  await database.update(session).set({ identityConfirmedAt: sql`now() - interval '11 minutes'` });
 }

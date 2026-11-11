@@ -1,13 +1,17 @@
+import type { ErrorCode } from '@mailbox/shared';
 import { fr } from '../../i18n/fr.ts';
 import { authErrorMessage } from './auth-error-message.ts';
 
 /**
  * What to tell the user after a passkey failed, if anything: closing the browser's window is their
- * own choice, which needs no word.
+ * own choice, which needs no word. The api's errors a screen expects besides say what it gives.
  */
-export function passkeyErrorMessage(error: unknown): string | undefined {
+export function passkeyErrorMessage(
+  error: unknown,
+  expected: Partial<Record<ErrorCode, string>> = {},
+): string | undefined {
   if (!(error instanceof DOMException)) {
-    return authErrorMessage(error, { INVALID_PASSKEY: fr.passkey.rejected });
+    return authErrorMessage(error, { INVALID_PASSKEY: fr.passkey.rejected, ...expected });
   }
   switch (error.name) {
     case 'NotAllowedError':

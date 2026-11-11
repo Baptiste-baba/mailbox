@@ -3,32 +3,19 @@ import { fr } from '../../i18n/fr.ts';
 import { IdentityConfirmationForm } from './identity-confirmation-form.tsx';
 import { useAddPasskey } from './use-add-passkey.ts';
 
-interface AddPasskeyDialogProps {
-  open: boolean;
-  onClose: () => void;
-  /** The account has a passkey already, to confirm the identity with. */
-  withPasskey: boolean;
-}
-
-export function AddPasskeyDialog({ open, onClose, withPasskey }: AddPasskeyDialogProps) {
+export function AddPasskeyDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
   return (
     <Dialog open={open} onClose={onClose} title={fr.passkey.add} closeLabel={fr.common.close}>
-      <AddPasskeyForm onDone={onClose} withPasskey={withPasskey} />
+      <AddPasskeyForm onDone={onClose} />
     </Dialog>
   );
 }
 
 // Only there while the dialog is open: each addition starts afresh.
-function AddPasskeyForm({ onDone, withPasskey }: { onDone: () => void; withPasskey: boolean }) {
+function AddPasskeyForm({ onDone }: { onDone: () => void }) {
   const form = useAddPasskey(onDone);
-  if (form.gate.confirming) {
-    return (
-      <IdentityConfirmationForm
-        withPasskey={withPasskey}
-        onConfirmed={form.gate.confirmed}
-        onCancel={onDone}
-      />
-    );
+  if (form.confirming) {
+    return <IdentityConfirmationForm onConfirmed={form.confirmed} onCancel={onDone} />;
   }
   return (
     <form
