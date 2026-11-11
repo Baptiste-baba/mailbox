@@ -1,10 +1,12 @@
 import * as z from 'zod';
+import { mailProviderNameSchema } from './mail-provider.ts';
 import { paletteColorSchema } from './palette-color.ts';
 
 const mailboxStatusSchema = z.enum(['connected', 'reconnectRequired']);
 
 export const mailboxSummarySchema = z.object({
   id: z.string().min(1),
+  provider: mailProviderNameSchema,
   /** Name the user gave the mailbox, such as "Perso". */
   name: z.string().min(1),
   address: z.string().min(1),

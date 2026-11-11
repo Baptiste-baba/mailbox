@@ -14,6 +14,7 @@ export class MailboxesService {
     const mailboxes = await this.database
       .select({
         id: mailbox.id,
+        provider: mailbox.provider,
         name: mailbox.name,
         address: mailbox.address,
         color: mailbox.color,

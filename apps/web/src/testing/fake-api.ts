@@ -16,6 +16,7 @@ export const testMailboxes: MailboxList = {
   mailboxes: [
     {
       id: 'mailbox-personal',
+      provider: 'gmail',
       name: 'Perso',
       address: 'alex@example.com',
       color: 'azur',

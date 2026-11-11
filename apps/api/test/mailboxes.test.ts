@@ -57,8 +57,8 @@ describe('GET /api/mailboxes', () => {
 
     const { mailboxes } = mailboxListSchema.parse(await response.json());
     expect(mailboxes).toMatchObject([
-      { ...personal, color: 'navy', status: 'reconnectRequired' },
-      { ...work, color: 'navy', status: 'connected' },
+      { ...personal, provider: 'gmail', color: 'navy', status: 'reconnectRequired' },
+      { ...work, provider: 'gmail', color: 'navy', status: 'connected' },
     ]);
   });
 
