@@ -57,13 +57,14 @@ interface FakeApi {
   /** Answers the changes of the passkeys, given what the app sent. */
   passkeyCreationOptions?: () => PasskeyCreationOptions | Response;
   addPasskey?: (body: unknown) => Response;
-  removePasskey?: (passkeyId: string) => Response;
+  /** Answers late when it gives a promise: a request still running. */
+  removePasskey?: (passkeyId: string) => Response | Promise<Response>;
   /** Answers the confirmation of the identity: its options, then the proof the app sent. */
   identityConfirmationOptions?: () => PasskeyRequestOptions | Response;
   confirmIdentity?: (body: unknown) => Response;
   /** Answers the sign-out of this device, and of the other ones. */
   logout?: () => Response;
-  logoutOthers?: () => Response;
+  logoutOthers?: () => Response | Promise<Response>;
   /** Answers the requests replacing the authenticator app. */
   authenticatorSecret?: () => TotpEnrollment | Response;
   authenticatorReplacement?: (body: unknown) => Response;
@@ -145,11 +146,10 @@ export function fakeApi({
     const sent: unknown = typeof init?.body === 'string' ? JSON.parse(init.body) : undefined;
     const method = init?.method ?? 'GET';
     const route = routes[url.pathname];
-    const body =
-      route?.(sent, url, method) ??
+    const body = await (route?.(sent, url, method) ??
       (url.pathname.startsWith(PASSKEY_PATH)
         ? removePasskey(decodeURIComponent(url.pathname.slice(PASSKEY_PATH.length)))
-        : thread(decodeURIComponent(url.pathname.slice(THREAD_PATH.length))));
+        : thread(decodeURIComponent(url.pathname.slice(THREAD_PATH.length)))));
     return body instanceof Response ? body : Response.json(body);
   });
   vi.stubGlobal('fetch', fetchMock);

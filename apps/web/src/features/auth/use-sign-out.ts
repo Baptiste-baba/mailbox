@@ -8,16 +8,18 @@ import { useContinueTo } from './use-continue-to.ts';
 export function useSignOut() {
   const continueTo = useContinueTo();
   const [error, setError] = useState<string>();
-  const signOut = useMutation({ mutationFn: logOut });
+  const signOut = useMutation({
+    mutationFn: logOut,
+    // Given here rather than to mutate(): they run even when the dialog was closed meanwhile.
+    onSuccess: () => continueTo('/login'),
+    onError: (failure) => setError(authErrorMessage(failure)),
+  });
   return {
     pending: signOut.isPending,
     error,
     signOut: () => {
       setError(undefined);
-      signOut.mutate(undefined, {
-        onSuccess: () => continueTo('/login'),
-        onError: (failure) => setError(authErrorMessage(failure)),
-      });
+      signOut.mutate();
     },
   };
 }

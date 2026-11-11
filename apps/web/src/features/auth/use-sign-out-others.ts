@@ -11,17 +11,19 @@ import { useIdentityGate } from './use-identity-gate.ts';
 export function useSignOutOthers(onSignedOut: () => void) {
   const gate = useIdentityGate();
   const [error, setError] = useState<string>();
-  const signOut = useMutation({ mutationFn: logOutOthers });
+  const signOut = useMutation({
+    mutationFn: logOutOthers,
+    // Given here rather than to mutate(): they run even when the dialog was closed meanwhile.
+    onSuccess: onSignedOut,
+    onError: (failure) => {
+      if (!gate.holds(failure, run)) {
+        setError(authErrorMessage(failure));
+      }
+    },
+  });
   const run = () => {
     setError(undefined);
-    signOut.mutate(undefined, {
-      onSuccess: onSignedOut,
-      onError: (failure) => {
-        if (!gate.holds(failure, run)) {
-          setError(authErrorMessage(failure));
-        }
-      },
-    });
+    signOut.mutate();
   };
   return { gate, pending: signOut.isPending, error, signOut: run };
 }
