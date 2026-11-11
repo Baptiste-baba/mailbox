@@ -8,7 +8,7 @@ import { createValidationPipe } from './errors/create-validation-pipe.ts';
 import { GlobalExceptionFilter } from './errors/global-exception.filter.ts';
 import { FoldersModule } from './folders/folders.module.ts';
 import { HealthModule } from './health/health.module.ts';
-import { createLoggerOptions } from './logging/logger-options.ts';
+import { createHttpLoggerOptions } from './logging/logger-options.ts';
 import { MailboxesModule } from './mailboxes/mailboxes.module.ts';
 import { ThreadsModule } from './threads/threads.module.ts';
 
@@ -19,7 +19,7 @@ export function createAppModule(config: ApiConfig): DynamicModule {
   return {
     module: AppModule,
     imports: [
-      LoggerModule.forRoot(createLoggerOptions(config.logLevel)),
+      LoggerModule.forRoot({ pinoHttp: createHttpLoggerOptions(config.logLevel) }),
       DatabaseModule.register(config.databaseUrl),
       HealthModule,
       createAuthModule(config.secretKey, config.appUrl),
