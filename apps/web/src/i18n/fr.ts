@@ -67,6 +67,13 @@ export const fr = {
     error: 'Impossible de charger ce mail. Vérifie que le serveur est joignable, puis réessaie.',
     crash: 'Ce mail n’a pas pu s’afficher.',
   },
+  compose: {
+    title: 'Nouveau mail',
+    close: 'Fermer',
+    attach: 'Joindre un fichier',
+    send: 'Envoyer',
+    crash: 'Le nouveau mail n’a pas pu s’afficher.',
+  },
   auth: {
     setupTitle: 'Installation',
     loginTitle: 'Connexion',

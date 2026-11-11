@@ -1,4 +1,5 @@
 import type { Thread } from '@mailbox/shared';
+import { PaneCard } from '@mailbox/ui';
 import { useQuery } from '@tanstack/react-query';
 import { getRouteApi } from '@tanstack/react-router';
 import { ApiError } from '../../api/api-error.ts';
@@ -6,7 +7,6 @@ import { mailboxesQuery } from '../../api/mailboxes-query.ts';
 import { threadQuery } from '../../api/thread-query.ts';
 import { fr } from '../../i18n/fr.ts';
 import { ReplyBar } from './reply-bar.tsx';
-import { ThreadFrame } from './thread-frame.tsx';
 import { ThreadHeader } from './thread-header.tsx';
 import { ThreadMessages } from './thread-messages.tsx';
 import { ThreadMessage, ThreadSkeleton } from './thread-states.tsx';
@@ -45,7 +45,7 @@ function OpenThread({ thread }: { thread: Thread }) {
   );
   const latestMessage = thread.messages.at(-1);
   return (
-    <ThreadFrame>
+    <PaneCard>
       <ThreadToolbar />
       <div className="min-h-0 flex-1 overflow-y-auto overscroll-none">
         <article className="flex flex-col gap-6 px-9 py-7">
@@ -56,6 +56,6 @@ function OpenThread({ thread }: { thread: Thread }) {
       {latestMessage !== undefined && (
         <ReplyBar latestMessage={latestMessage} ownAddress={mailbox?.address} />
       )}
-    </ThreadFrame>
+    </PaneCard>
   );
 }

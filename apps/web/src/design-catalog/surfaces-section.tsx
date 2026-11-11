@@ -4,6 +4,7 @@ import {
   Card,
   ColumnResizeHandle,
   FileChip,
+  PaneMessage,
   ResizableColumn,
   ResizableColumns,
   RowLink,
@@ -83,6 +84,12 @@ export function SurfacesSection() {
           />
         </div>
         <SampleName name='<StateMessage> · layout="block" pour une zone, layout="inline" en fin de liste' />
+      </div>
+      <div className="flex flex-col gap-2">
+        <div className="flex h-56 rounded-md bg-page">
+          <PaneMessage message="Choisis un mail dans la liste, ou parcours-la avec J et K." />
+        </div>
+        <SampleName name="<PaneCard> et <PaneMessage> · la carte qui remplit un volet, ici avec un message" />
       </div>
     </CatalogSection>
   );

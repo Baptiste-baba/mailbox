@@ -17,6 +17,7 @@ import { Route as SetupRouteImport } from './routes/setup'
 import { Route as ShellViewRouteRouteImport } from './routes/_shell/$view/route'
 import { Route as ShellViewIndexRouteImport } from './routes/_shell/$view/index'
 import { Route as ShellViewIdRouteImport } from './routes/_shell/$view/$id'
+import { Route as ShellViewNewRouteImport } from './routes/_shell/$view/new'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -57,6 +58,11 @@ const ShellViewIdRoute = ShellViewIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => ShellViewRouteRoute,
 } as any)
+const ShellViewNewRoute = ShellViewNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => ShellViewRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -65,6 +71,7 @@ export interface FileRoutesByFullPath {
   '/setup': typeof SetupRoute
   '/$view': typeof ShellViewRouteRouteWithChildren
   '/$view/$id': typeof ShellViewIdRoute
+  '/$view/new': typeof ShellViewNewRoute
   '/$view/': typeof ShellViewIndexRoute
 }
 export interface FileRoutesByTo {
@@ -73,6 +80,7 @@ export interface FileRoutesByTo {
   '/new-authenticator': typeof NewAuthenticatorRoute
   '/setup': typeof SetupRoute
   '/$view/$id': typeof ShellViewIdRoute
+  '/$view/new': typeof ShellViewNewRoute
   '/$view': typeof ShellViewIndexRoute
 }
 export interface FileRoutesById {
@@ -84,6 +92,7 @@ export interface FileRoutesById {
   '/setup': typeof SetupRoute
   '/_shell/$view': typeof ShellViewRouteRouteWithChildren
   '/_shell/$view/$id': typeof ShellViewIdRoute
+  '/_shell/$view/new': typeof ShellViewNewRoute
   '/_shell/$view/': typeof ShellViewIndexRoute
 }
 export interface FileRouteTypes {
@@ -95,9 +104,17 @@ export interface FileRouteTypes {
     | '/setup'
     | '/$view'
     | '/$view/$id'
+    | '/$view/new'
     | '/$view/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/new-authenticator' | '/setup' | '/$view/$id' | '/$view'
+  to:
+    | '/'
+    | '/login'
+    | '/new-authenticator'
+    | '/setup'
+    | '/$view/$id'
+    | '/$view/new'
+    | '/$view'
   id:
     | '__root__'
     | '/'
@@ -107,6 +124,7 @@ export interface FileRouteTypes {
     | '/setup'
     | '/_shell/$view'
     | '/_shell/$view/$id'
+    | '/_shell/$view/new'
     | '/_shell/$view/'
   fileRoutesById: FileRoutesById
 }
@@ -176,16 +194,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShellViewIdRouteImport
       parentRoute: typeof ShellViewRouteRoute
     }
+    '/_shell/$view/new': {
+      id: '/_shell/$view/new'
+      path: '/new'
+      fullPath: '/$view/new'
+      preLoaderRoute: typeof ShellViewNewRouteImport
+      parentRoute: typeof ShellViewRouteRoute
+    }
   }
 }
 
 interface ShellViewRouteRouteChildren {
   ShellViewIdRoute: typeof ShellViewIdRoute
+  ShellViewNewRoute: typeof ShellViewNewRoute
   ShellViewIndexRoute: typeof ShellViewIndexRoute
 }
 
 const ShellViewRouteRouteChildren: ShellViewRouteRouteChildren = {
   ShellViewIdRoute: ShellViewIdRoute,
+  ShellViewNewRoute: ShellViewNewRoute,
   ShellViewIndexRoute: ShellViewIndexRoute,
 }
 

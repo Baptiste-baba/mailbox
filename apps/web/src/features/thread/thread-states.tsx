@@ -1,19 +1,15 @@
-import { Skeleton, StateMessage } from '@mailbox/ui';
+import { PaneCard, PaneMessage, Skeleton } from '@mailbox/ui';
 import type { ErrorComponentProps } from '@tanstack/react-router';
 import { fr } from '../../i18n/fr.ts';
-import { ThreadFrame } from './thread-frame.tsx';
 import { ThreadToolbar } from './thread-toolbar.tsx';
 
-/** Why the thread pane shows no thread, centred in its card, with what to do about it. */
+/** Why the thread pane shows no thread, with what to do about it. */
 export function ThreadMessage({ message, onRetry }: { message: string; onRetry?: () => void }) {
   return (
-    <ThreadFrame>
-      <StateMessage
-        message={message}
-        action={onRetry === undefined ? undefined : { label: fr.common.retry, onClick: onRetry }}
-        className="flex-1 justify-center px-10"
-      />
-    </ThreadFrame>
+    <PaneMessage
+      message={message}
+      action={onRetry === undefined ? undefined : { label: fr.common.retry, onClick: onRetry }}
+    />
   );
 }
 
@@ -30,7 +26,7 @@ export function ThreadCrash({ reset }: ErrorComponentProps) {
 /** The shape of a thread while it loads, under its toolbar: nothing moves once it arrives. */
 export function ThreadSkeleton() {
   return (
-    <ThreadFrame>
+    <PaneCard>
       <ThreadToolbar />
       <div aria-hidden="true" className="flex flex-col gap-6 px-9 py-7">
         <div className="flex flex-col gap-3">
@@ -47,6 +43,6 @@ export function ThreadSkeleton() {
           </div>
         </div>
       </div>
-    </ThreadFrame>
+    </PaneCard>
   );
 }
