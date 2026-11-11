@@ -21,7 +21,9 @@ export function useShortcut(id: ShortcutId, handler: () => void): void {
   useEffect(() => {
     const { key, whileTyping = false } = shortcuts[id];
     function onKeyDown(event: KeyboardEvent) {
+      // While an input method composes a word, Escape and the other keys are its own.
       if (
+        event.isComposing ||
         event.key !== key ||
         event.metaKey ||
         event.ctrlKey ||

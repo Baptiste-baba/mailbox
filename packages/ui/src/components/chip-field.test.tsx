@@ -65,6 +65,41 @@ describe('ChipField, adding values', () => {
     await expect.element(screen.getByText('nadia@exemple.fr')).toBeVisible();
     expect(screen.getByText('camille@exemple.fr').elements()).toHaveLength(1);
   });
+});
+
+describe('ChipField, separators and input methods', () => {
+  // Regression: a name copied with its address, as mail programs do, was cut at its comma.
+  test('keeps a value whole where a separator is quoted or between angle brackets', async () => {
+    const { screen, field } = await renderRecipients();
+
+    await userEvent.type(field, '"Roussel, Camille" <camille@exemple.fr>;<a,b@exemple.fr>,');
+
+    await expect
+      .element(
+        screen.getByRole('button', { name: 'Retirer "Roussel, Camille" <camille@exemple.fr>' }),
+      )
+      .toBeVisible();
+    await expect
+      .element(screen.getByRole('button', { name: 'Retirer <a,b@exemple.fr>' }))
+      .toBeVisible();
+  });
+
+  // Regression: Enter that picks a word of an input method also made a chip of the text.
+  test('leaves Enter to an input method composing a word', async () => {
+    const { screen, field } = await renderRecipients();
+    await userEvent.type(field, 'nihon');
+
+    field
+      .element()
+      .dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'Enter', isComposing: true, bubbles: true }),
+      );
+
+    await expect.element(field).toHaveValue('nihon');
+    await expect
+      .element(screen.getByRole('button', { name: 'Retirer nihon' }))
+      .not.toBeInTheDocument();
+  });
 
   test('shows the example only while it holds nothing', async () => {
     const { field } = await renderRecipients();
