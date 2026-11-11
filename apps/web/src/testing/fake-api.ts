@@ -1,6 +1,7 @@
 import type {
   AuthStatus,
   MailboxList,
+  PasskeyCreationOptions,
   PasskeyList,
   PasskeyRequestOptions,
   SetupResponse,
@@ -53,6 +54,13 @@ interface FakeApi {
   passkeyLogin?: (body: unknown) => Response;
   /** The passkeys of the account, for the security settings. */
   passkeys?: () => PasskeyList | Response;
+  /** Answers the changes of the passkeys, given what the app sent. */
+  passkeyCreationOptions?: () => PasskeyCreationOptions | Response;
+  addPasskey?: (body: unknown) => Response;
+  removePasskey?: (passkeyId: string) => Response;
+  /** Answers the confirmation of the identity: its options, then the proof the app sent. */
+  identityConfirmationOptions?: () => PasskeyRequestOptions | Response;
+  confirmIdentity?: (body: unknown) => Response;
   /** Answers the sign-out. */
   logout?: () => Response;
   /** Answers the requests replacing the authenticator app. */
@@ -84,9 +92,10 @@ export const testEnrollment: TotpEnrollment = {
 const signedIn = (): AuthStatus => ({ state: 'signedIn', username: 'alex' });
 const noThread = (): ThreadPage => ({ threads: [], nextCursor: null });
 
-type FakeRoute = (sent: unknown, url: URL) => object;
+type FakeRoute = (sent: unknown, url: URL, method: string) => object;
 
 const THREAD_PATH = '/api/threads/';
+const PASSKEY_PATH = '/api/auth/passkeys/';
 
 /** Answers the app's requests to the api as the given functions say, and records them. */
 export function fakeApi({
@@ -100,6 +109,11 @@ export function fakeApi({
   passkeyLoginOptions = serverError,
   passkeyLogin = serverError,
   passkeys = () => ({ passkeys: [] }),
+  passkeyCreationOptions = serverError,
+  addPasskey = serverError,
+  removePasskey = serverError,
+  identityConfirmationOptions = serverError,
+  confirmIdentity = serverError,
   logout = serverError,
   authenticatorSecret = serverError,
   authenticatorReplacement = serverError,
@@ -114,7 +128,11 @@ export function fakeApi({
     '/api/auth/login': login,
     '/api/auth/passkey-login/options': () => passkeyLoginOptions(),
     '/api/auth/passkey-login': passkeyLogin,
-    '/api/auth/passkeys': () => passkeys(),
+    '/api/auth/passkeys': (sent, _url, method) =>
+      method === 'POST' ? addPasskey(sent) : passkeys(),
+    '/api/auth/passkeys/options': () => passkeyCreationOptions(),
+    '/api/auth/identity-confirmation/options': () => identityConfirmationOptions(),
+    '/api/auth/identity-confirmation': confirmIdentity,
     '/api/auth/logout': () => logout(),
     '/api/auth/totp/secret': () => authenticatorSecret(),
     '/api/auth/totp': authenticatorReplacement,
@@ -122,11 +140,13 @@ export function fakeApi({
   const fetchMock = vi.fn(async (input: string, init?: RequestInit) => {
     const url = new URL(input, window.location.origin);
     const sent: unknown = typeof init?.body === 'string' ? JSON.parse(init.body) : undefined;
+    const method = init?.method ?? 'GET';
     const route = routes[url.pathname];
     const body =
-      route === undefined
-        ? thread(decodeURIComponent(url.pathname.slice(THREAD_PATH.length)))
-        : route(sent, url);
+      route?.(sent, url, method) ??
+      (url.pathname.startsWith(PASSKEY_PATH)
+        ? removePasskey(decodeURIComponent(url.pathname.slice(PASSKEY_PATH.length)))
+        : thread(decodeURIComponent(url.pathname.slice(THREAD_PATH.length))));
     return body instanceof Response ? body : Response.json(body);
   });
   vi.stubGlobal('fetch', fetchMock);

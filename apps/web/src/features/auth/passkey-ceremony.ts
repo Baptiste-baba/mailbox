@@ -1,7 +1,10 @@
 import {
   type PasskeyAuthenticationResponse,
+  type PasskeyCreationOptions,
+  type PasskeyRegistrationResponse,
   type PasskeyRequestOptions,
   passkeyAuthenticationResponseSchema,
+  passkeyRegistrationResponseSchema,
 } from '@mailbox/shared';
 
 /** Whether this browser takes and gives passkeys in the JSON forms of WebAuthn the api speaks. */
@@ -32,4 +35,22 @@ export async function getPasskey(
     throw new DOMException('No passkey given', 'NotAllowedError');
   }
   return passkeyAuthenticationResponseSchema.parse(credential.toJSON());
+}
+
+/**
+ * Asks the browser to create a passkey of the app, kept by the password manager the user picks.
+ * @throws DOMException NotAllowedError when the user closes the browser's window, among others;
+ * InvalidStateError when that password manager already keeps one of the account's passkeys.
+ */
+export async function createPasskey(
+  options: PasskeyCreationOptions,
+): Promise<PasskeyRegistrationResponse> {
+  const credential = await navigator.credentials.create({
+    publicKey: PublicKeyCredential.parseCreationOptionsFromJSON(options),
+  });
+  // The browser answers what it was asked for: anything else would be its bug.
+  if (!(credential instanceof PublicKeyCredential)) {
+    throw new DOMException('No passkey created', 'NotAllowedError');
+  }
+  return passkeyRegistrationResponseSchema.parse(credential.toJSON());
 }

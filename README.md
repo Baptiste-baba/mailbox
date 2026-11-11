@@ -56,6 +56,11 @@ once in place of the app, and asks to set up a new one. Setting up a new app sig
 device and removes every passkey, in case one of them was lost. A session lasts 30 days after its
 last use.
 
+Once signed in, add passkeys in Réglages › Sécurité: a passkey signs in on its own, unlocked with
+Face ID, Touch ID or your password manager, from the sign-in button or the suggestions of the
+username field. Adding or removing one asks to confirm who you are again, unless you signed in
+less than ten minutes ago. Passkeys work at the address set in `MAILBOX_URL` only.
+
 Sessions only work over HTTPS, such as `tailscale serve` gives, or on `localhost`.
 
 ### Lost access
