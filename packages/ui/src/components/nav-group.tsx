@@ -7,7 +7,7 @@ interface NavGroupProps {
   title?: string;
   /** A small action at the end of the heading, a `NavGroupAction`. */
   action?: ReactNode;
-  children: ReactNode;
+  children?: ReactNode;
   className?: string;
 }
 

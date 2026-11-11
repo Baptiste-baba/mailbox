@@ -43,7 +43,10 @@ function MailboxLinks() {
     );
   }
   if (mailboxes.data.mailboxes.length === 0) {
-    return <p className="px-3 py-2 text-caption text-ink-2">{fr.sidebar.noMailbox}</p>;
+    // Reduced to icons, the sidebar has no room for a sentence.
+    return (
+      <p className="px-3 py-2 text-caption text-ink-2 @max-rail:hidden">{fr.sidebar.noMailbox}</p>
+    );
   }
   return mailboxes.data.mailboxes.map((mailbox) => (
     <MailboxLink key={mailbox.id} mailbox={mailbox} />

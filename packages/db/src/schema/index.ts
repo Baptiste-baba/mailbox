@@ -8,6 +8,7 @@ export { messageFolder } from './message-folder.ts';
 export { paletteColor } from './palette-color.ts';
 export { passkey } from './passkey.ts';
 export { recoveryCode } from './recovery-code.ts';
+export { attachmentRelations, messageRelations, threadRelations } from './relations.ts';
 export { session } from './session.ts';
 export { setupCode } from './setup-code.ts';
 export { thread } from './thread.ts';

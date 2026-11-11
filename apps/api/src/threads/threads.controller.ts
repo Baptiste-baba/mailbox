@@ -12,12 +12,12 @@ export class ThreadsController {
   constructor(private readonly threads: ThreadsService) {}
 
   @Get()
-  list(@Query({ schema: threadListQuerySchema }) query: ThreadListQuery): ThreadPage {
+  list(@Query({ schema: threadListQuerySchema }) query: ThreadListQuery): Promise<ThreadPage> {
     return this.threads.list(query);
   }
 
   @Get(':threadId')
-  get(@Param('threadId') threadId: string): Thread {
+  get(@Param('threadId') threadId: string): Promise<Thread> {
     return this.threads.get(threadId);
   }
 }

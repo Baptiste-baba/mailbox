@@ -1,20 +1,41 @@
-import type { MailboxList } from '@mailbox/shared';
+import { type Database, mailbox, thread } from '@mailbox/db';
+import type { MailboxList, MailboxSummary } from '@mailbox/shared';
 import { Inject, Injectable } from '@nestjs/common';
-import { TEST_DATASET } from '../test-dataset/test-dataset.module.ts';
-import type { TestDataset } from '../test-dataset/test-dataset.ts';
+import { and, asc, eq } from 'drizzle-orm';
+import { DATABASE } from '../database/database.module.ts';
 
 @Injectable()
 export class MailboxesService {
-  constructor(@Inject(TEST_DATASET) private readonly dataset: TestDataset) {}
+  constructor(@Inject(DATABASE) private readonly database: Database) {}
 
-  list(): MailboxList {
+  /** The connected mailboxes, in the order they were connected. */
+  async list(): Promise<MailboxList> {
+    const unreadInboxThreads = and(eq(thread.mailboxId, mailbox.id), thread.inInbox, thread.unread);
+    const mailboxes = await this.database
+      .select({
+        id: mailbox.id,
+        name: mailbox.name,
+        address: mailbox.address,
+        color: mailbox.color,
+        status: mailbox.status,
+        unreadCount: this.database.$count(thread, unreadInboxThreads),
+      })
+      .from(mailbox)
+      .orderBy(asc(mailbox.createdAt), asc(mailbox.id));
     return {
-      mailboxes: this.dataset.mailboxes.map((mailbox) => ({
-        ...mailbox,
-        unreadCount: this.dataset.threads.filter(
-          (thread) => thread.mailboxId === mailbox.id && thread.inInbox && thread.unread,
-        ).length,
+      mailboxes: mailboxes.map((stored) => ({
+        ...stored,
+        status: toStatus(stored.status),
       })),
     };
+  }
+}
+
+function toStatus(stored: (typeof mailbox.status.enumValues)[number]): MailboxSummary['status'] {
+  switch (stored) {
+    case 'connected':
+      return 'connected';
+    case 'reconnect_required':
+      return 'reconnectRequired';
   }
 }

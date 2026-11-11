@@ -32,7 +32,6 @@ export const fr = {
     folders: 'Dossiers',
     newFolder: 'Nouveau',
     newFolderLabel: 'Nouveau dossier',
-    foldersError: 'Impossible de charger tes dossiers.',
     settings: 'Réglages',
     crash: 'La navigation n’a pas pu s’afficher.',
   },
