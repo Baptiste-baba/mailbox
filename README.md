@@ -95,19 +95,21 @@ Services read their configuration from environment variables, validated at start
 invalid variable stops the service with an explicit message. With Docker Compose, `compose.yaml`
 sets them from `.env`; the table below matters to run a service on its own.
 
-| Variable             | Used by     | Required | Default     | Purpose                                                        |
-| -------------------- | ----------- | -------- | ----------- | -------------------------------------------------------------- |
-| `DATABASE_URL`       | api, worker | yes      |             | PostgreSQL connection string (`postgres://…`)                  |
-| `MAILBOX_SECRET_KEY` | api         | yes      |             | 32 bytes in base64 encrypting the secrets kept in the database |
-| `MAILBOX_URL`        | api         | yes      |             | HTTPS address the app is opened at (`http` for `localhost`)    |
-| `API_HOST`           | api         | no       | `127.0.0.1` | Address the api listens on (`0.0.0.0` inside a container)      |
-| `API_PORT`           | api         | no       | `3000`      | Port the api listens on                                        |
-| `WEB_DIRECTORY`      | api         | no       |             | Built web app (`apps/web/dist`) to serve; unset, API only      |
-| `BACKUP_DIRECTORY`   | worker      | yes      |             | Folder receiving the nightly database backups                  |
-| `WORKER_HEALTH_PORT` | worker      | no       | `3001`      | Port of the worker health check, bound to loopback only        |
-| `TRUSTED_PROXIES`    | api         | no       |             | Proxies whose `X-Forwarded-For` names the device (see below)   |
-| `LOG_LEVEL`          | api, worker | no       | `info`      | `fatal`, `error`, `warn`, `info`, `debug`, `trace` or `silent` |
-| `TZ`                 | worker      | no       | `UTC`       | Time zone, e.g. `Europe/Paris`; sets the hour of the backup    |
+| Variable               | Used by     | Required | Default     | Purpose                                                        |
+| ---------------------- | ----------- | -------- | ----------- | -------------------------------------------------------------- |
+| `DATABASE_URL`         | api, worker | yes      |             | PostgreSQL connection string (`postgres://…`)                  |
+| `MAILBOX_SECRET_KEY`   | api         | yes      |             | 32 bytes in base64 encrypting the secrets kept in the database |
+| `MAILBOX_URL`          | api         | yes      |             | HTTPS address the app is opened at (`http` for `localhost`)    |
+| `API_HOST`             | api         | no       | `127.0.0.1` | Address the api listens on (`0.0.0.0` inside a container)      |
+| `API_PORT`             | api         | no       | `3000`      | Port the api listens on                                        |
+| `WEB_DIRECTORY`        | api         | no       |             | Built web app (`apps/web/dist`) to serve; unset, API only      |
+| `GOOGLE_CLIENT_ID`     | api         | no       |             | OAuth client of this installation at Google, to connect Gmail  |
+| `GOOGLE_CLIENT_SECRET` | api         | no       |             | Secret of that client; set both, or neither                    |
+| `BACKUP_DIRECTORY`     | worker      | yes      |             | Folder receiving the nightly database backups                  |
+| `WORKER_HEALTH_PORT`   | worker      | no       | `3001`      | Port of the worker health check, bound to loopback only        |
+| `TRUSTED_PROXIES`      | api         | no       |             | Proxies whose `X-Forwarded-For` names the device (see below)   |
+| `LOG_LEVEL`            | api, worker | no       | `info`      | `fatal`, `error`, `warn`, `info`, `debug`, `trace` or `silent` |
+| `TZ`                   | worker      | no       | `UTC`       | Time zone, e.g. `Europe/Paris`; sets the hour of the backup    |
 
 `TRUSTED_PROXIES` lists addresses, subnets (`172.16.0.0/12`) or the names `loopback`, `linklocal`
 and `uniquelocal`, separated by commas. Failed sign-ins slow down the device that made them, known

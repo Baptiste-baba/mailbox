@@ -33,6 +33,8 @@ const invalidEnvironments: [string, Record<string, string>][] = [
   ['an app address on an IPv4 address', { ...required, MAILBOX_URL: 'https://192.168.1.20' }],
   ['an app address on an IPv6 address', { ...required, MAILBOX_URL: 'https://[fd00::1]' }],
   ['an app address with a path', { ...required, MAILBOX_URL: 'https://mail.example.ts.net/app' }],
+  ['a Google client id without its secret', { ...required, GOOGLE_CLIENT_ID: 'id' }],
+  ['a Google client secret without its id', { ...required, GOOGLE_CLIENT_SECRET: 'secret' }],
 ];
 
 describe('parseApiConfig', () => {
@@ -59,6 +61,7 @@ describe('parseApiConfig', () => {
       webDirectory: undefined,
       logLevel: 'info',
       trustedProxies: [],
+      google: undefined,
     });
   });
 
@@ -101,6 +104,28 @@ describe('parseApiConfig, address of the app', () => {
     const result = parseApiConfig({ ...required, MAILBOX_URL: 'http://localhost:5173' });
 
     expect(result.data?.appUrl).toEqual({ origin: 'http://localhost:5173', rpId: 'localhost' });
+  });
+});
+
+describe('parseApiConfig, Google', () => {
+  it('reads the client this installation has at Google', () => {
+    const result = parseApiConfig({
+      ...required,
+      GOOGLE_CLIENT_ID: '1234-abcd.apps.googleusercontent.com',
+      GOOGLE_CLIENT_SECRET: 'client-secret',
+    });
+
+    expect(result.data?.google).toEqual({
+      clientId: '1234-abcd.apps.googleusercontent.com',
+      clientSecret: 'client-secret',
+    });
+  });
+
+  it('takes variables left empty as unset: Gmail is then not configured', () => {
+    const result = parseApiConfig({ ...required, GOOGLE_CLIENT_ID: '', GOOGLE_CLIENT_SECRET: '' });
+
+    expect(result.success).toBe(true);
+    expect(result.data?.google).toBeUndefined();
   });
 });
 

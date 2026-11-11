@@ -49,10 +49,31 @@ export {
 } from './errors/too-many-attempts-details.ts';
 export { type MailAddress, mailAddressSchema } from './mail/mail-address.ts';
 export {
+  type AuthorizationCode,
+  type AuthorizationRequest,
+  type MailProvider,
+  type MailProviderList,
+  type MailProviderName,
+  mailProviderListSchema,
+  mailProviderNameSchema,
+  type ProviderGrant,
+} from './mail/mail-provider.ts';
+export {
+  type MailboxAuthorization,
+  type MailboxConnectionCompletion,
+  type MailboxConnectionRequest,
+  mailboxAuthorizationSchema,
+  mailboxConnectionCompletionSchema,
+  mailboxConnectionRequestSchema,
+  mailboxIdSchema,
+} from './mail/mailbox-connection.ts';
+export {
   type MailboxList,
   type MailboxSummary,
   mailboxListSchema,
+  mailboxSummarySchema,
 } from './mail/mailbox-summary.ts';
+export { type PaletteColor, paletteColorSchema } from './mail/palette-color.ts';
 export {
   type Attachment,
   type Message,

@@ -1,4 +1,4 @@
-import { account, type Database, setupCode } from '@mailbox/db';
+import { account, type Database, SecretBox, setupCode } from '@mailbox/db';
 import {
   AppError,
   type SetupEnrollmentRequest,
@@ -13,7 +13,6 @@ import { DATABASE } from '../database/database.module.ts';
 import { AttemptThrottleService } from './attempt-throttle.service.ts';
 import { hashPassword } from './password-hash.ts';
 import { RecoveryCodesService } from './recovery-codes.service.ts';
-import { SecretBox } from './secret-box.ts';
 import { replaceSetupCode } from './setup-code.ts';
 import { hashToken } from './token-hash.ts';
 import { TotpService } from './totp.service.ts';

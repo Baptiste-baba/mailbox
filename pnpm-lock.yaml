@@ -229,6 +229,9 @@ importers:
       '@mailbox/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@mailbox/providers':
+        specifier: workspace:*
+        version: link:../../packages/providers
       '@mailbox/shared':
         specifier: workspace:*
         version: link:../../packages/shared
@@ -401,6 +404,9 @@ importers:
         specifier: 'catalog:'
         version: 4.6.7
     devDependencies:
+      '@types/node':
+        specifier: 'catalog:'
+        version: 26.6.5
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
@@ -429,6 +435,16 @@ importers:
       vitest:
         specifier: 'catalog:'
         version: 5.0.5(@opentelemetry/api@1.10.0)(@types/node@26.6.5)(@vitest/browser-playwright@5.0.5)(@vitest/ui@5.0.5)(vite@8.3.5(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15))
+
+  packages/providers:
+    dependencies:
+      '@mailbox/shared':
+        specifier: workspace:*
+        version: link:../shared
+    devDependencies:
+      typescript:
+        specifier: 'catalog:'
+        version: 6.0.3
 
   packages/shared:
     dependencies:

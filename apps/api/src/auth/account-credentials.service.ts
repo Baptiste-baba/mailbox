@@ -1,9 +1,8 @@
-import { account, type Database } from '@mailbox/db';
+import { account, type Database, SecretBox } from '@mailbox/db';
 import { AppError } from '@mailbox/shared';
 import { Inject, Injectable } from '@nestjs/common';
 import { and, eq, isNull, lt, or } from 'drizzle-orm';
 import { DATABASE } from '../database/database.module.ts';
-import { SecretBox } from './secret-box.ts';
 import { TotpService } from './totp.service.ts';
 
 export type StoredAccount = typeof account.$inferSelect;

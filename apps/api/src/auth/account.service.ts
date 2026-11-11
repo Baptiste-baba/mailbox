@@ -1,8 +1,7 @@
-import { account, type Database, passkey } from '@mailbox/db';
+import { account, type Database, passkey, SecretBox } from '@mailbox/db';
 import { AppError, type TotpConfirmation, type TotpEnrollment } from '@mailbox/shared';
 import { Inject, Injectable } from '@nestjs/common';
 import { DATABASE } from '../database/database.module.ts';
-import { SecretBox } from './secret-box.ts';
 import { SessionService } from './session.service.ts';
 import { TotpService } from './totp.service.ts';
 
