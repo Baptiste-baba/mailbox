@@ -2,6 +2,15 @@ export type ShortcutId =
   | 'newMail'
   | 'closeComposer'
   | 'send'
+  | 'bold'
+  | 'italic'
+  | 'underline'
+  | 'strike'
+  | 'alignLeft'
+  | 'alignCenter'
+  | 'alignRight'
+  | 'bulletList'
+  | 'orderedList'
   | 'search'
   | 'searchList'
   | 'nextThread'
@@ -26,6 +35,16 @@ export const shortcuts: Record<ShortcutId, Shortcut> = {
   newMail: { label: 'C', key: 'c' },
   closeComposer: { label: 'Échap', key: 'Escape', whileTyping: true },
   send: { label: '⌘↵' },
+  // Handled by the editor of the message, which knows its own keys.
+  bold: { label: '⌘B' },
+  italic: { label: '⌘I' },
+  underline: { label: '⌘U' },
+  strike: { label: '⌘⇧S' },
+  alignLeft: { label: '⌘⇧L' },
+  alignCenter: { label: '⌘⇧E' },
+  alignRight: { label: '⌘⇧R' },
+  bulletList: { label: '⌘⇧8' },
+  orderedList: { label: '⌘⇧7' },
   search: { label: '⌘K' },
   searchList: { label: '/' },
   nextThread: { label: 'J', key: 'j' },

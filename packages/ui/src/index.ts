@@ -36,3 +36,4 @@ export { StateMessage } from './components/state-message.tsx';
 export { Stepper } from './components/stepper.tsx';
 export { Swatch } from './components/swatch.tsx';
 export { TextField } from './components/text-field.tsx';
+export { Toolbar, ToolbarSeparator } from './components/toolbar.tsx';

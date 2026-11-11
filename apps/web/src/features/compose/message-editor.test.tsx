@@ -2,17 +2,20 @@ import { useState } from 'react';
 import { describe, expect, test } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
-import { ComposeBody } from './compose-body.tsx';
+import { FormatBar } from './format-bar.tsx';
+import { MessageEditor, useMessageEditor } from './message-editor.tsx';
 
 /** The key the editor reads as ⌘ on a Mac, Ctrl elsewhere. */
 const MOD = navigator.platform.startsWith('Mac') ? 'Meta' : 'Control';
 
-/** The message editor, holding its own HTML, shown under it to check what the mail will hold. */
+/** The message editor and its bar, the HTML it holds shown under it: what the mail will hold. */
 function Body() {
   const [body, setBody] = useState('');
+  const editor = useMessageEditor(body, setBody);
   return (
     <>
-      <ComposeBody body={body} onChange={setBody} />
+      <MessageEditor editor={editor} />
+      <FormatBar editor={editor} />
       <output>{body}</output>
     </>
   );
@@ -97,5 +100,44 @@ describe('message, pasting', () => {
     );
 
     await expect.element(screen.getByRole('status')).toHaveTextContent('<p>piège</p>');
+  });
+});
+
+describe('message, formatting bar', () => {
+  test('styles the chosen text with its buttons, lit while the cursor is in that style', async () => {
+    const { screen, message } = await renderBody();
+    await userEvent.type(message, 'Important');
+    await userEvent.keyboard(`{${MOD}>}a{/${MOD}}`);
+    const bold = screen.getByRole('button', { name: 'Gras' });
+    await expect.element(bold).toHaveAttribute('aria-pressed', 'false');
+
+    await bold.click();
+
+    await expect
+      .element(screen.getByRole('status'))
+      .toHaveTextContent('<p><strong>Important</strong></p>');
+    await expect.element(bold).toHaveAttribute('aria-pressed', 'true');
+    await expect.element(bold).toHaveAttribute('title', 'Gras (⌘B)');
+    await expect.element(message).toHaveFocus();
+  });
+
+  test('aligns and lists the paragraph at the cursor, then clears it all', async () => {
+    const { screen, message } = await renderBody();
+    await userEvent.type(message, 'Important');
+
+    await screen.getByRole('button', { name: 'Centrer' }).click();
+    await screen.getByRole('button', { name: 'Liste numérotée' }).click();
+    await expect
+      .element(screen.getByRole('status'))
+      .toHaveTextContent('<ol><li><p style="text-align: center;">Important</p></li></ol>');
+    await expect
+      .element(screen.getByRole('button', { name: 'Aligner à gauche' }))
+      .toHaveAttribute('aria-pressed', 'false');
+
+    await screen.getByRole('button', { name: 'Effacer la mise en forme' }).click();
+    await expect.element(screen.getByRole('status')).toHaveTextContent('<p>Important</p>');
+    await expect
+      .element(screen.getByRole('button', { name: 'Aligner à gauche' }))
+      .toHaveAttribute('aria-pressed', 'true');
   });
 });
