@@ -1,5 +1,7 @@
 export type ShortcutId =
   | 'newMail'
+  | 'closeComposer'
+  | 'send'
   | 'search'
   | 'searchList'
   | 'settings'
@@ -20,7 +22,9 @@ interface Shortcut {
 
 /** Every keyboard shortcut of the app. */
 export const shortcuts: Record<ShortcutId, Shortcut> = {
-  newMail: { label: 'C' },
+  newMail: { label: 'C', key: 'c' },
+  closeComposer: { label: 'Échap', key: 'Escape' },
+  send: { label: '⌘↵' },
   search: { label: '⌘K' },
   searchList: { label: '/' },
   settings: { label: '⌘,' },
