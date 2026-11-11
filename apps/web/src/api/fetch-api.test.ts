@@ -1,7 +1,7 @@
 import { mailboxListSchema, setupResponseSchema } from '@mailbox/shared';
 import { afterEach, describe, expect, test, vi } from 'vitest';
 import { ApiError } from './api-error.ts';
-import { fetchApi, postApi } from './fetch-api.ts';
+import { fetchApi, postApi, sendApi } from './fetch-api.ts';
 import { ServerUnreachableError } from './server-unreachable-error.ts';
 
 function answer(status: number, body: unknown) {
@@ -81,5 +81,26 @@ describe('postApi', () => {
     const [url, init] = fetchMock.mock.calls[0] ?? [];
     expect(url).toBe('/api/auth/setup');
     expect(init).toMatchObject({ method: 'POST', body: '{"username":"alex"}' });
+  });
+});
+
+describe('sendApi', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  test('removes what `path` names, sending nothing else', async () => {
+    const fetchMock = vi.fn(
+      async (_url: string, _init?: RequestInit) => new Response(null, { status: 204 }),
+    );
+    vi.stubGlobal('fetch', fetchMock);
+
+    await sendApi('DELETE', '/auth/passkeys/passkey-1', undefined);
+
+    const [url, init] = fetchMock.mock.calls[0] ?? [];
+    expect(url).toBe('/api/auth/passkeys/passkey-1');
+    expect(init?.method).toBe('DELETE');
+    expect(init?.body).toBeUndefined();
+    expect(new Headers(init?.headers).has('content-type')).toBe(false);
   });
 });

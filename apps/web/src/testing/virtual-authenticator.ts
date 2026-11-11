@@ -1,4 +1,4 @@
-import type { PasskeyRequestOptions } from '@mailbox/shared';
+import type { PasskeyCreationOptions, PasskeyRequestOptions } from '@mailbox/shared';
 import { cdp } from 'vitest/browser';
 
 /** The options a passkey sign-in starts from, as the api gives them to the page under test. */
@@ -8,6 +8,23 @@ export function testPasskeyRequestOptions(): PasskeyRequestOptions {
     rpId: window.location.hostname,
     timeout: 60_000,
     userVerification: 'required',
+  };
+}
+
+/**
+ * The options a passkey is created from, as the api gives them to the page under test; the ids of
+ * `existing` passkeys are those no password manager may replace.
+ */
+export function testPasskeyCreationOptions(existing: string[] = []): PasskeyCreationOptions {
+  return {
+    challenge: 'Y3JlYXRpb24tY2hhbGxlbmdlLWZvci10ZXN0cw',
+    rp: { id: window.location.hostname, name: 'MailBox' },
+    user: { id: 'dXNlci1oYW5kbGUtb2YtYWxleA', name: 'alex', displayName: 'alex' },
+    pubKeyCredParams: [{ type: 'public-key', alg: -7 }],
+    timeout: 60_000,
+    excludeCredentials: existing.map((id) => ({ id, type: 'public-key' })),
+    authenticatorSelection: { residentKey: 'required', userVerification: 'required' },
+    attestation: 'none',
   };
 }
 
@@ -37,13 +54,7 @@ export async function addVirtualAuthenticator(): Promise<VirtualAuthenticator> {
     },
   });
   const passkey = await navigator.credentials.create({
-    publicKey: PublicKeyCredential.parseCreationOptionsFromJSON({
-      challenge: 'Y3JlYXRpb24tY2hhbGxlbmdlLWZvci10ZXN0cw',
-      rp: { id: window.location.hostname, name: 'MailBox' },
-      user: { id: 'dXNlci1oYW5kbGUtb2YtYWxleA', name: 'alex', displayName: 'alex' },
-      pubKeyCredParams: [{ type: 'public-key', alg: -7 }],
-      authenticatorSelection: { residentKey: 'required', userVerification: 'required' },
-    }),
+    publicKey: PublicKeyCredential.parseCreationOptionsFromJSON(testPasskeyCreationOptions()),
   });
   if (passkey === null) {
     throw new Error('The virtual authenticator created no passkey');

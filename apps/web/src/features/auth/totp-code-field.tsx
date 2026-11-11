@@ -11,10 +11,12 @@ interface TotpCodeFieldProps {
   value: string;
   onChange: (code: string) => void;
   error: string | undefined;
+  /** Takes the focus at once, unless a field before it takes it. */
+  autoFocus?: boolean;
 }
 
 /** The 6-digit code of the authenticator app: a numeric keypad on a phone, filled in by the system. */
-export function TotpCodeField({ value, onChange, error }: TotpCodeFieldProps) {
+export function TotpCodeField({ value, onChange, error, autoFocus = true }: TotpCodeFieldProps) {
   return (
     <TextField
       label={fr.authenticator.codeLabel}
@@ -25,7 +27,7 @@ export function TotpCodeField({ value, onChange, error }: TotpCodeFieldProps) {
       inputMode="numeric"
       autoComplete="one-time-code"
       maxLength={6}
-      autoFocus
+      autoFocus={autoFocus}
     />
   );
 }

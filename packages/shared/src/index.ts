@@ -33,9 +33,11 @@ export {
 export {
   type PasskeyAuthenticationResponse,
   type PasskeyCreationOptions,
+  type PasskeyRegistrationResponse,
   type PasskeyRequestOptions,
   passkeyAuthenticationResponseSchema,
   passkeyCreationOptionsSchema,
+  passkeyRegistrationResponseSchema,
   passkeyRequestOptionsSchema,
 } from './auth/webauthn.ts';
 export { AppError } from './errors/app-error.ts';

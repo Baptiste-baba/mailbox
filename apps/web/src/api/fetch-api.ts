@@ -6,7 +6,7 @@ import { ServerUnreachableError } from './server-unreachable-error.ts';
 const REQUEST_TIMEOUT_MS = 15_000;
 
 interface ApiRequest {
-  method: 'GET' | 'POST' | 'PUT';
+  method: 'GET' | 'POST' | 'PUT' | 'DELETE';
   body?: unknown;
   signal?: AbortSignal | undefined;
 }
@@ -68,10 +68,15 @@ export async function postApi<Schema extends z.ZodType>(
 }
 
 /**
- * Sends `body` to `path` as JSON, for an action the api answers with no content.
+ * Sends `body` to `path` as JSON, or nothing when it is undefined, for an action the api answers
+ * with no content.
  * @throws ApiError when the api answers with an error, ServerUnreachableError when it does not
  * answer.
  */
-export async function sendApi(method: 'POST' | 'PUT', path: string, body: unknown): Promise<void> {
+export async function sendApi(
+  method: 'POST' | 'PUT' | 'DELETE',
+  path: string,
+  body: unknown,
+): Promise<void> {
   await requestApi(path, { method, body });
 }

@@ -68,3 +68,4 @@ export const passkeyAuthenticationResponseSchema = z.object({
 export type PasskeyRequestOptions = z.infer<typeof passkeyRequestOptionsSchema>;
 export type PasskeyCreationOptions = z.infer<typeof passkeyCreationOptionsSchema>;
 export type PasskeyAuthenticationResponse = z.infer<typeof passkeyAuthenticationResponseSchema>;
+export type PasskeyRegistrationResponse = z.infer<typeof passkeyRegistrationResponseSchema>;

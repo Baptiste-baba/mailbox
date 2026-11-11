@@ -1,32 +1,49 @@
 import type { PasskeySummary } from '@mailbox/shared';
-import { Card, Skeleton, StateMessage } from '@mailbox/ui';
+import { Button, Card, Skeleton, StateMessage } from '@mailbox/ui';
 import { useQuery } from '@tanstack/react-query';
-import { KeyRoundIcon } from 'lucide-react';
-import { useId } from 'react';
+import { KeyRoundIcon, PlusIcon } from 'lucide-react';
+import { useId, useState } from 'react';
 import { passkeysQuery } from '../../api/passkeys-query.ts';
 import { formatDayPhrase } from '../../dates/format-day-phrase.ts';
 import { fr } from '../../i18n/fr.ts';
+import { AddPasskeyDialog } from './add-passkey-dialog.tsx';
+import { passkeysSupported } from './passkey-ceremony.ts';
+import { RemovePasskeyDialog } from './remove-passkey-dialog.tsx';
 
-/** The passkeys of the account, in the security settings. */
+/** The passkeys of the account, in the security settings: adding one, removing one. */
 export function PasskeySettings() {
   const titleId = useId();
+  const [adding, setAdding] = useState(false);
+  const [removing, setRemoving] = useState<PasskeySummary>();
+  const hasPasskey = (useQuery(passkeysQuery).data?.passkeys.length ?? 0) > 0;
   return (
     <section aria-labelledby={titleId} className="flex flex-col gap-3">
       <div className="flex flex-col gap-0.5">
-        <h3 id={titleId} className="text-body font-semibold text-ink">
-          {fr.passkey.listTitle}
-        </h3>
+        <div className="flex items-center justify-between gap-6">
+          <h3 id={titleId} className="text-body font-semibold text-ink">
+            {fr.passkey.listTitle}
+          </h3>
+          {/* Where the browser cannot create passkeys, none is offered to add. */}
+          {passkeysSupported() && (
+            <Button variant="primary" onClick={() => setAdding(true)}>
+              <PlusIcon />
+              {fr.passkey.add}
+            </Button>
+          )}
+        </div>
         <p className="text-small text-ink-2">{fr.passkey.listIntro}</p>
       </div>
       <Card>
-        <PasskeyList />
+        <PasskeyList onRemove={setRemoving} />
       </Card>
+      <AddPasskeyDialog open={adding} onClose={() => setAdding(false)} withPasskey={hasPasskey} />
+      <RemovePasskeyDialog passkey={removing} onClose={() => setRemoving(undefined)} />
     </section>
   );
 }
 
 /** The passkeys, oldest first, or why there is none to show. */
-function PasskeyList() {
+function PasskeyList({ onRemove }: { onRemove: (passkey: PasskeySummary) => void }) {
   const passkeys = useQuery(passkeysQuery);
   if (passkeys.data === undefined) {
     return passkeys.isError ? (
@@ -46,17 +63,28 @@ function PasskeyList() {
   return (
     <ul className="divide-y divide-line">
       {passkeys.data.passkeys.map((passkey) => (
-        <PasskeyRow key={passkey.id} passkey={passkey} now={now} />
+        <PasskeyRow
+          key={passkey.id}
+          passkey={passkey}
+          now={now}
+          onRemove={() => onRemove(passkey)}
+        />
       ))}
     </ul>
   );
 }
 
-function PasskeyRow({ passkey, now }: { passkey: PasskeySummary; now: Date }) {
+interface PasskeyRowProps {
+  passkey: PasskeySummary;
+  now: Date;
+  onRemove: () => void;
+}
+
+function PasskeyRow({ passkey, now, onRemove }: PasskeyRowProps) {
   const lastUsed =
     passkey.lastUsedAt === null ? undefined : formatDayPhrase(passkey.lastUsedAt, now);
   return (
-    <li className="flex items-center gap-4 px-6 py-4">
+    <li className="flex items-center gap-4 py-4 pr-4 pl-6">
       <KeyRoundIcon aria-hidden="true" className="icon-18 flex-none text-ink-2" />
       <div className="flex min-w-0 flex-1 flex-col">
         <span className="truncate text-base font-medium text-ink">{passkey.name}</span>
@@ -64,6 +92,14 @@ function PasskeyRow({ passkey, now }: { passkey: PasskeySummary; now: Date }) {
           {fr.passkey.history(formatDayPhrase(passkey.createdAt, now), lastUsed)}
         </span>
       </div>
+      <Button
+        variant="text"
+        size="sm"
+        onClick={onRemove}
+        aria-label={fr.passkey.removeLabel(passkey.name)}
+      >
+        {fr.passkey.remove}
+      </Button>
     </li>
   );
 }
