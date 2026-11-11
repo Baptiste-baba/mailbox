@@ -126,6 +126,8 @@ export const fr = {
     create: 'Créer la passkey',
     alreadyThere: 'Ce gestionnaire de mots de passe garde déjà une passkey de MailBox.',
     addFailed: 'La passkey n’a pas pu être ajoutée. Réessaie.',
+    notAdded:
+      'La passkey n’a pas été ajoutée. Si ton gestionnaire de mots de passe l’a quand même enregistrée, supprime-la de ton gestionnaire.',
     remove: 'Retirer',
     removeLabel: (name: string) => `Retirer la passkey «\u00a0${name}\u00a0»`,
     removeTitle: (name: string) => `Retirer la passkey «\u00a0${name}\u00a0»\u00a0?`,
