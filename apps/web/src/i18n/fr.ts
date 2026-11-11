@@ -6,13 +6,17 @@ export const fr = {
     retry: 'Réessayer',
     continue: 'Continuer',
     back: 'Retour',
+    cancel: 'Annuler',
+    close: 'Fermer',
     unreadCount: (count: number) => `${count} non ${count >= 2 ? 'lus' : 'lu'}`,
     reconnect: 'Reconnecter',
     noMailbox: 'Aucune boîte connectée.',
     mailboxesError: 'Impossible de charger tes boîtes.',
   },
   dates: {
+    today: 'aujourd’hui',
     yesterday: 'hier',
+    onDay: (day: string) => `le ${day}`,
     dayAndTime: (day: string, time: string) => `${day}, ${time}`,
   },
   sidebar: {
@@ -128,6 +132,24 @@ export const fr = {
       'Les passkeys ne fonctionnent qu’à l’adresse de MailBox réglée sur le serveur. Ouvre MailBox à cette adresse.',
     failed:
       'La passkey n’a pas pu être utilisée. Réessaie, ou utilise un autre moyen de te connecter.',
+    listTitle: 'Passkeys',
+    listIntro:
+      'Une passkey te connecte d’un geste, avec Face ID, Touch ID ou ton gestionnaire de mots de passe.',
+    none: 'Aucune passkey pour l’instant.',
+    loadError: 'Impossible de charger tes passkeys.',
+    history: (added: string, used: string | undefined) =>
+      `Ajoutée ${added} · ${used === undefined ? 'Jamais utilisée' : `Utilisée ${used}`}`,
+  },
+  signOut: {
+    action: 'Se déconnecter',
+    confirmTitle: 'Se déconnecter\u00a0?',
+    confirmText:
+      'Pour revenir, il te faudra ton mot de passe et un code de ton application d’authentification, ou une passkey.',
+  },
+  settings: {
+    title: 'Réglages',
+    security: 'Sécurité',
+    crash: 'Les réglages n’ont pas pu s’afficher.',
   },
   login: {
     signIn: 'Se connecter',

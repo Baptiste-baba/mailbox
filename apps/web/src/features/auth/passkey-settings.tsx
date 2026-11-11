@@ -1,0 +1,90 @@
+import type { PasskeySummary } from '@mailbox/shared';
+import { Card, Skeleton, StateMessage } from '@mailbox/ui';
+import { useQuery } from '@tanstack/react-query';
+import { KeyRoundIcon } from 'lucide-react';
+import { useId } from 'react';
+import { passkeysQuery } from '../../api/passkeys-query.ts';
+import { formatDayPhrase } from '../../dates/format-day-phrase.ts';
+import { fr } from '../../i18n/fr.ts';
+
+/** The passkeys of the account, in the security settings. */
+export function PasskeySettings() {
+  const titleId = useId();
+  return (
+    <section aria-labelledby={titleId} className="flex flex-col gap-3">
+      <div className="flex flex-col gap-0.5">
+        <h3 id={titleId} className="text-body font-semibold text-ink">
+          {fr.passkey.listTitle}
+        </h3>
+        <p className="text-small text-ink-2">{fr.passkey.listIntro}</p>
+      </div>
+      <Card>
+        <PasskeyList />
+      </Card>
+    </section>
+  );
+}
+
+/** The passkeys, oldest first, or why there is none to show. */
+function PasskeyList() {
+  const passkeys = useQuery(passkeysQuery);
+  if (passkeys.data === undefined) {
+    return passkeys.isError ? (
+      <StateMessage
+        message={fr.passkey.loadError}
+        action={{ label: fr.common.retry, onClick: () => passkeys.refetch() }}
+        className="px-6 py-10"
+      />
+    ) : (
+      <PasskeyListSkeleton />
+    );
+  }
+  if (passkeys.data.passkeys.length === 0) {
+    return <StateMessage message={fr.passkey.none} className="px-6 py-10" />;
+  }
+  const now = new Date();
+  return (
+    <ul className="divide-y divide-line">
+      {passkeys.data.passkeys.map((passkey) => (
+        <PasskeyRow key={passkey.id} passkey={passkey} now={now} />
+      ))}
+    </ul>
+  );
+}
+
+function PasskeyRow({ passkey, now }: { passkey: PasskeySummary; now: Date }) {
+  const lastUsed =
+    passkey.lastUsedAt === null ? undefined : formatDayPhrase(passkey.lastUsedAt, now);
+  return (
+    <li className="flex items-center gap-4 px-6 py-4">
+      <KeyRoundIcon aria-hidden="true" className="icon-18 flex-none text-ink-2" />
+      <div className="flex min-w-0 flex-1 flex-col">
+        <span className="truncate text-base font-medium text-ink">{passkey.name}</span>
+        <span className="text-small text-ink-2">
+          {fr.passkey.history(formatDayPhrase(passkey.createdAt, now), lastUsed)}
+        </span>
+      </div>
+    </li>
+  );
+}
+
+/** Two rows in the shape of passkeys, line for line: nothing moves once they arrive. */
+function PasskeyListSkeleton() {
+  return (
+    <ul aria-hidden="true" className="divide-y divide-line">
+      {['first', 'second'].map((row) => (
+        <li key={row} className="flex items-center gap-4 px-6 py-4">
+          <Skeleton className="size-4.5 flex-none" />
+          <div className="flex flex-1 flex-col">
+            <div className="flex h-5.5 items-center">
+              <Skeleton className="h-4 w-40" />
+            </div>
+            <div className="flex h-5 items-center">
+              <Skeleton className="h-3.5 w-56" />
+            </div>
+          </div>
+        </li>
+      ))}
+    </ul>
+  );
+}
