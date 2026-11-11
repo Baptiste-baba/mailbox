@@ -7,6 +7,7 @@ import {
   addVirtualAuthenticator,
   testPasskeyRequestOptions,
   type VirtualAuthenticator,
+  waitForeverForPick,
 } from '../../testing/virtual-authenticator.ts';
 
 const PASSKEY_LOGIN = '/api/auth/passkey-login';
@@ -19,6 +20,7 @@ beforeEach(async () => {
 
 afterEach(async () => {
   await authenticator.remove();
+  vi.restoreAllMocks();
   vi.unstubAllGlobals();
 });
 
@@ -46,7 +48,24 @@ function passkeyButton(screen: AppScreen) {
   return screen.getByRole('button', { name: 'Se connecter avec une passkey' });
 }
 
+/**
+ * The user picks no passkey among the suggestions of the username field: else Chromium's virtual
+ * authenticator, which picks its passkey at once, signs in before any button is pressed.
+ */
+function pickNoSuggestion() {
+  const ask = navigator.credentials.get.bind(navigator.credentials);
+  return vi
+    .spyOn(navigator.credentials, 'get')
+    .mockImplementation((request) =>
+      request?.mediation === 'conditional' ? waitForeverForPick(request) : ask(request),
+    );
+}
+
 describe('sign-in with a passkey', () => {
+  beforeEach(() => {
+    pickNoSuggestion();
+  });
+
   test('signs in with a passkey alone, and goes back to the page asked for', async () => {
     const fetchMock = passkeyApi();
     const { screen, router } = await renderApp('/login?redirect=%2Fall');
@@ -73,7 +92,45 @@ describe('sign-in with a passkey', () => {
   });
 });
 
+describe('sign-in with a passkey suggested in the username field', () => {
+  test('signs in with the passkey picked among the suggestions of the username field', async () => {
+    const fetchMock = passkeyApi();
+    const { router } = await renderApp('/login?redirect=%2Fall');
+
+    await expect.poll(() => router.state.location.pathname).toBe('/all');
+    const sent = fetchMock.mock.calls.find(([url]) => url === PASSKEY_LOGIN)?.[1];
+    const { response } = passkeyLoginRequestSchema.parse(JSON.parse(String(sent?.body)));
+    expect(response.id).toBe(authenticator.passkeyId);
+  });
+
+  test('marks the username field for the suggestions of passkeys', async () => {
+    pickNoSuggestion();
+    passkeyApi();
+    const { screen } = await renderApp('/login');
+
+    await expect
+      .element(screen.getByLabelText('Nom d’utilisateur'))
+      .toHaveAttribute('autocomplete', 'username webauthn');
+  });
+
+  test('stops suggesting when the button takes over', async () => {
+    const browser = pickNoSuggestion();
+    passkeyApi();
+    const { screen } = await renderApp('/login');
+    await vi.waitFor(() => expect(browser).toHaveBeenCalledOnce());
+
+    await userEvent.click(passkeyButton(screen));
+
+    await expect.element(screen.getByRole('heading', { name: 'Réception' })).toBeVisible();
+    expect(browser.mock.calls[0]?.[0]?.signal?.aborted).toBe(true);
+  });
+});
+
 describe('sign-in with a passkey, when something is wrong', () => {
+  beforeEach(() => {
+    pickNoSuggestion();
+  });
+
   test('says when the api does not know the passkey', async () => {
     passkeyApi(apiError(401, 'INVALID_PASSKEY'));
     const { screen } = await renderApp('/login');

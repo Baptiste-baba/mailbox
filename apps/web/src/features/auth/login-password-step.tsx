@@ -12,11 +12,11 @@ interface LoginPasswordStepProps extends PasswordLoginOptions {
 
 /**
  * The username and password, which a password manager recognises and fills, or else a passkey
- * alone.
+ * alone: from the button, or picked among the suggestions of the username field.
  */
 export function LoginPasswordStep({ onSignedIn, ...options }: LoginPasswordStepProps) {
   const form = usePasswordLogin(options);
-  const passkey = usePasskeyLogin(onSignedIn);
+  const passkey = usePasskeyLogin(onSignedIn, { suggest: true });
   return (
     <AuthStepLayout
       onSubmit={form.submit}
@@ -48,7 +48,8 @@ export function LoginPasswordStep({ onSignedIn, ...options }: LoginPasswordStepP
         placeholder={fr.auth.usernamePlaceholder}
         value={form.values.username}
         onChange={(event) => form.set.username(event.target.value)}
-        autoComplete="username"
+        // A password manager suggests the app's passkeys here too: one tap signs in.
+        autoComplete="username webauthn"
         autoCapitalize="none"
         spellCheck={false}
         autoFocus
