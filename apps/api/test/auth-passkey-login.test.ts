@@ -1,8 +1,14 @@
 import { generateKeyPairSync } from 'node:crypto';
 import { type Database, passkey } from '@mailbox/db';
-import { type PasskeyAuthenticationResponse, passkeyRequestOptionsSchema } from '@mailbox/shared';
+import type { PasskeyAuthenticationResponse } from '@mailbox/shared';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
-import { authStatusOf, callAuth, errorCode, sessionCookieFrom } from './auth-requests.ts';
+import {
+  authStatusOf,
+  callAuth,
+  errorCode,
+  passkeyChallenge,
+  sessionCookieFrom,
+} from './auth-requests.ts';
 import { createTestPasskey, signChallenge, type TestPasskey } from './passkey-authenticator.ts';
 import { type RunningApi, startApi } from './start-api.ts';
 import { signInOnFreshInstance, storeTestPasskey } from './test-account.ts';
@@ -28,9 +34,8 @@ beforeEach(async () => {
   testPasskey = await storeTestPasskey(database);
 });
 
-async function challengeFor(path: string, sessionCookie?: string): Promise<string> {
-  const response = await callAuth(api, 'POST', path, { cookie: sessionCookie });
-  return passkeyRequestOptionsSchema.parse(await response.json()).challenge;
+function challengeFor(path: string, sessionCookie?: string): Promise<string> {
+  return passkeyChallenge(api, path, sessionCookie);
 }
 
 function signIn(response: PasskeyAuthenticationResponse): Promise<Response> {

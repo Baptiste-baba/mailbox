@@ -30,7 +30,7 @@ export class IdentityConfirmationService {
     client: string,
   ): Promise<void> {
     if (confirmation.method === 'passkey') {
-      await this.assertions.verify(confirmation.response, 'identityConfirmation', sessionToken);
+      await this.assertions.verify(confirmation.response, sessionToken);
     } else {
       await this.checkPasswordAndCode(confirmation, client);
     }
@@ -42,11 +42,7 @@ export class IdentityConfirmationService {
     { password, totpCode }: PasswordConfirmation,
     client: string,
   ): Promise<void> {
-    const stored = await this.credentials.find();
-    // A reset of the access ends every session with the account: this only narrows the type.
-    if (stored === undefined) {
-      throw new AppError('UNAUTHENTICATED', 'No account');
-    }
+    const stored = await this.credentials.require();
     await this.throttle.attempt('password', client, async () => {
       if (!(await verifyPassword(password, stored.passwordHash))) {
         throw new AppError('INVALID_CREDENTIALS', 'Wrong password');

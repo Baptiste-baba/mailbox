@@ -1,8 +1,8 @@
 import type { PasskeySummary } from '@mailbox/shared';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
-import { fakeApi } from '../../testing/fake-api.ts';
+import { fakeApi, lastBodySentTo, noContent } from '../../testing/fake-api.ts';
 import { type AppScreen, renderApp } from '../../testing/render-app.tsx';
-import { lastBodySentTo, settingsApi } from '../../testing/settings-api.ts';
+import { settingsApi } from '../../testing/settings-api.ts';
 import {
   addVirtualAuthenticator,
   type VirtualAuthenticator,
@@ -88,7 +88,7 @@ describe('removing a passkey, the dialog closed meanwhile', () => {
         new Promise((resolve) => {
           answer = () => {
             stored = [];
-            resolve(new Response(null, { status: 204 }));
+            resolve(noContent());
           };
         }),
     });

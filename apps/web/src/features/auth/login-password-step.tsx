@@ -16,14 +16,11 @@ interface LoginPasswordStepProps extends PasswordLoginOptions {
  */
 export function LoginPasswordStep({ onSignedIn, ...options }: LoginPasswordStepProps) {
   const form = usePasswordLogin(options);
-  const passkey = usePasskeyLogin(onSignedIn, { suggest: true });
+  const passkey = usePasskeyLogin(onSignedIn, { suggest: true, onError: form.showError });
   return (
     <AuthStepLayout
-      onSubmit={() => {
-        passkey.clearError();
-        form.submit();
-      }}
-      error={passkey.error ?? form.error}
+      onSubmit={form.submit}
+      error={form.error}
       actions={
         <>
           <Button variant="primary" size="lg" type="submit" disabled={form.blocked}>

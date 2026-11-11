@@ -1,12 +1,12 @@
 import { passkeyRegistrationSchema } from '@mailbox/shared';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { passkeysQuery } from '../../api/passkeys-query.ts';
 import { fr } from '../../i18n/fr.ts';
 import { createPasskey } from './passkey-ceremony.ts';
 import { passkeyCreationErrorMessage } from './passkey-error-message.ts';
 import { addPasskey, startPasskeyCreation } from './passkey-requests.ts';
-import { useIdentityGate } from './use-identity-gate.ts';
+import { useIdentityGatedAction } from './use-identity-gated-action.ts';
 
 /** The api's options, then the password manager's new passkey, kept by the api under `name`. */
 async function createAndAddPasskey(name: string): Promise<void> {
@@ -20,33 +20,20 @@ async function createAndAddPasskey(name: string): Promise<void> {
  */
 export function useAddPasskey(onAdded: () => void) {
   const queryClient = useQueryClient();
-  const gate = useIdentityGate();
   const [name, setName] = useState('');
   const [nameError, setNameError] = useState<string>();
-  const [error, setError] = useState<string>();
-  const add = useMutation({
+  const add = useIdentityGatedAction({
     mutationFn: createAndAddPasskey,
-    // Given here rather than to mutate(): they run even when the dialog was closed meanwhile.
     onSuccess: async () => {
       await queryClient.invalidateQueries(passkeysQuery);
       onAdded();
     },
-    onError: (failure, checkedName) => {
-      if (!gate.holds(failure, () => run(checkedName))) {
-        setError(passkeyCreationErrorMessage(failure));
-      }
-    },
+    errorMessage: passkeyCreationErrorMessage,
   });
-  const run = (checkedName: string) => {
-    setError(undefined);
-    add.mutate(checkedName);
-  };
   return {
-    gate,
+    ...add,
     name,
     nameError,
-    error,
-    pending: add.isPending,
     changeName: (typed: string) => {
       setName(typed);
       setNameError(undefined);
@@ -54,7 +41,7 @@ export function useAddPasskey(onAdded: () => void) {
     submit: () => {
       const checked = passkeyRegistrationSchema.shape.name.safeParse(name);
       if (checked.success) {
-        run(checked.data);
+        add.run(checked.data);
       } else {
         setNameError(fr.passkey.nameMissing);
       }

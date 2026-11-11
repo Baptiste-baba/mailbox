@@ -1,4 +1,4 @@
-import { account, type Database, passkey } from '@mailbox/db';
+import { type Database, passkey } from '@mailbox/db';
 import {
   type PasskeyAuthenticationResponse,
   type PasskeyRequestOptions,
@@ -12,34 +12,41 @@ import {
 } from '@simplewebauthn/server';
 import { eq, sql } from 'drizzle-orm';
 import { DATABASE } from '../database/database.module.ts';
+import { AccountCredentialsService } from './account-credentials.service.ts';
 import { invalidPasskey } from './invalid-passkey.ts';
 import {
   CHALLENGE_LIFETIME_MS,
-  type ChallengePurpose,
   PasskeyChallenges,
+  type SessionChallengeScope,
 } from './passkey-challenges.ts';
 import { passkeyUserHandle } from './passkey-user-handle.ts';
 import { RelyingParty } from './relying-party.ts';
 
-/** Signing in, or confirming the identity, with a passkey of the account. */
-type AssertionPurpose = Extract<ChallengePurpose, 'signIn' | 'identityConfirmation'>;
-
 type StoredPasskey = typeof passkey.$inferSelect;
 
-/** Asks a passkey to sign a challenge of the api, then checks its signature and records its use. */
+/** The challenge of a session confirming its identity; none to sign in. */
+function confirmationScope(sessionToken: string | undefined): SessionChallengeScope | undefined {
+  return sessionToken === undefined ? undefined : { purpose: 'identityConfirmation', sessionToken };
+}
+
+/**
+ * Asks a passkey to sign a challenge of the api, then checks its signature and records its use: to
+ * sign in, or, given the session, to confirm its identity.
+ */
 @Injectable()
 export class PasskeyAssertionService {
   constructor(
     @Inject(DATABASE) private readonly database: Database,
     private readonly relyingParty: RelyingParty,
     private readonly challenges: PasskeyChallenges,
+    private readonly credentials: AccountCredentialsService,
   ) {}
 
   /** @param sessionToken The session confirming its identity; none to sign in. */
-  async options(purpose: AssertionPurpose, sessionToken?: string): Promise<PasskeyRequestOptions> {
+  async options(sessionToken?: string): Promise<PasskeyRequestOptions> {
     const options = await generateAuthenticationOptions({
       rpID: this.relyingParty.id,
-      challenge: Buffer.from(this.challenges.issue(purpose, sessionToken), 'base64url'),
+      challenge: Buffer.from(this.challenges.issue(confirmationScope(sessionToken)), 'base64url'),
       timeout: CHALLENGE_LIFETIME_MS,
       userVerification: 'required',
     });
@@ -47,19 +54,16 @@ export class PasskeyAssertionService {
   }
 
   /**
+   * @param sessionToken The session confirming its identity; none to sign in.
    * @throws AppError INVALID_PASSKEY for any passkey, signature or challenge the api does not
    * accept, without telling which.
    */
-  async verify(
-    response: PasskeyAuthenticationResponse,
-    purpose: AssertionPurpose,
-    sessionToken?: string,
-  ): Promise<void> {
+  async verify(response: PasskeyAuthenticationResponse, sessionToken?: string): Promise<void> {
     const stored = await this.findPasskey(response);
     if (stored === undefined) {
       throw invalidPasskey();
     }
-    const verification = await this.checkSignature(response, stored, purpose, sessionToken);
+    const verification = await this.checkSignature(response, stored, sessionToken);
     if (!verification.verified) {
       throw invalidPasskey();
     }
@@ -78,9 +82,9 @@ export class PasskeyAssertionService {
   private async findPasskey(
     response: PasskeyAuthenticationResponse,
   ): Promise<StoredPasskey | undefined> {
-    const [[found], [owner]] = await Promise.all([
+    const [[found], owner] = await Promise.all([
       this.database.select().from(passkey).where(eq(passkey.credentialId, response.id)),
-      this.database.select({ passkeyUserId: account.passkeyUserId }).from(account),
+      this.credentials.find(),
     ]);
     const ownedByAccount =
       owner !== undefined &&
@@ -91,14 +95,14 @@ export class PasskeyAssertionService {
   private async checkSignature(
     response: PasskeyAuthenticationResponse,
     stored: StoredPasskey,
-    purpose: AssertionPurpose,
     sessionToken: string | undefined,
   ): Promise<VerifiedAuthenticationResponse> {
     try {
       return await verifyAuthenticationResponse({
         response,
         // The challenge is used up at once, whatever comes next: it never works twice.
-        expectedChallenge: (challenge) => this.challenges.consume(challenge, purpose, sessionToken),
+        expectedChallenge: (challenge) =>
+          this.challenges.consume(challenge, confirmationScope(sessionToken)),
         expectedOrigin: this.relyingParty.origin,
         expectedRPID: this.relyingParty.id,
         credential: {

@@ -21,7 +21,7 @@ export class IdentityConfirmationController {
   @Post('options')
   @HttpCode(HttpStatus.OK)
   options(@Req() request: Request): Promise<PasskeyRequestOptions> {
-    return this.assertions.options('identityConfirmation', requireSessionToken(request));
+    return this.assertions.options(requireSessionToken(request));
   }
 
   @Post()

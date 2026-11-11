@@ -1,9 +1,8 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { passkeysQuery } from '../../api/passkeys-query.ts';
 import { authErrorMessage } from './auth-error-message.ts';
 import { removePasskey } from './passkey-requests.ts';
-import { useIdentityGate } from './use-identity-gate.ts';
+import { useIdentityGatedAction } from './use-identity-gated-action.ts';
 
 /**
  * Removing a passkey, once the user said so: the identity is confirmed first when the api asks,
@@ -11,24 +10,12 @@ import { useIdentityGate } from './use-identity-gate.ts';
  */
 export function useRemovePasskey(passkeyId: string, onRemoved: () => void) {
   const queryClient = useQueryClient();
-  const gate = useIdentityGate();
-  const [error, setError] = useState<string>();
-  const remove = useMutation({
+  return useIdentityGatedAction({
     mutationFn: () => removePasskey(passkeyId),
-    // Given here rather than to mutate(): they run even when the dialog was closed meanwhile.
     onSuccess: async () => {
       await queryClient.invalidateQueries(passkeysQuery);
       onRemoved();
     },
-    onError: (failure) => {
-      if (!gate.holds(failure, run)) {
-        setError(authErrorMessage(failure));
-      }
-    },
+    errorMessage: authErrorMessage,
   });
-  const run = () => {
-    setError(undefined);
-    remove.mutate();
-  };
-  return { gate, error, pending: remove.isPending, remove: run };
 }

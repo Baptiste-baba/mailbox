@@ -22,7 +22,7 @@ export class PasskeyLoginController {
   @Post('options')
   @HttpCode(HttpStatus.OK)
   options(): Promise<PasskeyRequestOptions> {
-    return this.assertions.options('signIn');
+    return this.assertions.options();
   }
 
   @Post()
@@ -32,7 +32,7 @@ export class PasskeyLoginController {
     @Req() request: Request,
     @Res({ passthrough: true }) response: Response,
   ): Promise<void> {
-    await this.assertions.verify(body.response, 'signIn');
+    await this.assertions.verify(body.response);
     const session = await this.sessions.start(request.get('user-agent') ?? '', false);
     writeSessionCookie(response, session);
   }

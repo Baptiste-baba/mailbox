@@ -1,4 +1,8 @@
-import { authStatusSchema, errorResponseSchema } from '@mailbox/shared';
+import {
+  authStatusSchema,
+  errorResponseSchema,
+  passkeyRequestOptionsSchema,
+} from '@mailbox/shared';
 import { SESSION_COOKIE } from '../src/auth/session-cookie.ts';
 import type { RunningApi } from './start-api.ts';
 
@@ -49,4 +53,14 @@ export function sessionCookieFrom(response: Response): string {
     throw new Error('The response sets no session cookie');
   }
   return setCookie.split(';')[0] ?? '';
+}
+
+/** The challenge of the passkey options the api gives at `path`, to the session of `cookie`. */
+export async function passkeyChallenge(
+  api: RunningApi,
+  path: string,
+  cookie?: string,
+): Promise<string> {
+  const response = await callAuth(api, 'POST', path, { cookie });
+  return passkeyRequestOptionsSchema.parse(await response.json()).challenge;
 }

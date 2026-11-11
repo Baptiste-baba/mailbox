@@ -1,10 +1,10 @@
 import { afterEach, describe, expect, test, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import { apiError, fakeApi, serverError } from '../../testing/fake-api.ts';
+import { fakeApi, noContent, serverError } from '../../testing/fake-api.ts';
 import { type AppScreen, renderApp } from '../../testing/render-app.tsx';
+import { settingsApi } from '../../testing/settings-api.ts';
 
 const LOGOUT_OTHERS = '/api/auth/logout/others';
-const done = () => new Response(null, { status: 204 });
 
 afterEach(() => {
   vi.unstubAllGlobals();
@@ -17,7 +17,7 @@ async function askToSignOutOthers(screen: AppScreen) {
 
 describe('signing out the other devices from the settings', () => {
   test('signs out the other devices once confirmed, and says so, this one staying', async () => {
-    const fetchMock = fakeApi({ logoutOthers: done });
+    const fetchMock = settingsApi();
     const { screen, router } = await renderApp('/settings');
     const dialog = await askToSignOutOthers(screen);
 
@@ -32,14 +32,7 @@ describe('signing out the other devices from the settings', () => {
   });
 
   test('confirms the identity first when the api asks, then signs them out', async () => {
-    let confirmed = false;
-    fakeApi({
-      logoutOthers: () => (confirmed ? done() : apiError(403, 'IDENTITY_CONFIRMATION_REQUIRED')()),
-      confirmIdentity: () => {
-        confirmed = true;
-        return done();
-      },
-    });
+    settingsApi({ confirmationExpired: true });
     const { screen } = await renderApp('/settings');
     const dialog = await askToSignOutOthers(screen);
     await dialog.getByRole('button', { name: 'Déconnecter', exact: true }).click();
@@ -56,7 +49,7 @@ describe('signing out the other devices from the settings', () => {
 
 describe('signing out the other devices, when it does not happen', () => {
   test('changes nothing when cancelled', async () => {
-    const fetchMock = fakeApi({ logoutOthers: done });
+    const fetchMock = settingsApi();
     const { screen } = await renderApp('/settings');
     const dialog = await askToSignOutOthers(screen);
 
@@ -85,7 +78,7 @@ describe('signing out the other devices, the dialog closed meanwhile', () => {
     fakeApi({
       logoutOthers: () =>
         new Promise((resolve) => {
-          answer = () => resolve(done());
+          answer = () => resolve(noContent());
         }),
     });
     const { screen } = await renderApp('/settings');
