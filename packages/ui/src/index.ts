@@ -1,3 +1,4 @@
+export { Alert } from './components/alert.tsx';
 export { Avatar } from './components/avatar.tsx';
 export { BarButton } from './components/bar-button.tsx';
 export { Button } from './components/button.tsx';

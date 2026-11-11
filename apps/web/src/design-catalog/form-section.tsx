@@ -1,4 +1,12 @@
-import { Checkbox, CopyButton, Divider, PasswordField, QrCode, TextField } from '@mailbox/ui';
+import {
+  Alert,
+  Checkbox,
+  CopyButton,
+  Divider,
+  PasswordField,
+  QrCode,
+  TextField,
+} from '@mailbox/ui';
 import { CatalogSection, SampleName } from './catalog-section.tsx';
 
 const SAMPLE_LINK =
@@ -50,6 +58,10 @@ export function FormSection() {
       <div className="flex max-w-100 flex-col gap-2">
         <Divider label="ou" />
         <SampleName name="Divider : un filet, un mot au milieu, entre deux façons de faire" />
+      </div>
+      <div className="flex max-w-100 flex-col gap-2">
+        <Alert>Impossible de joindre le serveur. Vérifie ta connexion, puis réessaie.</Alert>
+        <SampleName name="Alert : ce qui n’a pas marché, annoncé aux lecteurs d’écran" />
       </div>
     </CatalogSection>
   );

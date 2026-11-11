@@ -2,7 +2,6 @@ export type ShortcutId =
   | 'newMail'
   | 'search'
   | 'searchList'
-  | 'settings'
   | 'nextThread'
   | 'previousThread'
   | 'unreadOnly'
@@ -23,7 +22,6 @@ export const shortcuts: Record<ShortcutId, Shortcut> = {
   newMail: { label: 'C' },
   search: { label: '⌘K' },
   searchList: { label: '/' },
-  settings: { label: '⌘,' },
   nextThread: { label: 'J', key: 'j' },
   previousThread: { label: 'K', key: 'k' },
   unreadOnly: { label: 'U', key: 'u' },

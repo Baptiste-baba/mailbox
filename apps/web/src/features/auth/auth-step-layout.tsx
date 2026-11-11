@@ -1,3 +1,4 @@
+import { Alert } from '@mailbox/ui';
 import type { FormEvent, ReactNode } from 'react';
 
 interface AuthStepLayoutProps {
@@ -33,11 +34,7 @@ export function AuthStepLayout({
         </div>
       )}
       <div className="flex flex-col gap-4">{children}</div>
-      {error !== undefined && (
-        <p role="alert" className="rounded-md bg-danger-tint px-4 py-3 text-small text-danger">
-          {error}
-        </p>
-      )}
+      {error !== undefined && <Alert>{error}</Alert>}
       <div className="flex w-full max-w-120 flex-col gap-2 self-center">{actions}</div>
     </form>
   );
