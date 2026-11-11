@@ -21,7 +21,10 @@ export function LoginSecondFactorStep({ onBack, ...options }: LoginSecondFactorS
     <AuthStepLayout
       title={withApp ? fr.login.codeTitle : fr.login.recoveryTitle}
       intro={withApp ? fr.login.codeIntro : fr.login.recoveryIntro}
-      onSubmit={form.submit}
+      onSubmit={() => {
+        passkey.clearError();
+        form.submit();
+      }}
       error={passkey.error ?? form.error}
       actions={
         <>
