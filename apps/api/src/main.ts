@@ -5,9 +5,10 @@ import { SetupService } from './auth/setup.service.ts';
 import { type ApiConfig, parseApiConfig } from './config/api-config.ts';
 import { createApp } from './create-app.ts';
 import { DATABASE } from './database/database.module.ts';
+import { serializeError } from './logging/serialize-error.ts';
 
 // The configured logger only exists once the app is up: this one reports why startup failed.
-const bootstrapLogger = pino();
+const bootstrapLogger = pino({ serializers: { err: serializeError } });
 
 // The schema is brought up to date before the first request: an api never serves an older database.
 // Until the account exists, the setup code is in the logs from the start.

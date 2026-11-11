@@ -14,8 +14,8 @@
     }
   },
   "scripts": {
-    "build": "tsc",
-    "dev": "tsc --watch --preserveWatchOutput",
+    "build": "tsc -p tsconfig.build.json",
+    "dev": "tsc -p tsconfig.build.json --watch --preserveWatchOutput",
     "typecheck": "tsc --noEmit",
     "generate": "drizzle-kit generate",
     "migrate": "node --env-file=../../.env.development node_modules/drizzle-kit/bin.cjs migrate"
@@ -28,6 +28,7 @@
     "@types/node": "catalog:",
     "@types/pg": "8.23.1",
     "drizzle-kit": "0.31.11",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   }
 }
