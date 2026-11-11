@@ -37,13 +37,13 @@ function MailboxLinks() {
   // What is shown stays when a refresh fails: only a first load that fails shows the error.
   if (mailboxes.data === undefined) {
     return mailboxes.isError ? (
-      <SidebarError message={fr.sidebar.mailboxesError} onRetry={() => mailboxes.refetch()} />
+      <SidebarError message={fr.common.mailboxesError} onRetry={() => mailboxes.refetch()} />
     ) : (
       <NavItemSkeletons count={3} />
     );
   }
   if (mailboxes.data.mailboxes.length === 0) {
-    return <p className="px-3 py-2 text-caption text-ink-2">{fr.sidebar.noMailbox}</p>;
+    return <p className="px-3 py-2 text-caption text-ink-2">{fr.common.noMailbox}</p>;
   }
   return mailboxes.data.mailboxes.map((mailbox) => (
     <MailboxLink key={mailbox.id} mailbox={mailbox} />
@@ -64,12 +64,12 @@ function MailboxLink({ mailbox }: { mailbox: MailboxSummary }) {
         mailbox.name,
         mailbox.address,
         reconnect
-          ? fr.sidebar.reconnect
+          ? fr.common.reconnect
           : mailbox.unreadCount > 0 && fr.common.unreadCount(mailbox.unreadCount),
       )}
       trailing={
         reconnect ? (
-          <Chip tone="warn">{fr.sidebar.reconnect}</Chip>
+          <Chip tone="warn">{fr.common.reconnect}</Chip>
         ) : (
           mailbox.unreadCount || undefined
         )

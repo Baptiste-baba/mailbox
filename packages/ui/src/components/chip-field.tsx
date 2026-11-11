@@ -7,6 +7,7 @@ import {
   useState,
 } from 'react';
 import { joinClassNames } from '../join-class-names.ts';
+import { BareInput } from './bare-input.tsx';
 
 /** What ends a value as it is typed or pasted: a comma, a semicolon or a new line. */
 const SEPARATORS = /[,;\n]/;
@@ -64,7 +65,7 @@ export function ChipField({
           onRemove={() => remove(value)}
         />
       ))}
-      <input
+      <BareInput
         {...inputProps}
         ref={inputRef}
         value={entry.text}
@@ -76,7 +77,7 @@ export function ChipField({
           onBlur?.(event);
         }}
         placeholder={values.length === 0 ? placeholder : undefined}
-        className="h-7 min-w-32 flex-1 bg-transparent text-body text-ink outline-none placeholder:text-ink-2"
+        className="min-w-32 flex-1"
       />
     </div>
   );
