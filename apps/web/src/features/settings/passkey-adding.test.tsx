@@ -83,4 +83,16 @@ describe('adding a passkey, refused', () => {
 
     await expect.element(dialog.getByRole('alert').getByText(/garde déjà/)).toBeVisible();
   });
+
+  // Regression: a password manager kept the passkey without handing it back, and nothing was said.
+  test('says the passkey was not added when the browser hands none back', async () => {
+    const fetchMock = settingsApi();
+    await authenticator.refuseUnlocking();
+    const { screen } = await renderApp('/settings');
+
+    const dialog = await addPasskeyNamed(screen, 'MacBook');
+
+    await expect.element(dialog.getByRole('alert').getByText(/n’a pas été ajoutée/)).toBeVisible();
+    expect(lastBodySentTo(fetchMock, '/api/auth/passkeys')).toBeUndefined();
+  });
 });
