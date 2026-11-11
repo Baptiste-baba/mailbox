@@ -7,6 +7,20 @@ import type {
 } from '@mailbox/shared';
 import { Injectable } from '@nestjs/common';
 
+// Fictitious answers, of the shape of the real ones, until the connection itself is written.
+const FICTITIOUS_AUTHORIZATION: MailboxAuthorization = {
+  authorizationUrl: 'https://accounts.google.com/o/oauth2/v2/auth?client_id=fictitious',
+};
+const FICTITIOUS_MAILBOX: MailboxSummary = {
+  id: '0b8f1a52-6c1d-4f0e-9d59-3a3f2a8f4c11',
+  provider: 'gmail',
+  name: 'Perso',
+  address: 'alex.martin@example.com',
+  color: 'navy',
+  unreadCount: 0,
+  status: 'connected',
+};
+
 /**
  * Connecting a mailbox: the user signs in at the provider, which sends them back with a code, and
  * the code gives the token that reads their mail from then on.
@@ -15,7 +29,7 @@ import { Injectable } from '@nestjs/common';
 export class MailboxConnectionService {
   /** The providers a mailbox can be added from on this server. */
   providers(): MailProviderList {
-    throw new Error('Not implemented yet');
+    return { providers: ['gmail'] };
   }
 
   /**
@@ -24,7 +38,7 @@ export class MailboxConnectionService {
    * @throws AppError MAIL_PROVIDER_NOT_CONFIGURED
    */
   start(_request: MailboxConnectionRequest, _sessionToken: string): MailboxAuthorization {
-    throw new Error('Not implemented yet');
+    return FICTITIOUS_AUTHORIZATION;
   }
 
   /**
@@ -34,7 +48,7 @@ export class MailboxConnectionService {
    * @throws AppError MAIL_PROVIDER_NOT_CONFIGURED
    */
   startReconnection(_mailboxId: string, _sessionToken: string): Promise<MailboxAuthorization> {
-    throw new Error('Not implemented yet');
+    return Promise.resolve(FICTITIOUS_AUTHORIZATION);
   }
 
   /**
@@ -50,11 +64,11 @@ export class MailboxConnectionService {
     _completion: MailboxConnectionCompletion,
     _sessionToken: string,
   ): Promise<MailboxSummary> {
-    throw new Error('Not implemented yet');
+    return Promise.resolve(FICTITIOUS_MAILBOX);
   }
 
   /** Removes a mailbox with the mail mirrored from it. Removing one already gone changes nothing. */
   remove(_mailboxId: string): Promise<void> {
-    throw new Error('Not implemented yet');
+    return Promise.resolve();
   }
 }
