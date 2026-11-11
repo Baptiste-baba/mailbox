@@ -1,5 +1,6 @@
 import type { PasskeySummary } from '@mailbox/shared';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
+import { fakeApi } from '../../testing/fake-api.ts';
 import { type AppScreen, renderApp } from '../../testing/render-app.tsx';
 import { lastBodySentTo, settingsApi } from '../../testing/settings-api.ts';
 import {
@@ -73,5 +74,32 @@ describe('removing a passkey', () => {
     await expect.element(screen.getByRole('dialog')).not.toBeInTheDocument();
     await expect.element(screen.getByText('iPhone')).toBeVisible();
     expect(removals(fetchMock)).toHaveLength(0);
+  });
+});
+
+describe('removing a passkey, the dialog closed meanwhile', () => {
+  // Regression: closing the dialog while the removal ran left the removed passkey in the list.
+  test('drops the passkey from the list once removed, the dialog closed or not', async () => {
+    let stored = [iphone];
+    let answer: (() => void) | undefined;
+    fakeApi({
+      passkeys: () => ({ passkeys: stored }),
+      removePasskey: () =>
+        new Promise((resolve) => {
+          answer = () => {
+            stored = [];
+            resolve(new Response(null, { status: 204 }));
+          };
+        }),
+    });
+    const { screen } = await renderApp('/settings');
+    const dialog = await askToRemoveIphone(screen);
+    await dialog.getByRole('button', { name: 'Retirer' }).click();
+    await vi.waitFor(() => expect(answer).toBeDefined());
+    await dialog.getByRole('button', { name: 'Fermer' }).click();
+
+    answer?.();
+
+    await expect.element(screen.getByText('Aucune passkey pour l’instant.')).toBeVisible();
   });
 });

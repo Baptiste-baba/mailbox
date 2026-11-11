@@ -13,20 +13,22 @@ export function useRemovePasskey(passkeyId: string, onRemoved: () => void) {
   const queryClient = useQueryClient();
   const gate = useIdentityGate();
   const [error, setError] = useState<string>();
-  const remove = useMutation({ mutationFn: () => removePasskey(passkeyId) });
+  const remove = useMutation({
+    mutationFn: () => removePasskey(passkeyId),
+    // Given here rather than to mutate(): they run even when the dialog was closed meanwhile.
+    onSuccess: async () => {
+      await queryClient.invalidateQueries(passkeysQuery);
+      onRemoved();
+    },
+    onError: (failure) => {
+      if (!gate.holds(failure, run)) {
+        setError(authErrorMessage(failure));
+      }
+    },
+  });
   const run = () => {
     setError(undefined);
-    remove.mutate(undefined, {
-      onSuccess: async () => {
-        await queryClient.invalidateQueries(passkeysQuery);
-        onRemoved();
-      },
-      onError: (failure) => {
-        if (!gate.holds(failure, run)) {
-          setError(authErrorMessage(failure));
-        }
-      },
-    });
+    remove.mutate();
   };
   return { gate, error, pending: remove.isPending, remove: run };
 }
