@@ -6,6 +6,8 @@ export interface ComposeDraft {
   cc: string[];
   bcc: string[];
   subject: string;
+  /** The message, in plain text. */
+  body: string;
 }
 
 export const emptyDraft: ComposeDraft = {
@@ -14,4 +16,5 @@ export const emptyDraft: ComposeDraft = {
   cc: [],
   bcc: [],
   subject: '',
+  body: '',
 };

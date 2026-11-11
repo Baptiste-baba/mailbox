@@ -1,5 +1,6 @@
 import { ColumnResizeHandle, ResizableColumn, ResizableColumns, useColumnRef } from '@mailbox/ui';
 import { CatchBoundary, Outlet } from '@tanstack/react-router';
+import { ComposeDraftProvider } from '../features/compose/index.ts';
 import { Sidebar } from './sidebar.tsx';
 import { SidebarCrash } from './sidebar-message.tsx';
 import {
@@ -9,7 +10,8 @@ import {
 
 /**
  * Frame of the app around every screen: the sidebar, then the screen itself. The sidebar takes a
- * share of the window; dragged narrower than its minimum, it folds to its icons.
+ * share of the window; dragged narrower than its minimum, it folds to its icons. The new mail being
+ * written lives here, so that moving between screens keeps it.
  */
 export function Shell() {
   const sidebar = useColumnRef();
@@ -17,26 +19,28 @@ export function Shell() {
   return (
     // The columns take the height of their parent: the window, so that only the columns scroll.
     <div className="h-dvh min-h-160 bg-chrome">
-      <ResizableColumns id="shell">
-        <ResizableColumn
-          id="sidebar"
-          panelRef={sidebar}
-          onResize={onSidebarResize}
-          defaultSize={SIDEBAR_DEFAULT_SIZE}
-          minSize={240}
-          maxSize={320}
-          collapsible
-          collapsedSize={56}
-        >
-          <CatchBoundary getResetKey={() => 'sidebar'} errorComponent={SidebarCrash}>
-            <Sidebar />
-          </CatchBoundary>
-        </ResizableColumn>
-        <ColumnResizeHandle />
-        <ResizableColumn id="screen">
-          <Outlet />
-        </ResizableColumn>
-      </ResizableColumns>
+      <ComposeDraftProvider>
+        <ResizableColumns id="shell">
+          <ResizableColumn
+            id="sidebar"
+            panelRef={sidebar}
+            onResize={onSidebarResize}
+            defaultSize={SIDEBAR_DEFAULT_SIZE}
+            minSize={240}
+            maxSize={320}
+            collapsible
+            collapsedSize={56}
+          >
+            <CatchBoundary getResetKey={() => 'sidebar'} errorComponent={SidebarCrash}>
+              <Sidebar />
+            </CatchBoundary>
+          </ResizableColumn>
+          <ColumnResizeHandle />
+          <ResizableColumn id="screen">
+            <Outlet />
+          </ResizableColumn>
+        </ResizableColumns>
+      </ComposeDraftProvider>
     </div>
   );
 }
