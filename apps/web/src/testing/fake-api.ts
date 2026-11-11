@@ -1,6 +1,7 @@
 import type {
   AuthStatus,
   MailboxList,
+  PasskeyList,
   PasskeyRequestOptions,
   SetupResponse,
   Thread,
@@ -50,6 +51,10 @@ interface FakeApi {
   /** Answers the sign-in with a passkey: its options, then the passkey the app sent. */
   passkeyLoginOptions?: () => PasskeyRequestOptions | Response;
   passkeyLogin?: (body: unknown) => Response;
+  /** The passkeys of the account, for the security settings. */
+  passkeys?: () => PasskeyList | Response;
+  /** Answers the sign-out. */
+  logout?: () => Response;
   /** Answers the requests replacing the authenticator app. */
   authenticatorSecret?: () => TotpEnrollment | Response;
   authenticatorReplacement?: (body: unknown) => Response;
@@ -94,6 +99,8 @@ export function fakeApi({
   login = serverError,
   passkeyLoginOptions = serverError,
   passkeyLogin = serverError,
+  passkeys = () => ({ passkeys: [] }),
+  logout = serverError,
   authenticatorSecret = serverError,
   authenticatorReplacement = serverError,
 }: FakeApi = {}) {
@@ -107,6 +114,8 @@ export function fakeApi({
     '/api/auth/login': login,
     '/api/auth/passkey-login/options': () => passkeyLoginOptions(),
     '/api/auth/passkey-login': passkeyLogin,
+    '/api/auth/passkeys': () => passkeys(),
+    '/api/auth/logout': () => logout(),
     '/api/auth/totp/secret': () => authenticatorSecret(),
     '/api/auth/totp': authenticatorReplacement,
   };

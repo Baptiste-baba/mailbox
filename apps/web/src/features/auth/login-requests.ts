@@ -22,6 +22,11 @@ export function logInWithPasskey(request: PasskeyLoginRequest) {
   return sendApi('POST', '/auth/passkey-login', request);
 }
 
+/** Ends the session of this device, and clears its cookie. */
+export function logOut() {
+  return sendApi('POST', '/auth/logout', undefined);
+}
+
 /** A new secret for the authenticator app of the signed-in user. */
 export function startAuthenticatorReplacement() {
   return postApi('/auth/totp/secret', undefined, totpEnrollmentSchema);

@@ -30,10 +30,11 @@ export function Sidebar() {
           <SidebarDestinations />
         </div>
         <NavGroup className="flex-none px-4 pt-3 @max-rail:px-2">
-          <ComingSoonNavItem
+          <SidebarNavLink
+            to="/settings"
             icon={<SettingsIcon />}
             label={fr.sidebar.settings}
-            shortcut={shortcuts.settings.label}
+            title={fr.sidebar.settings}
           />
         </NavGroup>
       </nav>
