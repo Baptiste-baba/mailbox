@@ -34,7 +34,10 @@ export function passkeyCreationErrorMessage(error: unknown): string | undefined 
     // The password manager keeps one of the account's passkeys already, and would replace it.
     case 'InvalidStateError':
       return fr.passkey.alreadyThere;
+    // The user closing the browser's window looks the same as a password manager that kept the
+    // passkey without handing it back: the latter must hear of it, to delete it there.
     case 'NotAllowedError':
+      return fr.passkey.notAdded;
     case 'AbortError':
     case 'SecurityError':
       return passkeyErrorMessage(error);
