@@ -139,6 +139,27 @@ export const fr = {
     loadError: 'Impossible de charger tes passkeys.',
     history: (added: string, used: string | undefined) =>
       `Ajoutée ${added} · ${used === undefined ? 'Jamais utilisée' : `Utilisée ${used}`}`,
+    add: 'Ajouter une passkey',
+    addIntro:
+      'Donne-lui un nom pour la reconnaître. Ton navigateur te demandera ensuite où l’enregistrer.',
+    nameLabel: 'Nom de la passkey',
+    namePlaceholder: 'ex. iPhone, MacBook, 1Password',
+    nameMissing: 'Donne un nom à la passkey.',
+    create: 'Créer la passkey',
+    alreadyThere: 'Ce gestionnaire de mots de passe garde déjà une passkey de MailBox.',
+    addFailed: 'La passkey n’a pas pu être ajoutée. Réessaie.',
+    remove: 'Retirer',
+    removeLabel: (name: string) => `Retirer la passkey «\u00a0${name}\u00a0»`,
+    removeTitle: (name: string) => `Retirer la passkey «\u00a0${name}\u00a0»\u00a0?`,
+    removeText:
+      'Elle ne pourra plus te connecter. Supprime-la aussi de ton gestionnaire de mots de passe, qui continuera de la proposer.',
+  },
+  identity: {
+    intro: 'Pour modifier ta sécurité, confirme d’abord que c’est toi.',
+    withPasskey: 'Confirmer avec une passkey',
+    confirm: 'Confirmer',
+    passwordMissing: 'Saisis ton mot de passe.',
+    wrongPassword: 'Mot de passe incorrect.',
   },
   signOut: {
     action: 'Se déconnecter',
