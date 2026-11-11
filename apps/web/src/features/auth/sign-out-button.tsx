@@ -1,4 +1,4 @@
-import { Alert, Button, Dialog, DialogActions } from '@mailbox/ui';
+import { Button, Dialog, DialogConfirmation } from '@mailbox/ui';
 import { LogOutIcon } from 'lucide-react';
 import { useState } from 'react';
 import { fr } from '../../i18n/fr.ts';
@@ -33,21 +33,14 @@ export function SignOutButton() {
 function SignOutConfirmation({ onCancel }: { onCancel: () => void }) {
   const signOut = useSignOut();
   return (
-    <>
-      <p className="text-center text-ink-2">{fr.signOut.confirmText}</p>
-      {signOut.error !== undefined && (
-        <div className="mt-4">
-          <Alert>{signOut.error}</Alert>
-        </div>
-      )}
-      <DialogActions>
-        <Button variant="danger" size="lg" onClick={signOut.signOut} disabled={signOut.pending}>
-          {fr.signOut.action}
-        </Button>
-        <Button variant="secondary" size="lg" onClick={onCancel}>
-          {fr.common.cancel}
-        </Button>
-      </DialogActions>
-    </>
+    <DialogConfirmation
+      message={fr.signOut.confirmText}
+      error={signOut.error}
+      confirmLabel={fr.signOut.action}
+      cancelLabel={fr.common.cancel}
+      onConfirm={signOut.signOut}
+      onCancel={onCancel}
+      pending={signOut.pending}
+    />
   );
 }

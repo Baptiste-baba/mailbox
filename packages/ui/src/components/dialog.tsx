@@ -1,5 +1,7 @@
 import { XIcon } from 'lucide-react';
 import { type ReactNode, useId, useLayoutEffect, useRef } from 'react';
+import { Alert } from './alert.tsx';
+import { Button } from './button.tsx';
 import { IconButton } from './icon-button.tsx';
 
 interface DialogProps {
@@ -61,4 +63,50 @@ export function Dialog({ open, onClose, title, closeLabel, children }: DialogPro
 /** The buttons at the foot of a dialog, across its whole width, the main one first. */
 export function DialogActions({ children }: { children: ReactNode }) {
   return <div className="mt-6 flex flex-col gap-3 [&>button]:w-full">{children}</div>;
+}
+
+interface DialogConfirmationProps {
+  /** What the action does, and what follows from it. */
+  message: string;
+  /** Why the action failed, if it did. */
+  error: string | undefined;
+  confirmLabel: string;
+  cancelLabel: string;
+  onConfirm: () => void;
+  onCancel: () => void;
+  /** The action is on its way: it cannot be asked twice. */
+  pending: boolean;
+}
+
+/**
+ * The content of a dialog asking before an action that cannot be undone: what it does, then the
+ * red action and the way back.
+ */
+export function DialogConfirmation({
+  message,
+  error,
+  confirmLabel,
+  cancelLabel,
+  onConfirm,
+  onCancel,
+  pending,
+}: DialogConfirmationProps) {
+  return (
+    <>
+      <p className="text-center text-ink-2">{message}</p>
+      {error !== undefined && (
+        <div className="mt-4">
+          <Alert>{error}</Alert>
+        </div>
+      )}
+      <DialogActions>
+        <Button variant="danger" size="lg" onClick={onConfirm} disabled={pending}>
+          {confirmLabel}
+        </Button>
+        <Button variant="secondary" size="lg" onClick={onCancel}>
+          {cancelLabel}
+        </Button>
+      </DialogActions>
+    </>
+  );
 }

@@ -27,6 +27,11 @@ export function logOut() {
   return sendApi('POST', '/auth/logout', undefined);
 }
 
+/** Ends the session of every other device: this one stays signed in. */
+export function logOutOthers() {
+  return sendApi('POST', '/auth/logout/others', undefined);
+}
+
 /** A new secret for the authenticator app of the signed-in user. */
 export function startAuthenticatorReplacement() {
   return postApi('/auth/totp/secret', undefined, totpEnrollmentSchema);

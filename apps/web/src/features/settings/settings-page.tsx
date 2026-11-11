@@ -2,7 +2,7 @@ import { StateMessage } from '@mailbox/ui';
 import type { ErrorComponentProps } from '@tanstack/react-router';
 import { useId } from 'react';
 import { fr } from '../../i18n/fr.ts';
-import { PasskeySettings, SignOutButton } from '../auth/index.ts';
+import { PasskeySettings, SessionActions } from '../auth/index.ts';
 
 /** The settings of the app: for now, the security of the account. */
 export function SettingsPage() {
@@ -17,7 +17,7 @@ export function SettingsPage() {
           </h2>
           <PasskeySettings />
           <div className="border-t border-line pt-6">
-            <SignOutButton />
+            <SessionActions />
           </div>
         </section>
       </div>

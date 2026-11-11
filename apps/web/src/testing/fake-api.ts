@@ -61,8 +61,9 @@ interface FakeApi {
   /** Answers the confirmation of the identity: its options, then the proof the app sent. */
   identityConfirmationOptions?: () => PasskeyRequestOptions | Response;
   confirmIdentity?: (body: unknown) => Response;
-  /** Answers the sign-out. */
+  /** Answers the sign-out of this device, and of the other ones. */
   logout?: () => Response;
+  logoutOthers?: () => Response;
   /** Answers the requests replacing the authenticator app. */
   authenticatorSecret?: () => TotpEnrollment | Response;
   authenticatorReplacement?: (body: unknown) => Response;
@@ -115,6 +116,7 @@ export function fakeApi({
   identityConfirmationOptions = serverError,
   confirmIdentity = serverError,
   logout = serverError,
+  logoutOthers = serverError,
   authenticatorSecret = serverError,
   authenticatorReplacement = serverError,
 }: FakeApi = {}) {
@@ -134,6 +136,7 @@ export function fakeApi({
     '/api/auth/identity-confirmation/options': () => identityConfirmationOptions(),
     '/api/auth/identity-confirmation': confirmIdentity,
     '/api/auth/logout': () => logout(),
+    '/api/auth/logout/others': () => logoutOthers(),
     '/api/auth/totp/secret': () => authenticatorSecret(),
     '/api/auth/totp': authenticatorReplacement,
   };
