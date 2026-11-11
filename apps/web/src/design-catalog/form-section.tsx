@@ -1,4 +1,4 @@
-import { Checkbox, CopyButton, PasswordField, QrCode, TextField } from '@mailbox/ui';
+import { Checkbox, CopyButton, Divider, PasswordField, QrCode, TextField } from '@mailbox/ui';
 import { CatalogSection, SampleName } from './catalog-section.tsx';
 
 const SAMPLE_LINK =
@@ -46,6 +46,10 @@ export function FormSection() {
       <div className="flex flex-col gap-2">
         <QrCode value={SAMPLE_LINK} label="QR code d'exemple" className="size-45" />
         <SampleName name="QrCode : foncé sur clair dans les deux thèmes" />
+      </div>
+      <div className="flex max-w-100 flex-col gap-2">
+        <Divider label="ou" />
+        <SampleName name="Divider : un filet, un mot au milieu, entre deux façons de faire" />
       </div>
     </CatalogSection>
   );
