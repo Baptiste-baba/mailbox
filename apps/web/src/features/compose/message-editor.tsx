@@ -1,3 +1,4 @@
+import { Link } from '@tiptap/extension-link';
 import { TextAlign } from '@tiptap/extension-text-align';
 import { Placeholder } from '@tiptap/extensions';
 import { type Editor, EditorContent, useEditor } from '@tiptap/react';
@@ -17,8 +18,15 @@ const extensions = [
     horizontalRule: false,
     // No empty paragraph kept at the end of every message: Enter twice leaves a list.
     trailingNode: false,
-    // A link opens from a mail being read, never from the one being written.
-    link: { openOnClick: false, autolink: false, linkOnPaste: false },
+    link: false,
+  }),
+  // What is typed right after a link is not part of it. A link opens from a mail being read, never
+  // from the one being written; an address typed, or pasted on some text, becomes a link.
+  Link.extend({ inclusive: () => false }).configure({
+    openOnClick: false,
+    autolink: true,
+    linkOnPaste: true,
+    defaultProtocol: 'https',
   }),
   TextAlign.configure({ types: ['paragraph'], alignments: ['left', 'center', 'right'] }),
   Placeholder.configure({ placeholder: fr.compose.bodyPlaceholder }),
@@ -31,18 +39,34 @@ const contentClassNames = [
   '[&_.is-editor-empty:first-child]:before:pointer-events-none [&_.is-editor-empty:first-child]:before:float-left [&_.is-editor-empty:first-child]:before:h-0 [&_.is-editor-empty:first-child]:before:text-ink-2 [&_.is-editor-empty:first-child]:before:content-[attr(data-placeholder)]',
 ].join(' ');
 
+/** Whether the key pressed is ⌘K, or Ctrl+K away from a Mac. */
+const isLinkShortcut = (event: KeyboardEvent) =>
+  event.key === 'k' && (event.metaKey || event.ctrlKey) && !event.shiftKey && !event.altKey;
+
 /**
  * The editor of the message, holding `body` as HTML and giving back every change. ⌘B, ⌘I and ⌘U
- * style the text, ⌘Z undoes, "- " or "1. " starts a list.
+ * style the text, ⌘Z undoes, "- " or "1. " starts a list, ⌘K asks for a link.
  */
-export function useMessageEditor(body: string, onChange: (body: string) => void): Editor {
+export function useMessageEditor(
+  body: string,
+  onChange: (body: string) => void,
+  onLinkShortcut: () => void,
+): Editor {
   return useEditor({
     extensions,
     content: body,
-    // Only lists start as they are typed: no other text turns into a style by surprise.
+    // Only lists start as they are typed, and links as addresses are pasted: no other text turns
+    // into a style by surprise.
     enableInputRules: ['bulletList', 'orderedList'],
-    enablePasteRules: false,
+    enablePasteRules: ['link'],
     editorProps: {
+      handleKeyDown: (_view, event) => {
+        if (!isLinkShortcut(event)) {
+          return false;
+        }
+        onLinkShortcut();
+        return true;
+      },
       attributes: {
         'aria-label': fr.compose.body,
         'aria-multiline': 'true',

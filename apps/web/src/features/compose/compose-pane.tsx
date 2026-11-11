@@ -5,10 +5,8 @@ import { fr } from '../../i18n/fr.ts';
 import { shortcuts } from '../../shortcuts.ts';
 import { useShortcut } from '../../use-shortcut.ts';
 import { useComposeDraft } from './compose-draft-context.tsx';
-import { ComposeEnvelope } from './compose-envelope.tsx';
 import { ComposeFooter } from './compose-footer.tsx';
-import { FormatBar } from './format-bar.tsx';
-import { MessageEditor, useMessageEditor } from './message-editor.tsx';
+import { ComposeMessage } from './compose-message.tsx';
 import { useCloseComposer } from './use-close-composer.ts';
 
 /**
@@ -26,7 +24,6 @@ export function ComposePane() {
     close();
   });
   const { draft, change, discard } = useComposeDraft();
-  const editor = useMessageEditor(draft.body, (body) => change({ body }));
   return (
     <PaneCard>
       <div className="flex flex-none items-center gap-3 border-b border-line py-3 pr-4 pl-6">
@@ -41,11 +38,7 @@ export function ComposePane() {
           <XIcon />
         </IconButton>
       </div>
-      <div className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-none">
-        <ComposeEnvelope draft={draft} onChange={change} />
-        <MessageEditor editor={editor} />
-      </div>
-      <FormatBar editor={editor} />
+      <ComposeMessage draft={draft} onChange={change} />
       <ComposeFooter
         onDiscard={() => {
           discard();
