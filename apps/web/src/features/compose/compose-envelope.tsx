@@ -12,12 +12,13 @@ interface ComposeEnvelopeProps {
 
 /**
  * Who the mail goes from and to, and its subject. "Cc" and "Cci" show their lines when asked for,
- * or by themselves once they hold someone.
+ * or by themselves when the mail reopens with someone in them; once shown, a line stays.
  */
 export function ComposeEnvelope({ draft, onChange }: ComposeEnvelopeProps) {
   const [asked, setAsked] = useState({ cc: false, bcc: false });
-  const showCc = asked.cc || draft.cc.length > 0;
-  const showBcc = asked.bcc || draft.bcc.length > 0;
+  const [filledAtOpening] = useState({ cc: draft.cc.length > 0, bcc: draft.bcc.length > 0 });
+  const showCc = asked.cc || filledAtOpening.cc;
+  const showBcc = asked.bcc || filledAtOpening.bcc;
   const ask = (line: 'cc' | 'bcc') => setAsked({ ...asked, [line]: true });
   return (
     <div className="flex flex-none flex-col px-6">

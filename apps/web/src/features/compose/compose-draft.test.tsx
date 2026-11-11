@@ -57,3 +57,31 @@ describe('new mail, draft', () => {
     await expect.element(screen.getByRole('textbox', { name: 'Cc' })).not.toBeInTheDocument();
   });
 });
+
+describe('new mail, draft, what is being typed', () => {
+  // Regression: Escape unmounted the line before the recipient being typed became a chip.
+  test('keeps a recipient still being typed when Escape closes', async () => {
+    fakeApi();
+    const { screen } = await renderApp('/inbox/new');
+
+    await userEvent.keyboard('camille@exemple.fr{Escape}');
+    await screen.getByRole('button', { name: 'Nouveau mail' }).click();
+
+    await expect
+      .element(screen.getByRole('button', { name: 'Retirer camille@exemple.fr' }))
+      .toBeVisible();
+  });
+
+  // Regression: the line of a reopened mail went away with the keyboard once emptied.
+  test('keeps the Cc line of a reopened mail once emptied', async () => {
+    fakeApi();
+    const { screen } = await renderApp('/inbox/new');
+    await writeMail(screen);
+    await userEvent.keyboard('{Escape}');
+    await screen.getByRole('button', { name: 'Nouveau mail' }).click();
+
+    await screen.getByRole('button', { name: 'Retirer hugo@exemple.fr' }).click();
+
+    await expect.element(screen.getByRole('textbox', { name: 'Cc' })).toHaveFocus();
+  });
+});
