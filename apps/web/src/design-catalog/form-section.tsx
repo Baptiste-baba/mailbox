@@ -1,4 +1,5 @@
-import { Checkbox, CopyButton, PasswordField, QrCode, TextField } from '@mailbox/ui';
+import { Checkbox, ChipField, CopyButton, PasswordField, QrCode, TextField } from '@mailbox/ui';
+import { useId, useState } from 'react';
 import { CatalogSection, SampleName } from './catalog-section.tsx';
 
 const SAMPLE_LINK =
@@ -28,6 +29,7 @@ export function FormSection() {
         />
         <SampleName name="TextField, PasswordField : libellé, exemple en gris, aide ou erreur sous le champ" />
       </div>
+      <ChipFieldSample />
       <div className="flex flex-col gap-2">
         <Checkbox label="Je les ai mis en lieu sûr" />
         <Checkbox label="Case cochée" defaultChecked />
@@ -48,5 +50,30 @@ export function FormSection() {
         <SampleName name="QrCode : foncé sur clair dans les deux thèmes" />
       </div>
     </CatalogSection>
+  );
+}
+
+function ChipFieldSample() {
+  const id = useId();
+  const [values, setValues] = useState(['camille.roussel@exemple.fr', 'hugo@exemple']);
+  return (
+    <div className="flex max-w-120 flex-col gap-2">
+      <div className="flex items-start gap-3 border-b border-line py-3">
+        <label htmlFor={id} className="flex h-7 flex-none items-center text-small text-ink-2">
+          À
+        </label>
+        <ChipField
+          id={id}
+          values={values}
+          onChange={setValues}
+          isValid={(value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)}
+          invalidLabel="Adresse invalide"
+          removeLabel={(value) => `Retirer ${value}`}
+          placeholder="camille@exemple.fr"
+          className="flex-1"
+        />
+      </div>
+      <SampleName name="ChipField : Entrée, virgule ou point-virgule font une pastille, rouge si elle n'est pas valide" />
+    </div>
   );
 }

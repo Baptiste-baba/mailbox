@@ -4,6 +4,7 @@ export { Button } from './components/button.tsx';
 export { Card } from './components/card.tsx';
 export { Checkbox } from './components/checkbox.tsx';
 export { Chip } from './components/chip.tsx';
+export { ChipField } from './components/chip-field.tsx';
 export { CopyButton } from './components/copy-button.tsx';
 export { FileChip } from './components/file-chip.tsx';
 export { IconButton } from './components/icon-button.tsx';
