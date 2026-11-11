@@ -1,4 +1,4 @@
-import { IconButton, Toolbar, ToolbarSeparator } from '@mailbox/ui';
+import { IconButton, Toolbar, ToolbarGroup, ToolbarSeparator } from '@mailbox/ui';
 import { type ChainedCommands, type Editor, useEditorState } from '@tiptap/react';
 import {
   BoldIcon,
@@ -16,6 +16,7 @@ import {
 import type { ReactNode } from 'react';
 import { fr } from '../../i18n/fr.ts';
 import { type ShortcutId, shortcuts } from '../../shortcuts.ts';
+import { TextStyleControls } from './text-style-controls.tsx';
 
 /** A style the text at the cursor has or not, and the button that gives or takes it. */
 interface FormatToggle {
@@ -115,7 +116,7 @@ interface ToggleGroupProps {
 /** One group of toggles, then the line that sets it apart from the next. */
 function ToggleGroup({ group, active, onApply }: ToggleGroupProps) {
   return (
-    <>
+    <ToolbarGroup>
       {group.map((toggle) => (
         <IconButton
           key={toggle.id}
@@ -128,7 +129,7 @@ function ToggleGroup({ group, active, onApply }: ToggleGroupProps) {
         </IconButton>
       ))}
       <ToolbarSeparator />
-    </>
+    </ToolbarGroup>
   );
 }
 
@@ -154,24 +155,30 @@ export function FormatBar({ editor, onWriteLink }: FormatBarProps) {
     apply(editor.chain().focus()).run();
   return (
     <Toolbar label={fr.compose.formatting} className="flex-none border-t border-line px-4 py-1.5">
+      <ToolbarGroup>
+        <TextStyleControls editor={editor} />
+        <ToolbarSeparator />
+      </ToolbarGroup>
       {toggleGroups.map((group) => (
         <ToggleGroup key={group[0]?.id} group={group} active={active.styles} onApply={run} />
       ))}
-      <IconButton
-        label={fr.compose.link}
-        shortcut={shortcuts.link.label}
-        pressed={active.link}
-        onClick={onWriteLink}
-      >
-        <LinkIcon />
-      </IconButton>
-      <ToolbarSeparator />
-      <IconButton
-        label={fr.compose.clearFormatting}
-        onClick={() => run((chain) => chain.unsetAllMarks().unsetTextAlign().clearNodes())}
-      >
-        <RemoveFormattingIcon />
-      </IconButton>
+      <ToolbarGroup>
+        <IconButton
+          label={fr.compose.link}
+          shortcut={shortcuts.link.label}
+          pressed={active.link}
+          onClick={onWriteLink}
+        >
+          <LinkIcon />
+        </IconButton>
+        <ToolbarSeparator />
+        <IconButton
+          label={fr.compose.clearFormatting}
+          onClick={() => run((chain) => chain.unsetAllMarks().unsetTextAlign().clearNodes())}
+        >
+          <RemoveFormattingIcon />
+        </IconButton>
+      </ToolbarGroup>
     </Toolbar>
   );
 }

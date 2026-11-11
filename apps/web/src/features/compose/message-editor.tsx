@@ -1,9 +1,12 @@
 import { Link } from '@tiptap/extension-link';
 import { TextAlign } from '@tiptap/extension-text-align';
+import { Color, FontFamily, FontSize, TextStyle } from '@tiptap/extension-text-style';
 import { Placeholder } from '@tiptap/extensions';
 import { type Editor, EditorContent, useEditor } from '@tiptap/react';
 import { StarterKit } from '@tiptap/starter-kit';
 import { fr } from '../../i18n/fr.ts';
+import { mailFonts } from './mail-text-styles.ts';
+import { PasteWithoutForeignStyles } from './paste-without-foreign-styles.ts';
 
 /**
  * What the message can hold: paragraphs, lists, links and the styles of the text. Anything else,
@@ -29,6 +32,11 @@ const extensions = [
     defaultProtocol: 'https',
   }),
   TextAlign.configure({ types: ['paragraph'], alignments: ['left', 'center', 'right'] }),
+  TextStyle,
+  FontFamily,
+  FontSize,
+  Color,
+  PasteWithoutForeignStyles,
   Placeholder.configure({ placeholder: fr.compose.bodyPlaceholder }),
 ];
 
@@ -71,6 +79,8 @@ export function useMessageEditor(
         'aria-label': fr.compose.body,
         'aria-multiline': 'true',
         class: contentClassNames,
+        // The text shows in the font the mail is sent in, not in that of the interface.
+        style: `font-family: ${mailFonts[0].stack}`,
       },
     },
     onUpdate: ({ editor }) => onChange(editor.getHTML()),

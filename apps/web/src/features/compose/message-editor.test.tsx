@@ -101,6 +101,24 @@ describe('message, pasting', () => {
   });
 });
 
+describe('message, pasting within itself', () => {
+  test('keeps the font, size and colour of what the message copied from itself', async () => {
+    const { screen, message } = await renderBody();
+    await userEvent.click(message);
+
+    pasteHtml(
+      message.element(),
+      '<p data-pm-slice="1 1 []"><span style="font-family: Georgia; color: #e12f2f">Titre</span></p>',
+    );
+
+    await expect
+      .element(screen.getByRole('status'))
+      .toHaveTextContent(
+        '<p><span style="font-family: Georgia; color: rgb(225, 47, 47);">Titre</span></p>',
+      );
+  });
+});
+
 describe('message, formatting bar', () => {
   test('styles the chosen text with its buttons, lit while the cursor is in that style', async () => {
     const { screen, message } = await renderBody();
@@ -137,5 +155,68 @@ describe('message, formatting bar', () => {
     await expect
       .element(screen.getByRole('button', { name: 'Aligner à gauche' }))
       .toHaveAttribute('aria-pressed', 'true');
+  });
+});
+
+describe('message, font, size and colour', () => {
+  test('writes in the font of the mail, Arial, until another is chosen', async () => {
+    const { message } = await renderBody();
+
+    await expect.element(message).toHaveStyle({ fontFamily: 'Arial, Helvetica, sans-serif' });
+  });
+
+  test('gives the chosen text the font, size and colour picked from the menus', async () => {
+    const { screen, message } = await renderBody();
+    await userEvent.type(message, 'Important');
+    await userEvent.keyboard(`{${MOD}>}a{/${MOD}}`);
+
+    await screen.getByRole('button', { name: 'Police' }).click();
+    await screen.getByRole('menuitemradio', { name: 'Georgia' }).click();
+    await userEvent.click(screen.getByRole('spinbutton', { name: 'Taille' }));
+    await userEvent.keyboard('15{Enter}');
+    await screen.getByRole('button', { name: 'Couleur du texte' }).click();
+    await screen.getByRole('menuitemradio', { name: 'Rouge' }).click();
+
+    await expect
+      .element(screen.getByRole('status'))
+      .toHaveTextContent(
+        '<p><span style="font-family: Georgia, &quot;Times New Roman&quot;, serif; font-size: 15pt; color: rgb(225, 47, 47);">Important</span></p>',
+      );
+    await expect
+      .element(screen.getByRole('button', { name: 'Police' }))
+      .toHaveTextContent('Georgia');
+    await expect.element(screen.getByRole('spinbutton', { name: 'Taille' })).toHaveValue('15');
+    await expect.element(message).toHaveFocus();
+  });
+});
+
+describe('message, size and the defaults', () => {
+  test('steps the size of the chosen text by one point with its buttons', async () => {
+    const { screen, message } = await renderBody();
+    await userEvent.type(message, 'Important');
+    await userEvent.keyboard(`{${MOD}>}a{/${MOD}}`);
+
+    await screen.getByRole('button', { name: 'Agrandir la taille' }).click();
+    await screen.getByRole('button', { name: 'Agrandir la taille' }).click();
+
+    await expect
+      .element(screen.getByRole('status'))
+      .toHaveTextContent('<p><span style="font-size: 14pt;">Important</span></p>');
+    await screen.getByRole('button', { name: 'Réduire la taille' }).click();
+    await screen.getByRole('button', { name: 'Réduire la taille' }).click();
+    await expect.element(screen.getByRole('status')).toHaveTextContent('<p>Important</p>');
+  });
+
+  test('goes back to the font and size of the mail with the first choices', async () => {
+    const { screen, message } = await renderBody();
+    await userEvent.type(message, 'Important');
+    await userEvent.keyboard(`{${MOD}>}a{/${MOD}}`);
+    await screen.getByRole('button', { name: 'Police' }).click();
+    await screen.getByRole('menuitemradio', { name: 'Verdana' }).click();
+
+    await screen.getByRole('button', { name: 'Police' }).click();
+    await screen.getByRole('menuitemradio', { name: 'Arial' }).click();
+
+    await expect.element(screen.getByRole('status')).toHaveTextContent('<p>Important</p>');
   });
 });
