@@ -9,14 +9,12 @@ import { fr } from '../../i18n/fr.ts';
 import { AddPasskeyDialog } from './add-passkey-dialog.tsx';
 import { passkeysSupported } from './passkey-ceremony.ts';
 import { RemovePasskeyDialog } from './remove-passkey-dialog.tsx';
-import { useHasPasskey } from './use-has-passkey.ts';
 
 /** The passkeys of the account, in the security settings: adding one, removing one. */
 export function PasskeySettings() {
   const titleId = useId();
   const [adding, setAdding] = useState(false);
   const [removing, setRemoving] = useState<PasskeySummary>();
-  const hasPasskey = useHasPasskey();
   return (
     <section aria-labelledby={titleId} className="flex flex-col gap-3">
       <div className="flex flex-col gap-0.5">
@@ -37,7 +35,7 @@ export function PasskeySettings() {
       <Card>
         <PasskeyList onRemove={setRemoving} />
       </Card>
-      <AddPasskeyDialog open={adding} onClose={() => setAdding(false)} withPasskey={hasPasskey} />
+      <AddPasskeyDialog open={adding} onClose={() => setAdding(false)} />
       <RemovePasskeyDialog passkey={removing} onClose={() => setRemoving(undefined)} />
     </section>
   );

@@ -69,7 +69,10 @@ export function useSecondFactorLogin(options: SecondFactorLoginOptions) {
   };
   return {
     ...input,
-    error: countdown.message ?? formError,
+    // During a wait, only a passkey can fail: what it says is the latest news.
+    error: formError ?? countdown.message,
+    /** Shows why another way to sign in failed, in place of the form's own error. */
+    showError: setFormError,
     blocked: login.isPending || countdown.waiting,
     submit,
   };

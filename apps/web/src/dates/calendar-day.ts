@@ -27,9 +27,9 @@ export function calendarDay(date: Date): { day: number; year: number } {
   };
 }
 
-/** "14 oct." this year, "14 oct. 2025" before. */
-export function formatShortDate(date: Date, now: Date): string {
-  return calendarDay(date).year === calendarDay(now).year
+/** "14 oct." in the current year, "14 oct. 2025" in another. */
+export function formatShortDate(date: Date, inCurrentYear: boolean): string {
+  return inCurrentYear
     ? dateFormatter({ day: 'numeric', month: 'short' }).format(date)
     : dateFormatter({ day: 'numeric', month: 'short', year: 'numeric' }).format(date);
 }

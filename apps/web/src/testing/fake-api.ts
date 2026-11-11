@@ -39,35 +39,37 @@ export function testThread(id: string, unread: boolean): ThreadSummary {
   };
 }
 
+/** What a fake route answers: the data of the contract or a response, at once or late. */
+type Answer<Data = never> = Data | Response | Promise<Data | Response>;
+
 interface FakeApi {
-  threadPages?: (url: URL) => ThreadPage | Response;
-  thread?: (threadId: string) => Thread | Response;
-  mailboxes?: () => MailboxList | Response;
-  authStatus?: () => AuthStatus | Response;
+  threadPages?: (url: URL) => Answer<ThreadPage>;
+  thread?: (threadId: string) => Answer<Thread>;
+  mailboxes?: () => Answer<MailboxList>;
+  authStatus?: () => Answer<AuthStatus>;
   /** Answers the setup requests, given the body the app sent. */
-  setupEnrollment?: (body: unknown) => TotpEnrollment | Response;
-  setup?: (body: unknown) => SetupResponse | Response;
+  setupEnrollment?: (body: unknown) => Answer<TotpEnrollment>;
+  setup?: (body: unknown) => Answer<SetupResponse>;
   /** Answers the sign-in, given the body the app sent. */
-  login?: (body: unknown) => Response;
+  login?: (body: unknown) => Answer;
   /** Answers the sign-in with a passkey: its options, then the passkey the app sent. */
-  passkeyLoginOptions?: () => PasskeyRequestOptions | Response;
-  passkeyLogin?: (body: unknown) => Response;
+  passkeyLoginOptions?: () => Answer<PasskeyRequestOptions>;
+  passkeyLogin?: (body: unknown) => Answer;
   /** The passkeys of the account, for the security settings. */
-  passkeys?: () => PasskeyList | Response;
+  passkeys?: () => Answer<PasskeyList>;
   /** Answers the changes of the passkeys, given what the app sent. */
-  passkeyCreationOptions?: () => PasskeyCreationOptions | Response;
-  addPasskey?: (body: unknown) => Response;
-  /** Answers late when it gives a promise: a request still running. */
-  removePasskey?: (passkeyId: string) => Response | Promise<Response>;
+  passkeyCreationOptions?: () => Answer<PasskeyCreationOptions>;
+  addPasskey?: (body: unknown) => Answer;
+  removePasskey?: (passkeyId: string) => Answer;
   /** Answers the confirmation of the identity: its options, then the proof the app sent. */
-  identityConfirmationOptions?: () => PasskeyRequestOptions | Response;
-  confirmIdentity?: (body: unknown) => Response;
+  identityConfirmationOptions?: () => Answer<PasskeyRequestOptions>;
+  confirmIdentity?: (body: unknown) => Answer;
   /** Answers the sign-out of this device, and of the other ones. */
-  logout?: () => Response;
-  logoutOthers?: () => Response | Promise<Response>;
+  logout?: () => Answer;
+  logoutOthers?: () => Answer;
   /** Answers the requests replacing the authenticator app. */
-  authenticatorSecret?: () => TotpEnrollment | Response;
-  authenticatorReplacement?: (body: unknown) => Response;
+  authenticatorSecret?: () => Answer<TotpEnrollment>;
+  authenticatorReplacement?: (body: unknown) => Answer;
 }
 
 /** An error of the api contract, as the api answers it. */
@@ -77,6 +79,9 @@ export function apiError(status: number, code: string, details?: object) {
 
 /** What the api answers when it fails on its side. */
 export const serverError = apiError(500, 'INTERNAL_ERROR');
+
+/** What the api answers to an action done, with nothing to say. */
+export const noContent = () => new Response(null, { status: 204 });
 
 /** What the api answers to a request without a valid session. */
 export const unauthenticated = apiError(401, 'UNAUTHENTICATED');
@@ -94,12 +99,31 @@ export const testEnrollment: TotpEnrollment = {
 const signedIn = (): AuthStatus => ({ state: 'signedIn', username: 'alex' });
 const noThread = (): ThreadPage => ({ threads: [], nextCursor: null });
 
-type FakeRoute = (sent: unknown, url: URL, method: string) => object;
+interface FakeRequest {
+  /** The body the app sent, parsed. */
+  sent: unknown;
+  url: URL;
+  /** What stands for `:id` in the route's path. */
+  id: string;
+}
 
-const THREAD_PATH = '/api/threads/';
-const PASSKEY_PATH = '/api/auth/passkeys/';
+type FakeRoute = (request: FakeRequest) => Answer<object>;
 
-/** Answers the app's requests to the api as the given functions say, and records them. */
+/** The route for `METHOD /path`, else for `METHOD /parent/:id`, with what stands for its id. */
+function findRoute(routes: Record<string, FakeRoute>, method: string, path: string) {
+  const exact = routes[`${method} ${path}`];
+  if (exact !== undefined) {
+    return { route: exact, id: '' };
+  }
+  const slash = path.lastIndexOf('/');
+  const route = routes[`${method} ${path.slice(0, slash)}/:id`];
+  return route === undefined ? undefined : { route, id: decodeURIComponent(path.slice(slash + 1)) };
+}
+
+/**
+ * Answers the app's requests to the api as the given functions say, and records them. A request
+ * no route expects fails, naming it.
+ */
 export function fakeApi({
   threadPages = noThread,
   thread = notFound,
@@ -122,36 +146,46 @@ export function fakeApi({
   authenticatorReplacement = serverError,
 }: FakeApi = {}) {
   const routes: Record<string, FakeRoute> = {
-    '/api/threads': (_sent, url) => threadPages(url),
-    '/api/mailboxes': () => mailboxes(),
-    '/api/folders': () => ({ folders: [] }),
-    '/api/auth/status': () => authStatus(),
-    '/api/auth/setup/totp-secret': setupEnrollment,
-    '/api/auth/setup': setup,
-    '/api/auth/login': login,
-    '/api/auth/passkey-login/options': () => passkeyLoginOptions(),
-    '/api/auth/passkey-login': passkeyLogin,
-    '/api/auth/passkeys': (sent, _url, method) =>
-      method === 'POST' ? addPasskey(sent) : passkeys(),
-    '/api/auth/passkeys/options': () => passkeyCreationOptions(),
-    '/api/auth/identity-confirmation/options': () => identityConfirmationOptions(),
-    '/api/auth/identity-confirmation': confirmIdentity,
-    '/api/auth/logout': () => logout(),
-    '/api/auth/logout/others': () => logoutOthers(),
-    '/api/auth/totp/secret': () => authenticatorSecret(),
-    '/api/auth/totp': authenticatorReplacement,
+    'GET /api/threads': ({ url }) => threadPages(url),
+    'GET /api/threads/:id': ({ id }) => thread(id),
+    'GET /api/mailboxes': () => mailboxes(),
+    'GET /api/folders': () => ({ folders: [] }),
+    'GET /api/auth/status': () => authStatus(),
+    'POST /api/auth/setup/totp-secret': ({ sent }) => setupEnrollment(sent),
+    'POST /api/auth/setup': ({ sent }) => setup(sent),
+    'POST /api/auth/login': ({ sent }) => login(sent),
+    'POST /api/auth/passkey-login/options': () => passkeyLoginOptions(),
+    'POST /api/auth/passkey-login': ({ sent }) => passkeyLogin(sent),
+    'GET /api/auth/passkeys': () => passkeys(),
+    'POST /api/auth/passkeys': ({ sent }) => addPasskey(sent),
+    'POST /api/auth/passkeys/options': () => passkeyCreationOptions(),
+    'DELETE /api/auth/passkeys/:id': ({ id }) => removePasskey(id),
+    'POST /api/auth/identity-confirmation/options': () => identityConfirmationOptions(),
+    'POST /api/auth/identity-confirmation': ({ sent }) => confirmIdentity(sent),
+    'POST /api/auth/logout': () => logout(),
+    'POST /api/auth/logout/others': () => logoutOthers(),
+    'POST /api/auth/totp/secret': () => authenticatorSecret(),
+    'PUT /api/auth/totp': ({ sent }) => authenticatorReplacement(sent),
   };
   const fetchMock = vi.fn(async (input: string, init?: RequestInit) => {
     const url = new URL(input, window.location.origin);
-    const sent: unknown = typeof init?.body === 'string' ? JSON.parse(init.body) : undefined;
     const method = init?.method ?? 'GET';
-    const route = routes[url.pathname];
-    const body = await (route?.(sent, url, method) ??
-      (url.pathname.startsWith(PASSKEY_PATH)
-        ? removePasskey(decodeURIComponent(url.pathname.slice(PASSKEY_PATH.length)))
-        : thread(decodeURIComponent(url.pathname.slice(THREAD_PATH.length)))));
+    const found = findRoute(routes, method, url.pathname);
+    if (found === undefined) {
+      throw new Error(`The fake api has no route for ${method} ${url.pathname}`);
+    }
+    const sent: unknown = typeof init?.body === 'string' ? JSON.parse(init.body) : undefined;
+    const body = await found.route({ sent, url, id: found.id });
     return body instanceof Response ? body : Response.json(body);
   });
   vi.stubGlobal('fetch', fetchMock);
   return fetchMock;
+}
+
+/** What the app last sent to `path` in a request with a body, as it was parsed. */
+export function lastBodySentTo(fetchMock: ReturnType<typeof fakeApi>, path: string): unknown {
+  const sent = fetchMock.mock.calls.findLast(
+    ([url, init]) => url === path && init?.body !== undefined,
+  )?.[1]?.body;
+  return sent === undefined ? undefined : JSON.parse(String(sent));
 }

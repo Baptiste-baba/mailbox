@@ -3,7 +3,6 @@ import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 import { ApiError } from '../../api/api-error.ts';
 import { fr } from '../../i18n/fr.ts';
-import { authErrorMessage } from './auth-error-message.ts';
 import { getPasskey } from './passkey-ceremony.ts';
 import { passkeyErrorMessage } from './passkey-error-message.ts';
 import { confirmIdentity, startIdentityConfirmation } from './passkey-requests.ts';
@@ -22,15 +21,6 @@ async function sendProof(proof: Proof): Promise<void> {
   await confirmIdentity({ method: 'passkey', response: await getPasskey(options) });
 }
 
-function errorMessage(failure: unknown): string | undefined {
-  return failure instanceof DOMException
-    ? passkeyErrorMessage(failure)
-    : authErrorMessage(failure, {
-        INVALID_CREDENTIALS: fr.identity.wrongPassword,
-        INVALID_PASSKEY: fr.passkey.rejected,
-      });
-}
-
 /** Proving again who one is: with a passkey, or the password and a code of the app. */
 export function useIdentityConfirmation(onConfirmed: () => void) {
   const [password, setPassword] = useState('');
@@ -46,7 +36,9 @@ export function useIdentityConfirmation(onConfirmed: () => void) {
         if (failure instanceof ApiError && failure.code === 'INVALID_SECOND_FACTOR') {
           code.setCodeError(fr.login.codeRejected);
         } else if (!countdown.startFrom(failure)) {
-          setError(errorMessage(failure));
+          setError(
+            passkeyErrorMessage(failure, { INVALID_CREDENTIALS: fr.identity.wrongPassword }),
+          );
         }
       },
     });

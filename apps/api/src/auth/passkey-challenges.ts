@@ -3,10 +3,13 @@ import { Injectable } from '@nestjs/common';
 import { hashToken } from './token-hash.ts';
 
 /**
- * What a challenge was issued for. Signing in comes before any session; confirming the identity and
- * adding a passkey belong to the session that asked.
+ * What a session asked a challenge for: confirming its identity, or adding a passkey. Challenges
+ * without one are for signing in, which comes before any session.
  */
-export type ChallengePurpose = 'signIn' | 'identityConfirmation' | 'registration';
+export interface SessionChallengeScope {
+  purpose: 'identityConfirmation' | 'registration';
+  sessionToken: string;
+}
 
 /** Time to pick a passkey and unlock it, before its challenge stops working. */
 export const CHALLENGE_LIFETIME_MS = 5 * 60 * 1_000;
@@ -37,29 +40,29 @@ export class PasskeyChallenges {
 
   /**
    * A new challenge, in base64url. For a session, it replaces the one it had for this purpose.
-   * @param sessionToken The session that asked, except to sign in.
+   * @param scope The session that asked, and what for; none to sign in.
    */
-  issue(purpose: ChallengePurpose, sessionToken?: string): string {
+  issue(scope?: SessionChallengeScope): string {
     const challenge = randomBytes(CHALLENGE_BYTES).toString('base64url');
     const expiresAt = Date.now() + CHALLENGE_LIFETIME_MS;
-    if (sessionToken === undefined) {
+    if (scope === undefined) {
       this.forgetOldestSignInWhenFull();
       this.signInChallenges.set(challenge, expiresAt);
     } else {
       this.forgetExpiredSessionChallenges();
-      this.sessionChallenges.set(sessionKey(purpose, sessionToken), { challenge, expiresAt });
+      this.sessionChallenges.set(sessionKey(scope), { challenge, expiresAt });
     }
     return challenge;
   }
 
-  /** Forgets the challenge, and tells whether it was still valid for this purpose and session. */
-  consume(challenge: string, purpose: ChallengePurpose, sessionToken?: string): boolean {
-    if (sessionToken === undefined) {
+  /** Forgets the challenge, and tells whether it was still valid for this session and purpose. */
+  consume(challenge: string, scope?: SessionChallengeScope): boolean {
+    if (scope === undefined) {
       const expiresAt = this.signInChallenges.get(challenge);
       this.signInChallenges.delete(challenge);
-      return purpose === 'signIn' && expiresAt !== undefined && expiresAt > Date.now();
+      return expiresAt !== undefined && expiresAt > Date.now();
     }
-    const key = sessionKey(purpose, sessionToken);
+    const key = sessionKey(scope);
     const pending = this.sessionChallenges.get(key);
     if (pending?.challenge !== challenge) {
       return false;
@@ -86,6 +89,6 @@ export class PasskeyChallenges {
   }
 }
 
-function sessionKey(purpose: ChallengePurpose, sessionToken: string): string {
+function sessionKey({ purpose, sessionToken }: SessionChallengeScope): string {
   return `${purpose}:${hashToken(sessionToken)}`;
 }

@@ -32,15 +32,8 @@ function RemovePasskeyConfirmation({
   onDone: () => void;
 }) {
   const removal = useRemovePasskey(passkey.id, onDone);
-  if (removal.gate.confirming) {
-    // The passkey about to go can still confirm the identity: it is one of the account's.
-    return (
-      <IdentityConfirmationForm
-        withPasskey
-        onConfirmed={removal.gate.confirmed}
-        onCancel={onDone}
-      />
-    );
+  if (removal.confirming) {
+    return <IdentityConfirmationForm onConfirmed={removal.confirmed} onCancel={onDone} />;
   }
   return (
     <DialogConfirmation
@@ -48,7 +41,7 @@ function RemovePasskeyConfirmation({
       error={removal.error}
       confirmLabel={fr.passkey.remove}
       cancelLabel={fr.common.cancel}
-      onConfirm={removal.remove}
+      onConfirm={() => removal.run()}
       onCancel={onDone}
       pending={removal.pending}
     />

@@ -1,6 +1,5 @@
-import { account, type Database, passkey } from '@mailbox/db';
+import { type Database, passkey } from '@mailbox/db';
 import {
-  AppError,
   type PasskeyCreationOptions,
   type PasskeyList,
   type PasskeyRegistration,
@@ -14,6 +13,8 @@ import {
 } from '@simplewebauthn/server';
 import { asc, eq } from 'drizzle-orm';
 import { DATABASE } from '../database/database.module.ts';
+import { AccountCredentialsService } from './account-credentials.service.ts';
+import { APP_NAME } from './app-name.ts';
 import { invalidPasskey } from './invalid-passkey.ts';
 import { CHALLENGE_LIFETIME_MS, PasskeyChallenges } from './passkey-challenges.ts';
 import { passkeyUserHandle } from './passkey-user-handle.ts';
@@ -29,6 +30,7 @@ export class PasskeysService {
     @Inject(DATABASE) private readonly database: Database,
     private readonly relyingParty: RelyingParty,
     private readonly challenges: PasskeyChallenges,
+    private readonly credentials: AccountCredentialsService,
   ) {}
 
   async list(): Promise<PasskeyList> {
@@ -55,23 +57,20 @@ export class PasskeysService {
    * @throws AppError UNAUTHENTICATED while no account exists.
    */
   async creationOptions(sessionToken: string): Promise<PasskeyCreationOptions> {
-    const [[owner], existing] = await Promise.all([
-      this.database
-        .select({ username: account.username, passkeyUserId: account.passkeyUserId })
-        .from(account),
+    const [owner, existing] = await Promise.all([
+      this.credentials.require(),
       this.database.select({ id: passkey.credentialId }).from(passkey),
     ]);
-    // A reset of the access ends every session with the account: this only narrows the type.
-    if (owner === undefined) {
-      throw new AppError('UNAUTHENTICATED', 'No account');
-    }
     const options = await generateRegistrationOptions({
-      rpName: this.relyingParty.name,
+      rpName: APP_NAME,
       rpID: this.relyingParty.id,
       userName: owner.username,
       userDisplayName: owner.username,
       userID: Buffer.from(passkeyUserHandle(owner.passkeyUserId), 'base64url'),
-      challenge: Buffer.from(this.challenges.issue('registration', sessionToken), 'base64url'),
+      challenge: Buffer.from(
+        this.challenges.issue({ purpose: 'registration', sessionToken }),
+        'base64url',
+      ),
       timeout: CHALLENGE_LIFETIME_MS,
       attestationType: 'none',
       // With the same user handle, a password manager would replace one of them without a word.
@@ -121,7 +120,7 @@ export class PasskeysService {
         response: registration.response,
         // The challenge is used up at once, whatever comes next: it never works twice.
         expectedChallenge: (challenge) =>
-          this.challenges.consume(challenge, 'registration', sessionToken),
+          this.challenges.consume(challenge, { purpose: 'registration', sessionToken }),
         expectedOrigin: this.relyingParty.origin,
         expectedRPID: this.relyingParty.id,
         requireUserVerification: true,

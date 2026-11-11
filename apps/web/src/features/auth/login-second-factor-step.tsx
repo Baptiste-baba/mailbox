@@ -15,17 +15,14 @@ interface LoginSecondFactorStepProps extends SecondFactorLoginOptions {
  */
 export function LoginSecondFactorStep({ onBack, ...options }: LoginSecondFactorStepProps) {
   const form = useSecondFactorLogin(options);
-  const passkey = usePasskeyLogin(options.onSignedIn);
+  const passkey = usePasskeyLogin(options.onSignedIn, { onError: form.showError });
   const withApp = form.kind === 'totp';
   return (
     <AuthStepLayout
       title={withApp ? fr.login.codeTitle : fr.login.recoveryTitle}
       intro={withApp ? fr.login.codeIntro : fr.login.recoveryIntro}
-      onSubmit={() => {
-        passkey.clearError();
-        form.submit();
-      }}
-      error={passkey.error ?? form.error}
+      onSubmit={form.submit}
+      error={form.error}
       actions={
         <>
           <Button variant="primary" size="lg" type="submit" disabled={form.blocked}>
