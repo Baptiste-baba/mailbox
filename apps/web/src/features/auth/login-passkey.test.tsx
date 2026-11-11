@@ -161,3 +161,30 @@ describe('sign-in with a passkey, when something is wrong', () => {
     expect(passkeyButton(screen).query()).toBeNull();
   });
 });
+
+describe('sign-in with a passkey, then the password', () => {
+  beforeEach(() => {
+    pickNoSuggestion();
+  });
+
+  // Regression: a refused passkey kept its message over the errors of the password tried next.
+  test('shows the error of the password tried after a refused passkey', async () => {
+    fakeApi({
+      authStatus: () => ({ state: 'signedOut' }),
+      login: apiError(401, 'INVALID_CREDENTIALS'),
+      passkeyLoginOptions: testPasskeyRequestOptions,
+      passkeyLogin: apiError(401, 'INVALID_PASSKEY'),
+    });
+    const { screen } = await renderApp('/login');
+    await userEvent.click(passkeyButton(screen));
+    await expect.element(screen.getByRole('alert').getByText(/n’est pas reconnue/)).toBeVisible();
+
+    await userEvent.fill(screen.getByLabelText('Nom d’utilisateur'), 'alex');
+    await userEvent.fill(screen.getByLabelText('Mot de passe', { exact: true }), 'un mot de passe');
+    await userEvent.click(screen.getByRole('button', { name: 'Continuer' }));
+
+    await expect
+      .element(screen.getByRole('alert').getByText(/mot de passe incorrect/))
+      .toBeVisible();
+  });
+});
