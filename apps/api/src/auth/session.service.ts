@@ -88,9 +88,12 @@ export class SessionService {
     return { ...resumed, expiresAt, renewed: true };
   }
 
-  /** Ends every session but the one of `token`. */
-  async endAllBut(transaction: Transaction, token: string): Promise<void> {
-    await transaction.delete(session).where(ne(session.tokenHash, hashToken(token)));
+  /**
+   * Ends every session but the one of `token`: as part of `executor` when the change is one, such
+   * as a new authenticator app, or on its own when the user asks.
+   */
+  async endAllBut(token: string, executor: Database | Transaction = this.database): Promise<void> {
+    await executor.delete(session).where(ne(session.tokenHash, hashToken(token)));
   }
 
   /**

@@ -54,7 +54,7 @@ export class AccountService {
       // The app is replaced when a device was lost: a session open on it, and a passkey kept on it,
       // must end with it. New passkeys can be added once signed in again.
       await transaction.delete(passkey);
-      await this.sessions.endAllBut(transaction, sessionToken);
+      await this.sessions.endAllBut(sessionToken, transaction);
       await this.sessions.endAuthenticatorReplacement(transaction, sessionToken);
     });
   }

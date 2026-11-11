@@ -5,7 +5,12 @@ import { clientAddress } from './client-address.ts';
 import { LoginService } from './login.service.ts';
 import { Public } from './public.decorator.ts';
 import { SessionService } from './session.service.ts';
-import { clearSessionCookie, readSessionToken, writeSessionCookie } from './session-cookie.ts';
+import {
+  clearSessionCookie,
+  readSessionToken,
+  requireSessionToken,
+  writeSessionCookie,
+} from './session-cookie.ts';
 
 @Controller('auth')
 export class AuthController {
@@ -60,5 +65,12 @@ export class AuthController {
       await this.sessions.end(token);
     }
     clearSessionCookie(response);
+  }
+
+  // Every other device signs in again: one that was lost, or one a removed passkey opened.
+  @Post('logout/others')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async logOutOthers(@Req() request: Request): Promise<void> {
+    await this.sessions.endAllBut(requireSessionToken(request));
   }
 }
