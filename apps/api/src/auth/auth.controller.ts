@@ -4,6 +4,7 @@ import type { Request, Response } from 'express';
 import { clientAddress } from './client-address.ts';
 import { LoginService } from './login.service.ts';
 import { Public } from './public.decorator.ts';
+import { RecentIdentityConfirmation } from './recent-identity-confirmation.decorator.ts';
 import { SessionService } from './session.service.ts';
 import {
   clearSessionCookie,
@@ -67,7 +68,9 @@ export class AuthController {
     clearSessionCookie(response);
   }
 
-  // Every other device signs in again: one that was lost, or one a removed passkey opened.
+  // Every other device signs in again: one that was lost, or one a removed passkey opened. Proving
+  // who one is first keeps a stolen session from signing the owner out again and again.
+  @RecentIdentityConfirmation()
   @Post('logout/others')
   @HttpCode(HttpStatus.NO_CONTENT)
   async logOutOthers(@Req() request: Request): Promise<void> {
