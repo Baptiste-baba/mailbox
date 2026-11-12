@@ -3,6 +3,9 @@ import { isMailAddress } from './is-mail-address.ts';
 const SCHEME = /^[a-z][a-z\d+.-]*:/i;
 const MAILTO = /^mailto:/i;
 const WEB_PROTOCOLS = ['http:', 'https:'];
+// No address holds a space, a control or an invisible character, which another program reading the
+// link could skip or read otherwise than this check does.
+const HIDDEN_OR_SPACE = /[\p{Cc}\p{Cf}\p{Z}]/u;
 
 /** A web address, kept when it is one: an http or https page on a named host. */
 function webHref(address: string): string | undefined {
@@ -18,7 +21,7 @@ function webHref(address: string): string | undefined {
  */
 export function linkHref(typed: string): string | undefined {
   const address = typed.trim();
-  if (address === '' || /\s/.test(address)) {
+  if (address === '' || HIDDEN_OR_SPACE.test(address)) {
     return undefined;
   }
   if (MAILTO.test(address)) {
