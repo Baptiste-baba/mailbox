@@ -87,7 +87,15 @@ export function useMessageEditor(
   });
 }
 
-/** The message itself, under the fields: it takes the rest of the pane, at a reading width. */
+/**
+ * The message itself, under the fields: it takes the rest of the pane, at a reading width. The
+ * bubble over the chosen text is placed within it, so that it scrolls along with the text.
+ */
 export function MessageEditor({ editor }: { editor: Editor }) {
-  return <EditorContent editor={editor} className="flex min-h-40 flex-1 flex-col [&>div]:flex-1" />;
+  return (
+    <EditorContent
+      editor={editor}
+      className="relative flex min-h-40 flex-1 flex-col [&>div]:flex-1"
+    />
+  );
 }

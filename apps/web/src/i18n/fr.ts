@@ -92,6 +92,7 @@ export const fr = {
     formatting: 'Mise en forme',
     moreFormatting: 'Plus de mise en forme',
     lessFormatting: 'Moins de mise en forme',
+    selectionFormatting: 'Mise en forme de la sélection',
     bold: 'Gras',
     italic: 'Italique',
     underline: 'Souligné',

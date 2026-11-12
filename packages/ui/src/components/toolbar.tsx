@@ -11,6 +11,8 @@ interface ToolbarProps {
   /** What the controls act on, read aloud, such as "Mise en forme". */
   label: string;
   children: ReactNode;
+  /** Lifted above the page, as over the text it acts on. */
+  floating?: boolean;
   className?: string;
 }
 
@@ -48,7 +50,7 @@ function setTabStop(controls: HTMLElement[], current: HTMLElement | undefined) {
  * A row of controls acting on one thing, such as the text being written. Tab enters it once, on
  * the control used last; the arrows then move between its controls, Home and End to its ends.
  */
-export function Toolbar({ label, children, className }: ToolbarProps) {
+export function Toolbar({ label, children, floating = false, className }: ToolbarProps) {
   const toolbarRef = useRef<HTMLDivElement>(null);
   const currentRef = useRef<HTMLElement | null>(null);
   // After every render, as controls may come and go: one of them, and only one, takes Tab.
@@ -80,7 +82,11 @@ export function Toolbar({ label, children, className }: ToolbarProps) {
       aria-label={label}
       onFocus={onFocus}
       onKeyDown={onKeyDown}
-      className={joinClassNames('flex flex-wrap items-center gap-0.5', className)}
+      className={joinClassNames(
+        'flex flex-wrap items-center gap-0.5',
+        floating ? 'rounded-lg border border-line bg-surface p-1 text-ink shadow-card' : undefined,
+        className,
+      )}
     >
       {children}
     </div>

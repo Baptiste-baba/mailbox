@@ -4,6 +4,7 @@ import { ComposeEnvelope } from './compose-envelope.tsx';
 import { FormatBar } from './format-bar.tsx';
 import { LinkPanel } from './link-panel.tsx';
 import { MessageEditor, useMessageEditor } from './message-editor.tsx';
+import { SelectionBubble } from './selection-bubble.tsx';
 
 interface ComposeMessageProps {
   draft: ComposeDraft;
@@ -11,8 +12,8 @@ interface ComposeMessageProps {
 }
 
 /**
- * The mail being written: its fields and its message, which scroll together, then the formatting
- * bar, or the link being written in its place.
+ * The mail being written: its fields and its message, which scroll together, with a bubble over
+ * the text being chosen; then the formatting bar, or the link being written in its place.
  */
 export function ComposeMessage({ draft, onChange }: ComposeMessageProps) {
   const [writingLink, setWritingLink] = useState(false);
@@ -26,6 +27,7 @@ export function ComposeMessage({ draft, onChange }: ComposeMessageProps) {
       <div className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-none">
         <ComposeEnvelope draft={draft} onChange={onChange} />
         <MessageEditor editor={editor} />
+        <SelectionBubble editor={editor} onWriteLink={() => setWritingLink(true)} />
       </div>
       {writingLink ? (
         <LinkPanel editor={editor} onDone={() => setWritingLink(false)} />
