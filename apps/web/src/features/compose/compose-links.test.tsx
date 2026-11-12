@@ -87,14 +87,16 @@ describe('new mail, links refused or given up', () => {
   });
 
   test('makes a link of an address as it is typed', async () => {
-    const { message } = await writeMessage('Voir https://exemple.fr/programme ici');
+    const { message } = await writeMessage(
+      'Voir https://exemple.fr/programme ici ou nom@exemple.fr ',
+    );
 
     await expect
       .element(message.getByRole('link', { name: 'https://exemple.fr/programme' }))
       .toHaveAttribute('href', 'https://exemple.fr/programme');
     await expect
-      .element(message.getByRole('link'))
-      .toHaveTextContent('https://exemple.fr/programme');
+      .element(message.getByRole('link', { name: 'nom@exemple.fr' }))
+      .toHaveAttribute('href', 'mailto:nom@exemple.fr');
   });
 });
 

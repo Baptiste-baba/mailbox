@@ -22,6 +22,9 @@ describe('linkHref', () => {
     'ftp://exemple.fr',
     'mailto:nom',
     'https://localhost',
+    'tel:+33612345678',
+    '<nom@exemple.fr>',
+    'mailto:<nom@exemple.fr>',
   ])('refuses %s', (typed) => {
     expect(linkHref(typed)).toBeUndefined();
   });

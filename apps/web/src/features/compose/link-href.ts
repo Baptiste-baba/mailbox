@@ -1,4 +1,4 @@
-import { isValidRecipient } from './is-valid-recipient.ts';
+import { isMailAddress } from './is-mail-address.ts';
 
 const SCHEME = /^[a-z][a-z\d+.-]*:/i;
 const MAILTO = /^mailto:/i;
@@ -22,10 +22,10 @@ export function linkHref(typed: string): string | undefined {
     return undefined;
   }
   if (MAILTO.test(address)) {
-    return isValidRecipient(address.slice('mailto:'.length)) ? address : undefined;
+    return isMailAddress(address.slice('mailto:'.length)) ? address : undefined;
   }
   if (SCHEME.test(address)) {
     return webHref(address);
   }
-  return isValidRecipient(address) ? `mailto:${address}` : webHref(`https://${address}`);
+  return isMailAddress(address) ? `mailto:${address}` : webHref(`https://${address}`);
 }
