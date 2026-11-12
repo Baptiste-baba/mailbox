@@ -1,7 +1,6 @@
 import { afterEach, describe, expect, test, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { fakeApi } from '../../testing/fake-api.ts';
-import { MODIFIER_KEY as MOD } from '../../testing/modifier-key.ts';
 import { renderApp } from '../../testing/render-app.tsx';
 
 afterEach(() => {
@@ -20,7 +19,7 @@ async function writeMessage(text: string) {
 describe('new mail, links', () => {
   test('links the chosen text from the bar, then hands the keyboard back', async () => {
     const { screen, message } = await writeMessage('Le programme');
-    await userEvent.keyboard(`{${MOD}>}a{/${MOD}}`);
+    await userEvent.keyboard(`{ControlOrMeta>}a{/ControlOrMeta}`);
 
     await screen.getByRole('button', { name: 'Lien' }).click();
     await userEvent.keyboard('exemple.fr{Enter}');
@@ -35,7 +34,7 @@ describe('new mail, links', () => {
   test('writes a link and its text with ⌘K when no text is chosen', async () => {
     const { screen, message } = await writeMessage('Écris-moi à ');
 
-    await userEvent.keyboard(`{${MOD}>}k{/${MOD}}`);
+    await userEvent.keyboard(`{ControlOrMeta>}k{/ControlOrMeta}`);
     await expect.element(screen.getByRole('textbox', { name: 'Texte' })).toHaveFocus();
     await userEvent.keyboard('mon adresse{Tab}nom@exemple.fr{Enter}');
 
@@ -46,9 +45,11 @@ describe('new mail, links', () => {
 
   test('changes, then removes, the link at the cursor', async () => {
     const { screen, message } = await writeMessage('Le programme');
-    await userEvent.keyboard(`{${MOD}>}a{/${MOD}}{${MOD}>}k{/${MOD}}exemple.fr{Enter}{ArrowLeft}`);
+    await userEvent.keyboard(
+      `{ControlOrMeta>}a{/ControlOrMeta}{ControlOrMeta>}k{/ControlOrMeta}exemple.fr{Enter}{ArrowLeft}`,
+    );
 
-    await userEvent.keyboard(`{${MOD}>}k{/${MOD}}`);
+    await userEvent.keyboard(`{ControlOrMeta>}k{/ControlOrMeta}`);
     await expect
       .element(screen.getByRole('textbox', { name: 'Adresse' }))
       .toHaveValue('https://exemple.fr');
@@ -62,7 +63,9 @@ describe('new mail, links', () => {
 describe('new mail, links refused or given up', () => {
   test('refuses an address that is neither a page nor a mail address', async () => {
     const { screen, message } = await writeMessage('Clique');
-    await userEvent.keyboard(`{${MOD}>}a{/${MOD}}{${MOD}>}k{/${MOD}}javascript:alert(1){Enter}`);
+    await userEvent.keyboard(
+      `{ControlOrMeta>}a{/ControlOrMeta}{ControlOrMeta>}k{/ControlOrMeta}javascript:alert(1){Enter}`,
+    );
 
     await expect
       .element(screen.getByText('Cette adresse n’est ni une page web ni une adresse mail.'))
@@ -73,7 +76,7 @@ describe('new mail, links refused or given up', () => {
 
   test('gives up the link with Escape, the new mail staying open', async () => {
     const { screen, message } = await writeMessage('Le programme');
-    await userEvent.keyboard(`{${MOD}>}k{/${MOD}}`);
+    await userEvent.keyboard(`{ControlOrMeta>}k{/ControlOrMeta}`);
 
     await userEvent.keyboard('{Escape}');
     // Closing the new mail would take the message away before the typing goes on.
@@ -100,8 +103,8 @@ describe('new mail, links next to each other', () => {
   test('writes a link right after another without replacing it', async () => {
     const { message } = await writeMessage('Voir ');
 
-    await userEvent.keyboard(`{${MOD}>}k{/${MOD}}premier{Tab}un.fr{Enter}`);
-    await userEvent.keyboard(`{${MOD}>}k{/${MOD}}second{Tab}deux.fr{Enter}`);
+    await userEvent.keyboard(`{ControlOrMeta>}k{/ControlOrMeta}premier{Tab}un.fr{Enter}`);
+    await userEvent.keyboard(`{ControlOrMeta>}k{/ControlOrMeta}second{Tab}deux.fr{Enter}`);
 
     await expect
       .element(message.getByRole('link', { name: 'premier' }))
@@ -114,7 +117,7 @@ describe('new mail, links next to each other', () => {
   // Regression: Escape that closes the word list of an input method also gave up the link.
   test('leaves Escape to an input method composing a word', async () => {
     const { screen } = await writeMessage('Voir ');
-    await userEvent.keyboard(`{${MOD}>}k{/${MOD}}nihon`);
+    await userEvent.keyboard(`{ControlOrMeta>}k{/ControlOrMeta}nihon`);
     const text = screen.getByRole('textbox', { name: 'Texte' });
 
     text

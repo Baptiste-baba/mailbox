@@ -8,6 +8,7 @@ import {
   useId,
   useRef,
 } from 'react';
+import { floatingSurfaceClassNames } from '../floating-surface-class-names.ts';
 import { joinClassNames } from '../join-class-names.ts';
 import { pressableClassNames } from '../pressable-class-names.ts';
 
@@ -136,7 +137,10 @@ export function ChoiceMenu({
         onKeyDown={menu.onKeyDown}
         style={{ gridTemplateColumns: `repeat(${columns}, auto)` }}
         // Laid out only once open: a display of its own would keep the closed menu on screen.
-        className="inset-auto m-0 gap-0.5 rounded-lg border border-line bg-surface p-1.5 text-ink shadow-card open:grid"
+        className={joinClassNames(
+          'inset-auto m-0 gap-0.5 p-1.5 open:grid',
+          floatingSurfaceClassNames,
+        )}
       >
         {choices.map((choice) => (
           <ChoiceItem

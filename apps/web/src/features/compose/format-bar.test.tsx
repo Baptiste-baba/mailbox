@@ -1,7 +1,6 @@
 import { afterEach, describe, expect, test, vi } from 'vitest';
 import { page, userEvent } from 'vitest/browser';
 import { fakeApi } from '../../testing/fake-api.ts';
-import { MODIFIER_KEY as MOD } from '../../testing/modifier-key.ts';
 import { renderApp } from '../../testing/render-app.tsx';
 
 afterEach(async () => {
@@ -43,7 +42,7 @@ describe('new mail, formatting bar', () => {
     const { screen } = await renderApp('/inbox/new');
     const message = screen.getByRole('textbox', { name: 'Message' });
     await userEvent.type(message, 'Grand');
-    await userEvent.keyboard(`{${MOD}>}a{/${MOD}}`);
+    await userEvent.keyboard(`{ControlOrMeta>}a{/ControlOrMeta}`);
 
     await userEvent.click(screen.getByRole('spinbutton', { name: 'Taille' }));
     await userEvent.keyboard('100{Enter}');
@@ -101,7 +100,7 @@ describe('new mail, formatting bar folded', () => {
     const message = screen.getByRole('textbox', { name: 'Message' });
     await userEvent.type(message, 'Important');
 
-    await userEvent.keyboard(`{${MOD}>}{Shift>}e{/Shift}{/${MOD}}`);
+    await userEvent.keyboard(`{ControlOrMeta>}{Shift>}e{/Shift}{/ControlOrMeta}`);
 
     await expect.element(message.getByText('Important')).toHaveStyle({ textAlign: 'center' });
     await expect.element(screen.getByRole('button', { name: 'Centrer' })).not.toBeInTheDocument();
