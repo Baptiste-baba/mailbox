@@ -1,0 +1,20 @@
+/** The texts of an open mail and its thread. */
+export const thread = {
+  archive: 'Archiver',
+  snooze: 'Plus tard',
+  translate: 'Traduire',
+  moreActions: 'Plus d’actions',
+  move: 'Ranger',
+  reply: 'Répondre',
+  replyTo: (names: string) => `Répondre à ${names}`,
+  send: 'Envoyer',
+  messagesLabel: 'Messages du fil',
+  me: 'Toi',
+  meInSentence: 'toi',
+  to: (names: string) => `à ${names}`,
+  cc: (names: string) => `cc ${names}`,
+  placeholder: 'Choisis un mail dans la liste, ou parcours-la avec J et K.',
+  notFound: 'Ce mail n’existe plus. Il a peut-être été supprimé ou déplacé.',
+  error: 'Impossible de charger ce mail. Vérifie que le serveur est joignable, puis réessaie.',
+  crash: 'Ce mail n’a pas pu s’afficher.',
+};
