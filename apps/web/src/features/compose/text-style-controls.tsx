@@ -81,35 +81,37 @@ function useTextStyle(editor: Editor) {
   return { current, chooseFont, chooseSize, chooseColour };
 }
 
-/**
- * The font and the size of the text: the fonts from a menu that shows them as they will look, the
- * size as a number of points. The defaults leave the text as the mail has it.
- */
-export function FontAndSize({ editor }: { editor: Editor }) {
-  const { current, chooseFont, chooseSize } = useTextStyle(editor);
+/** The font of the text, from a menu that shows each one as it will look. */
+export function FontMenu({ editor }: { editor: Editor }) {
+  const { current, chooseFont } = useTextStyle(editor);
   return (
-    <>
-      <ChoiceMenu
-        label={fr.compose.font}
-        choices={fontChoices}
-        value={current.font.name}
-        onChoose={chooseFont}
-      >
-        <span className="max-w-24 truncate" style={{ fontFamily: current.font.stack }}>
-          {current.font.name}
-        </span>
-      </ChoiceMenu>
-      <NumberStepper
-        label={fr.compose.size}
-        value={current.size}
-        min={MIN_SIZE}
-        max={MAX_SIZE}
-        onChange={chooseSize}
-        onSubmit={() => editor.commands.focus()}
-        decreaseLabel={fr.compose.decreaseSize}
-        increaseLabel={fr.compose.increaseSize}
-      />
-    </>
+    <ChoiceMenu
+      label={fr.compose.font}
+      choices={fontChoices}
+      value={current.font.name}
+      onChoose={chooseFont}
+    >
+      <span className="max-w-18 truncate" style={{ fontFamily: current.font.stack }}>
+        {current.font.name}
+      </span>
+    </ChoiceMenu>
+  );
+}
+
+/** The size of the text, as a number of points typed or stepped one by one. */
+export function SizeStepper({ editor }: { editor: Editor }) {
+  const { current, chooseSize } = useTextStyle(editor);
+  return (
+    <NumberStepper
+      label={fr.compose.size}
+      value={current.size}
+      min={MIN_SIZE}
+      max={MAX_SIZE}
+      onChange={chooseSize}
+      onSubmit={() => editor.commands.focus()}
+      decreaseLabel={fr.compose.decreaseSize}
+      increaseLabel={fr.compose.increaseSize}
+    />
   );
 }
 

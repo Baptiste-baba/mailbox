@@ -4,7 +4,7 @@ import { BubbleMenu, type BubbleMenuProps } from '@tiptap/react/menus';
 import { type FocusEvent, useEffect, useRef } from 'react';
 import { fr } from '../../i18n/fr.ts';
 import { LinkGroup, ToggleGroup, toggles, useFormatting } from './format-controls.tsx';
-import { ColourMenu } from './text-style-controls.tsx';
+import { ColourMenu, FontMenu } from './text-style-controls.tsx';
 
 const pluginKey = 'selectionBubble';
 
@@ -27,8 +27,8 @@ interface SelectionBubbleProps {
 }
 
 /**
- * The most used formatting, shown right above the text being chosen: bold, italic, underline, the
- * colour, a link, and the clearing of it all.
+ * The most used formatting, shown right above the text being chosen: the font, bold, italic,
+ * underline, the colour, a link, and the clearing of it all.
  */
 export function SelectionBubble({ editor, onWriteLink }: SelectionBubbleProps) {
   const { active, run, clear } = useFormatting(editor);
@@ -59,6 +59,10 @@ export function SelectionBubble({ editor, onWriteLink }: SelectionBubbleProps) {
       onBlur={hideWhenLeft}
     >
       <Toolbar label={fr.compose.selectionFormatting} floating>
+        <ToolbarGroup>
+          <FontMenu editor={editor} />
+          <ToolbarSeparator />
+        </ToolbarGroup>
         <ToggleGroup group={bubbleToggles} active={active.styles} onApply={run} />
         <ToolbarGroup>
           <ColourMenu editor={editor} />

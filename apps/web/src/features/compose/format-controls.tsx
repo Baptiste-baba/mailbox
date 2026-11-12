@@ -109,7 +109,7 @@ export const toggleGroups: FormatToggle[][] = [
       id: 'orderedList',
       label: fr.compose.orderedList,
       icon: <ListOrderedIcon />,
-      common: true,
+      common: false,
       apply: (chain) => chain.toggleOrderedList(),
       isActive: (editor) => editor.isActive('orderedList'),
     },
