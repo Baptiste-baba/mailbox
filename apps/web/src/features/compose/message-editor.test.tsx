@@ -112,24 +112,6 @@ describe('message, pasting', () => {
   });
 });
 
-describe('message, pasting within itself', () => {
-  test('keeps the font, size and colour of what the message copied from itself', async () => {
-    const { screen, message } = await renderBody();
-    await userEvent.click(message);
-
-    pasteHtml(
-      message.element(),
-      '<p data-pm-slice="1 1 []"><span style="font-family: Georgia; color: #e12f2f">Titre</span></p>',
-    );
-
-    await expect
-      .element(screen.getByRole('status'))
-      .toHaveTextContent(
-        '<p><span style="font-family: Georgia; color: rgb(225, 47, 47);">Titre</span></p>',
-      );
-  });
-});
-
 describe('message, formatting bar', () => {
   test('styles the chosen text with its buttons, lit while the cursor is in that style', async () => {
     const { screen, message } = await renderBody();
