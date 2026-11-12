@@ -81,18 +81,12 @@ function useTextStyle(editor: Editor) {
   return { current, chooseFont, chooseSize, chooseColour };
 }
 
-interface TextStyleControlsProps {
-  editor: Editor;
-  /** Whether the colour is offered too, as it is once the formatting bar is unfolded. */
-  withColour: boolean;
-}
-
 /**
- * The font, the size and the colour of the text: the fonts and colours from menus that show them
- * as they will look, the size as a number of points. The defaults leave the text as the mail has it.
+ * The font and the size of the text: the fonts from a menu that shows them as they will look, the
+ * size as a number of points. The defaults leave the text as the mail has it.
  */
-export function TextStyleControls({ editor, withColour }: TextStyleControlsProps) {
-  const { current, chooseFont, chooseSize, chooseColour } = useTextStyle(editor);
+export function FontAndSize({ editor }: { editor: Editor }) {
+  const { current, chooseFont, chooseSize } = useTextStyle(editor);
   return (
     <>
       <ChoiceMenu
@@ -115,23 +109,28 @@ export function TextStyleControls({ editor, withColour }: TextStyleControlsProps
         decreaseLabel={fr.compose.decreaseSize}
         increaseLabel={fr.compose.increaseSize}
       />
-      {withColour && (
-        <ChoiceMenu
-          label={fr.compose.colour}
-          choices={colourChoices}
-          value={current.colour?.id ?? 'auto'}
-          onChoose={chooseColour}
-          columns={4}
-        >
-          <span className="relative grid size-5 place-items-center font-semibold">
-            A
-            <span
-              className="absolute inset-x-0.5 -bottom-0.5 h-1 rounded-full bg-ink"
-              style={{ backgroundColor: current.colour?.colour }}
-            />
-          </span>
-        </ChoiceMenu>
-      )}
     </>
+  );
+}
+
+/** The colour of the text, from swatches; "Automatique" leaves it to whoever reads the mail. */
+export function ColourMenu({ editor }: { editor: Editor }) {
+  const { current, chooseColour } = useTextStyle(editor);
+  return (
+    <ChoiceMenu
+      label={fr.compose.colour}
+      choices={colourChoices}
+      value={current.colour?.id ?? 'auto'}
+      onChoose={chooseColour}
+      columns={4}
+    >
+      <span className="relative grid size-5 place-items-center font-semibold">
+        A
+        <span
+          className="absolute inset-x-0.5 -bottom-0.5 h-1 rounded-full bg-ink"
+          style={{ backgroundColor: current.colour?.colour }}
+        />
+      </span>
+    </ChoiceMenu>
   );
 }

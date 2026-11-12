@@ -79,6 +79,21 @@ export function IconButtonSection() {
         </Toolbar>
         <SampleName name="<Toolbar>, <ToolbarSeparator>, <ChoiceMenu> et <NumberStepper> · Tab y entre une fois, les flèches passent d’un bouton à l’autre ; le menu s’ouvre sur le choix en cours ; le nombre se tape ou s’ajuste de un en un" />
       </div>
+      <div className="flex flex-col items-start gap-2">
+        <Toolbar label="Mise en forme de la sélection" floating>
+          <IconButton label="Gras" shortcut="⌘B" pressed>
+            <BoldIcon />
+          </IconButton>
+          <IconButton label="Italique" shortcut="⌘I" pressed={false}>
+            <ItalicIcon />
+          </IconButton>
+          <ToolbarSeparator />
+          <IconButton label="Centrer" shortcut="⌘⇧E" pressed={false}>
+            <TextAlignCenterIcon />
+          </IconButton>
+        </Toolbar>
+        <SampleName name="<Toolbar floating> · au-dessus de la page, comme sur le texte choisi" />
+      </div>
     </CatalogSection>
   );
 }
