@@ -1,6 +1,4 @@
-import * as z from 'zod';
-
-const addressSchema = z.email();
+import { isMailAddress } from './is-mail-address.ts';
 
 /** The address between angle brackets that ends a recipient written with its name. */
 const NAMED_ADDRESS = /<([^<>]*)>\s*$/;
@@ -11,5 +9,5 @@ const NAMED_ADDRESS = /<([^<>]*)>\s*$/;
  */
 export function isValidRecipient(recipient: string): boolean {
   const address = NAMED_ADDRESS.exec(recipient)?.[1] ?? recipient;
-  return addressSchema.safeParse(address.trim()).success;
+  return isMailAddress(address.trim());
 }

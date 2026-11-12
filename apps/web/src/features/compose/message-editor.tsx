@@ -8,6 +8,7 @@ import { type Editor, EditorContent, useEditor } from '@tiptap/react';
 import { StarterKit } from '@tiptap/starter-kit';
 import { useState } from 'react';
 import { fr } from '../../i18n/fr.ts';
+import { linkHref } from './link-href.ts';
 import { mailFonts } from './mail-text-styles.ts';
 import { PasteWithoutForeignStyles } from './paste-without-foreign-styles.ts';
 
@@ -27,12 +28,14 @@ const extensions = [
     link: false,
   }),
   // What is typed right after a link is not part of it. A link opens from a mail being read, never
-  // from the one being written; an address typed, or pasted on some text, becomes a link.
+  // from the one being written; an address typed, or pasted on some text, becomes a link. Written,
+  // typed or pasted, a link leads to a web page or a mail address, nowhere else.
   Link.extend({ inclusive: () => false }).configure({
     openOnClick: false,
     autolink: true,
     linkOnPaste: true,
     defaultProtocol: 'https',
+    isAllowedUri: (url) => linkHref(url) !== undefined,
   }),
   TextAlign.configure({ types: ['paragraph'], alignments: ['left', 'center', 'right'] }),
   TextStyle,

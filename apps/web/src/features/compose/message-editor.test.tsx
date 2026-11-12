@@ -111,6 +111,25 @@ describe('message, pasting', () => {
   });
 });
 
+describe('message, pasting links', () => {
+  // Regression: pasted links could lead to a phone number or a file server, unlike those written.
+  test('keeps only the links to a web page or a mail address', async () => {
+    const { screen, message } = await renderBody();
+    await userEvent.click(message);
+
+    pasteHtml(
+      message.element(),
+      '<p><a href="tel:+33612345678">appeler</a> <a href="ftp://exemple.fr">fichier</a> <a href="mailto:nom@exemple.fr">écrire</a></p>',
+    );
+
+    await expect
+      .element(screen.getByRole('status'))
+      .toHaveTextContent(
+        '<p>appeler fichier <a target="_blank" rel="noopener noreferrer nofollow" href="mailto:nom@exemple.fr">écrire</a></p>',
+      );
+  });
+});
+
 describe('message, formatting bar', () => {
   test('styles the chosen text with its buttons, lit while the cursor is in that style', async () => {
     const { screen, message } = await renderBody();
