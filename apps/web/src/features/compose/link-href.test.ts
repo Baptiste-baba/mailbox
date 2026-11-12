@@ -25,6 +25,10 @@ describe('linkHref', () => {
     'tel:+33612345678',
     '<nom@exemple.fr>',
     'mailto:<nom@exemple.fr>',
+    '\u0001javascript:alert(1)',
+    'java\u0000script:alert(1)',
+    'https://exemple\u200B.fr',
+    'https://exemple.fr/\u202Epage',
   ])('refuses %s', (typed) => {
     expect(linkHref(typed)).toBeUndefined();
   });

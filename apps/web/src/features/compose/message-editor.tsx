@@ -35,7 +35,7 @@ const extensions = [
     autolink: true,
     linkOnPaste: true,
     defaultProtocol: 'https',
-    isAllowedUri: (url) => linkHref(url) !== undefined,
+    isAllowedUri: (url, { defaultValidate }) => defaultValidate(url) && linkHref(url) !== undefined,
   }),
   TextAlign.configure({ types: ['paragraph'], alignments: ['left', 'center', 'right'] }),
   TextStyle,
