@@ -27,7 +27,11 @@ function useLinkEditing(editor: Editor, onDone: () => void) {
       setInvalid(true);
       return;
     }
-    const chain = editor.chain().focus().extendMarkRange('link');
+    // Only the link the cursor is in changes: one right next to the cursor stays as it is.
+    const chain =
+      start.href === undefined
+        ? editor.chain().focus()
+        : editor.chain().focus().extendMarkRange('link');
     const link = { type: 'link', attrs: { href } };
     const shown = text.trim() || address.trim();
     (needsText
@@ -124,9 +128,10 @@ interface LinkPanelProps {
 export function LinkPanel({ editor, onDone }: LinkPanelProps) {
   const link = useLinkEditing(editor, onDone);
   const errorId = useId();
-  // Escape gives up the link only: the new mail stays open.
+  // Escape gives up the link only: the new mail stays open. While an input method composes a
+  // word, Escape is its own.
   const onKeyDown = (event: KeyboardEvent) => {
-    if (event.key === 'Escape') {
+    if (event.key === 'Escape' && !event.nativeEvent.isComposing) {
       event.stopPropagation();
       link.cancel();
     }

@@ -94,3 +94,37 @@ describe('new mail, links refused or given up', () => {
       .toHaveTextContent('https://exemple.fr/programme');
   });
 });
+
+describe('new mail, links next to each other', () => {
+  // Regression: a link written right after another one took its place.
+  test('writes a link right after another without replacing it', async () => {
+    const { message } = await writeMessage('Voir ');
+
+    await userEvent.keyboard(`{${MOD}>}k{/${MOD}}premier{Tab}un.fr{Enter}`);
+    await userEvent.keyboard(`{${MOD}>}k{/${MOD}}second{Tab}deux.fr{Enter}`);
+
+    await expect
+      .element(message.getByRole('link', { name: 'premier' }))
+      .toHaveAttribute('href', 'https://un.fr');
+    await expect
+      .element(message.getByRole('link', { name: 'second' }))
+      .toHaveAttribute('href', 'https://deux.fr');
+  });
+
+  // Regression: Escape that closes the word list of an input method also gave up the link.
+  test('leaves Escape to an input method composing a word', async () => {
+    const { screen } = await writeMessage('Voir ');
+    await userEvent.keyboard(`{${MOD}>}k{/${MOD}}nihon`);
+    const text = screen.getByRole('textbox', { name: 'Texte' });
+
+    text
+      .element()
+      .dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'Escape', isComposing: true, bubbles: true }),
+      );
+    // Giving up would take the field away before the typing goes on.
+    await userEvent.type(text, ' san');
+
+    await expect.element(text).toHaveValue('nihon san');
+  });
+});
