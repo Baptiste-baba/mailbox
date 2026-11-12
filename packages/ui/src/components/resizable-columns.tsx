@@ -1,33 +1,14 @@
 import type { ComponentProps, ReactNode } from 'react';
 import {
   Group,
-  type LayoutStorage,
   Panel,
   type PanelImperativeHandle,
   Separator,
   useDefaultLayout,
   usePanelRef,
 } from 'react-resizable-panels';
+import { deviceStorage } from '../device-storage.ts';
 import { joinClassNames } from '../join-class-names.ts';
-
-// The browser may refuse storage (private window, blocked site data): the columns then simply
-// start at their default widths.
-const deviceStorage: LayoutStorage = {
-  getItem: (key) => {
-    try {
-      return window.localStorage.getItem(key);
-    } catch {
-      return null;
-    }
-  },
-  setItem: (key, value) => {
-    try {
-      window.localStorage.setItem(key, value);
-    } catch {
-      // Not remembered on this device: the layout still works for this session.
-    }
-  },
-};
 
 interface ResizableColumnsProps {
   /** Names the layout, to remember the widths the user chose on this device. */

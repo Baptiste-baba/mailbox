@@ -90,6 +90,8 @@ export const fr = {
     bodyPlaceholder: 'Écris ton message…',
     discard: 'Supprimer le brouillon',
     formatting: 'Mise en forme',
+    moreFormatting: 'Plus de mise en forme',
+    lessFormatting: 'Moins de mise en forme',
     bold: 'Gras',
     italic: 'Italique',
     underline: 'Souligné',

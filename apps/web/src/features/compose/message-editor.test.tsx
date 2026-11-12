@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { describe, expect, test } from 'vitest';
+import { afterEach, describe, expect, test } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 import { MODIFIER_KEY as MOD } from '../../testing/modifier-key.ts';
@@ -23,6 +23,17 @@ async function renderBody() {
   const screen = await render(<Body />);
   return { screen, message: screen.getByRole('textbox', { name: 'Message' }) };
 }
+
+/** The bar with all of its options, as it shows once unfolded. */
+async function renderBodyUnfolded() {
+  const rendered = await renderBody();
+  await rendered.screen.getByRole('button', { name: 'Plus de mise en forme' }).click();
+  return rendered;
+}
+
+afterEach(() => {
+  localStorage.clear();
+});
 
 /** Pastes `html` in the editor, as the clipboard would after a copy from a web page. */
 function pasteHtml(target: Element, html: string) {
@@ -138,7 +149,7 @@ describe('message, formatting bar', () => {
   });
 
   test('aligns and lists the paragraph at the cursor, then clears it all', async () => {
-    const { screen, message } = await renderBody();
+    const { screen, message } = await renderBodyUnfolded();
     await userEvent.type(message, 'Important');
 
     await screen.getByRole('button', { name: 'Centrer' }).click();
@@ -166,7 +177,7 @@ describe('message, font, size and colour', () => {
   });
 
   test('gives the chosen text the font, size and colour picked from the menus', async () => {
-    const { screen, message } = await renderBody();
+    const { screen, message } = await renderBodyUnfolded();
     await userEvent.type(message, 'Important');
     await userEvent.keyboard(`{${MOD}>}a{/${MOD}}`);
 
