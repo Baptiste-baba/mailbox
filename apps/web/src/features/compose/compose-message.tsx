@@ -17,22 +17,19 @@ interface ComposeMessageProps {
  */
 export function ComposeMessage({ draft, onChange }: ComposeMessageProps) {
   const [writingLink, setWritingLink] = useState(false);
-  const editor = useMessageEditor(
-    draft.body,
-    (body) => onChange({ body }),
-    () => setWritingLink(true),
-  );
+  const writeLink = () => setWritingLink(true);
+  const editor = useMessageEditor(draft.body, (body) => onChange({ body }), writeLink);
   return (
     <>
       <div className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-none">
         <ComposeEnvelope draft={draft} onChange={onChange} />
         <MessageEditor editor={editor} />
-        <SelectionBubble editor={editor} onWriteLink={() => setWritingLink(true)} />
+        <SelectionBubble editor={editor} onWriteLink={writeLink} />
       </div>
       {writingLink ? (
         <LinkPanel editor={editor} onDone={() => setWritingLink(false)} />
       ) : (
-        <FormatBar editor={editor} onWriteLink={() => setWritingLink(true)} />
+        <FormatBar editor={editor} onWriteLink={writeLink} />
       )}
     </>
   );

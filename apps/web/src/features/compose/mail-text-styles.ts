@@ -33,7 +33,7 @@ export const DEFAULT_SIZE = 12;
 export const MIN_SIZE = 1;
 export const MAX_SIZE = 100;
 
-interface MailColour {
+export interface MailColour {
   id: string;
   label: string;
   /** Unset for the text colour of whoever reads the mail, dark on light or light on dark. */

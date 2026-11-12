@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { afterEach, describe, expect, test } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
-import { MODIFIER_KEY as MOD } from '../../testing/modifier-key.ts';
 import { FormatBar } from './format-bar.tsx';
 import { MessageEditor, useMessageEditor } from './message-editor.tsx';
 
@@ -57,13 +56,13 @@ describe('message, typing', () => {
     const { screen, message } = await renderBody();
     await userEvent.type(message, 'Important');
 
-    await userEvent.keyboard(`{${MOD}>}a{/${MOD}}`);
-    await userEvent.keyboard(`{${MOD}>}biu{/${MOD}}`);
+    await userEvent.keyboard(`{ControlOrMeta>}a{/ControlOrMeta}`);
+    await userEvent.keyboard(`{ControlOrMeta>}biu{/ControlOrMeta}`);
     await expect
       .element(screen.getByRole('status'))
       .toHaveTextContent('<p><strong><em><u>Important</u></em></strong></p>');
 
-    await userEvent.keyboard(`{${MOD}>}z{/${MOD}}`);
+    await userEvent.keyboard(`{ControlOrMeta>}z{/ControlOrMeta}`);
     await expect
       .element(screen.getByRole('status'))
       .toHaveTextContent('<p><strong><em>Important</em></strong></p>');
@@ -116,7 +115,7 @@ describe('message, formatting bar', () => {
   test('styles the chosen text with its buttons, lit while the cursor is in that style', async () => {
     const { screen, message } = await renderBody();
     await userEvent.type(message, 'Important');
-    await userEvent.keyboard(`{${MOD}>}a{/${MOD}}`);
+    await userEvent.keyboard(`{ControlOrMeta>}a{/ControlOrMeta}`);
     const bold = screen.getByRole('button', { name: 'Gras' });
     await expect.element(bold).toHaveAttribute('aria-pressed', 'false');
 
@@ -161,7 +160,7 @@ describe('message, font, size and colour', () => {
   test('gives the chosen text the font, size and colour picked from the menus', async () => {
     const { screen, message } = await renderBody();
     await userEvent.type(message, 'Important');
-    await userEvent.keyboard(`{${MOD}>}a{/${MOD}}`);
+    await userEvent.keyboard(`{ControlOrMeta>}a{/ControlOrMeta}`);
 
     await screen.getByRole('button', { name: 'Police' }).click();
     await screen.getByRole('menuitemradio', { name: 'Georgia' }).click();
@@ -187,7 +186,7 @@ describe('message, size and the defaults', () => {
   test('steps the size of the chosen text by one point with its buttons', async () => {
     const { screen, message } = await renderBody();
     await userEvent.type(message, 'Important');
-    await userEvent.keyboard(`{${MOD}>}a{/${MOD}}`);
+    await userEvent.keyboard(`{ControlOrMeta>}a{/ControlOrMeta}`);
 
     await screen.getByRole('button', { name: 'Agrandir la taille' }).click();
     await screen.getByRole('button', { name: 'Agrandir la taille' }).click();
@@ -203,7 +202,7 @@ describe('message, size and the defaults', () => {
   test('goes back to the font and size of the mail with the first choices', async () => {
     const { screen, message } = await renderBody();
     await userEvent.type(message, 'Important');
-    await userEvent.keyboard(`{${MOD}>}a{/${MOD}}`);
+    await userEvent.keyboard(`{ControlOrMeta>}a{/ControlOrMeta}`);
     await screen.getByRole('button', { name: 'Police' }).click();
     await screen.getByRole('menuitemradio', { name: 'Verdana' }).click();
 

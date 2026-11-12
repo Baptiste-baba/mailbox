@@ -128,3 +128,18 @@ describe('message, dragging and dropping', () => {
     expect(styled).not.toContain('web');
   });
 });
+
+describe('message, pasting plain text', () => {
+  // Regression: plain text pasted in red text lost the red it takes from where it lands.
+  test('gives plain text the font, size and colour of where it is pasted', async () => {
+    const { message } = await writeRedTitle();
+    await userEvent.keyboard('{ArrowRight}');
+    const clipboard = new DataTransfer();
+    clipboard.setData('text/plain', 'Rouge');
+
+    clipboardEvent(message.element(), 'paste', clipboard);
+
+    await expect.element(message).toHaveTextContent('suite TitreRouge');
+    expect(coloursOf(message, 'Rouge')).toEqual([red]);
+  });
+});

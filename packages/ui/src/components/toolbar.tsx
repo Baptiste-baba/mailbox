@@ -5,6 +5,7 @@ import {
   useLayoutEffect,
   useRef,
 } from 'react';
+import { floatingSurfaceClassNames } from '../floating-surface-class-names.ts';
 import { joinClassNames } from '../join-class-names.ts';
 
 interface ToolbarProps {
@@ -84,7 +85,7 @@ export function Toolbar({ label, children, floating = false, className }: Toolba
       onKeyDown={onKeyDown}
       className={joinClassNames(
         'flex flex-wrap items-center gap-0.5',
-        floating ? 'rounded-lg border border-line bg-surface p-1 text-ink shadow-card' : undefined,
+        floating ? joinClassNames('p-1', floatingSurfaceClassNames) : undefined,
         className,
       )}
     >

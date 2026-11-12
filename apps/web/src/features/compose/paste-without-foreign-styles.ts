@@ -66,9 +66,10 @@ export const PasteWithoutForeignStyles = Extension.create({
           }),
         }),
         props: {
-          transformPasted: (slice, view) => {
+          // Plain text brings no style of its own: it takes those of where it lands.
+          transformPasted: (slice, view, plain) => {
             const textStyle = view.state.schema.marks.textStyle;
-            return fromHere || textStyle === undefined
+            return fromHere || plain || textStyle === undefined
               ? slice
               : new Slice(withoutMark(slice.content, textStyle), slice.openStart, slice.openEnd);
           },

@@ -1,7 +1,14 @@
 import { type Choice, ChoiceMenu, NumberStepper } from '@mailbox/ui';
-import { type ChainedCommands, type Editor, useEditorState } from '@tiptap/react';
+import { type Editor, useEditorState } from '@tiptap/react';
 import { fr } from '../../i18n/fr.ts';
-import { DEFAULT_SIZE, MAX_SIZE, MIN_SIZE, mailColours, mailFonts } from './mail-text-styles.ts';
+import {
+  DEFAULT_SIZE,
+  MAX_SIZE,
+  type MailColour,
+  MIN_SIZE,
+  mailColours,
+  mailFonts,
+} from './mail-text-styles.ts';
 
 /** The first font of a font list, however the browser writes it back: "Courier New". */
 function firstFont(stack: string): string {
@@ -17,6 +24,13 @@ function normalColour(colour: string): string {
 
 const defaultFont = mailFonts[0];
 
+/** The colours of the palette by the way the browser writes them, to tell the one at the cursor. */
+const paletteColours = new Map(
+  mailColours.flatMap((choice): [string, MailColour][] =>
+    choice.colour === undefined ? [] : [[normalColour(choice.colour), choice]],
+  ),
+);
+
 const fontChoices: Choice[] = mailFonts.map((font) => ({
   value: font.name,
   label: font.name,
@@ -28,14 +42,7 @@ const colourChoices: Choice[] = mailColours.map((colour) => ({
   value: colour.id,
   label: colour.label,
   content: (
-    <span
-      className={
-        colour.colour === undefined
-          ? 'block size-5 rounded-full bg-ink'
-          : 'block size-5 rounded-full'
-      }
-      style={{ backgroundColor: colour.colour }}
-    />
+    <span className="block size-5 rounded-full bg-ink" style={{ backgroundColor: colour.colour }} />
   ),
 }));
 
@@ -43,31 +50,25 @@ const colourChoices: Choice[] = mailColours.map((colour) => ({
 function styleAtCursor(editor: Editor) {
   const { fontFamily, fontSize, color }: Record<string, unknown> =
     editor.getAttributes('textStyle');
-  const font = mailFonts.find(
-    (candidate) => typeof fontFamily === 'string' && candidate.name === firstFont(fontFamily),
-  );
+  const fontName = typeof fontFamily === 'string' ? firstFont(fontFamily) : undefined;
   const size = typeof fontSize === 'string' ? Number.parseFloat(fontSize) : Number.NaN;
-  const colour = mailColours.find(
-    (candidate) =>
-      candidate.colour !== undefined &&
-      typeof color === 'string' &&
-      normalColour(candidate.colour) === normalColour(color),
-  );
-  return { font: font ?? defaultFont, size: Number.isFinite(size) ? size : DEFAULT_SIZE, colour };
+  return {
+    font: mailFonts.find((font) => font.name === fontName) ?? defaultFont,
+    size: Number.isFinite(size) ? size : DEFAULT_SIZE,
+    colour: typeof color === 'string' ? paletteColours.get(normalColour(color)) : undefined,
+  };
 }
 
 /** The font, size and colour at the cursor, and what choosing another one does to the text. */
 function useTextStyle(editor: Editor) {
   const current = useEditorState({ editor, selector: ({ editor: at }) => styleAtCursor(at) });
-  const run = (apply: (chain: ChainedCommands) => ChainedCommands) =>
-    apply(editor.chain().focus()).run();
   const chooseFont = (name: string) => {
     const font = mailFonts.find((candidate) => candidate.name === name);
-    run((chain) =>
-      font === undefined || font === defaultFont
-        ? chain.unsetFontFamily()
-        : chain.setFontFamily(font.stack),
-    );
+    const chain = editor.chain().focus();
+    (font === undefined || font === defaultFont
+      ? chain.unsetFontFamily()
+      : chain.setFontFamily(font.stack)
+    ).run();
   };
   // The size is stepped from its own field, which keeps the keyboard until Enter.
   const chooseSize = (size: number) => {
@@ -76,7 +77,8 @@ function useTextStyle(editor: Editor) {
   };
   const chooseColour = (id: string) => {
     const colour = mailColours.find((candidate) => candidate.id === id)?.colour;
-    run((chain) => (colour === undefined ? chain.unsetColor() : chain.setColor(colour)));
+    const chain = editor.chain().focus();
+    (colour === undefined ? chain.unsetColor() : chain.setColor(colour)).run();
   };
   return { current, chooseFont, chooseSize, chooseColour };
 }
