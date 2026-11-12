@@ -1,23 +1,31 @@
 import { afterEach, describe, expect, test, vi } from 'vitest';
-import { userEvent } from 'vitest/browser';
+import { page, userEvent } from 'vitest/browser';
 import { fakeApi } from '../../testing/fake-api.ts';
 import { MODIFIER_KEY as MOD } from '../../testing/modifier-key.ts';
 import { renderApp } from '../../testing/render-app.tsx';
 
-afterEach(() => {
+afterEach(async () => {
   vi.unstubAllGlobals();
   localStorage.clear();
+  await page.viewport(1440, 900);
 });
 
-const commonOptions = ['Police', 'Gras', 'Italique', 'Souligné', 'Liste à puces', 'Lien'];
-const moreOptions = ['Couleur du texte', 'Barré', 'Centrer', 'Effacer la mise en forme'];
+const commonOptions = [
+  'Police',
+  'Couleur du texte',
+  'Gras',
+  'Italique',
+  'Souligné',
+  'Liste à puces',
+  'Lien',
+];
+const moreOptions = ['Barré', 'Centrer', 'Liste numérotée', 'Effacer la mise en forme'];
 
 describe('new mail, formatting bar', () => {
   // Regression: the closed menus stayed on screen, over the buttons of the bar.
   test('shows the choices of its menus only once they are opened', async () => {
     fakeApi();
     const { screen } = await renderApp('/inbox/new');
-    await screen.getByRole('button', { name: 'Plus de mise en forme' }).click();
     await expect.element(screen.getByRole('button', { name: 'Police' })).toBeVisible();
 
     for (const name of ['Police', 'Couleur du texte']) {
@@ -97,5 +105,28 @@ describe('new mail, formatting bar folded', () => {
 
     await expect.element(message.getByText('Important')).toHaveStyle({ textAlign: 'center' });
     await expect.element(screen.getByRole('button', { name: 'Centrer' })).not.toBeInTheDocument();
+  });
+});
+
+/** The rows a toolbar takes, from where its controls sit. */
+function rowsOf(toolbar: Element): number {
+  return new Set([...toolbar.children].map((control) => control.getBoundingClientRect().top)).size;
+}
+
+describe('new mail, formatting bar folded, in a narrow window', () => {
+  test('stays on one line in a window 1280 px wide, whatever the font', async () => {
+    await page.viewport(1280, 800);
+    fakeApi();
+    const { screen } = await renderApp('/inbox/new');
+    const bar = screen.getByRole('toolbar', { name: 'Mise en forme', exact: true });
+    await expect.element(bar).toBeVisible();
+
+    await bar.getByRole('button', { name: 'Police' }).click();
+    await screen.getByRole('menuitemradio', { name: 'Times New Roman' }).click();
+
+    await expect
+      .element(bar.getByRole('button', { name: 'Police' }))
+      .toHaveTextContent('Times New Roman');
+    expect(rowsOf(bar.element())).toBe(1);
   });
 });

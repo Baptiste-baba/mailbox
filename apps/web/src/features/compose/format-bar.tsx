@@ -9,7 +9,7 @@ import {
   toggleGroups,
   useFormatting,
 } from './format-controls.tsx';
-import { ColourMenu, FontAndSize } from './text-style-controls.tsx';
+import { ColourMenu, FontMenu, SizeStepper } from './text-style-controls.tsx';
 import { useFormatBarUnfolded } from './use-format-bar-unfolded.ts';
 
 interface FormatBarProps {
@@ -29,8 +29,9 @@ export function FormatBar({ editor, onWriteLink }: FormatBarProps) {
   return (
     <Toolbar label={fr.compose.formatting} className="flex-none border-t border-line px-4 py-1.5">
       <ToolbarGroup>
-        <FontAndSize editor={editor} />
-        {unfolded && <ColourMenu editor={editor} />}
+        <FontMenu editor={editor} />
+        <SizeStepper editor={editor} />
+        <ColourMenu editor={editor} />
         <ToolbarSeparator />
       </ToolbarGroup>
       {(unfolded ? toggleGroups : commonToggleGroups).map((group) => (

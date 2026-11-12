@@ -100,5 +100,5 @@ export function ToolbarGroup({ children }: { children: ReactNode }) {
 
 /** A thin line between groups of controls in a toolbar. */
 export function ToolbarSeparator() {
-  return <hr aria-orientation="vertical" className="mx-1.5 h-5 w-px border-0 bg-line" />;
+  return <hr aria-orientation="vertical" className="mx-1 h-5 w-px border-0 bg-line" />;
 }

@@ -44,12 +44,20 @@ describe('new mail, bubble over the chosen text', () => {
     await expect.element(bubble).not.toBeInTheDocument();
   });
 
-  test('colours the chosen words, and asks for their link', async () => {
+  test('gives the chosen words a font and a colour, and asks for their link', async () => {
     const { screen, message, bubble } = await renderWithWordChosen();
+
+    await bubble.getByRole('button', { name: 'Police' }).click();
+    await screen.getByRole('menuitemradio', { name: 'Georgia' }).click();
+    await expect
+      .element(bubble.getByRole('button', { name: 'Police' }))
+      .toHaveTextContent('Georgia');
 
     await bubble.getByRole('button', { name: 'Couleur du texte' }).click();
     await screen.getByRole('menuitemradio', { name: 'Rouge' }).click();
-    await expect.element(message.getByText('important')).toHaveStyle({ color: 'rgb(225, 47, 47)' });
+    await expect
+      .element(message.getByText('important'))
+      .toHaveStyle({ color: 'rgb(225, 47, 47)', fontFamily: 'Georgia, "Times New Roman", serif' });
 
     await bubble.getByRole('button', { name: 'Lien' }).click();
     await expect.element(screen.getByRole('textbox', { name: 'Adresse' })).toHaveFocus();
@@ -62,7 +70,7 @@ describe('new mail, bubble over the chosen text, from the keyboard', () => {
     await expect.element(bubble).toBeVisible();
 
     await userEvent.keyboard('{Tab}');
-    await expect.element(bubble.getByRole('button', { name: 'Gras' })).toHaveFocus();
+    await expect.element(bubble.getByRole('button', { name: 'Police' })).toHaveFocus();
 
     await userEvent.keyboard('{Tab}');
     await expect.element(bubble).not.toBeInTheDocument();

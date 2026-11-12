@@ -177,7 +177,7 @@ describe('message, font, size and colour', () => {
   });
 
   test('gives the chosen text the font, size and colour picked from the menus', async () => {
-    const { screen, message } = await renderBodyUnfolded();
+    const { screen, message } = await renderBody();
     await userEvent.type(message, 'Important');
     await userEvent.keyboard(`{${MOD}>}a{/${MOD}}`);
 
