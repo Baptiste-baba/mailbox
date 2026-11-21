@@ -108,7 +108,8 @@
     {
       "includes": [
         "packages/providers/src/gmail/google-token-answers.ts",
-        "packages/providers/src/gmail/*.test.ts"
+        "packages/providers/src/gmail/*.test.ts",
+        "apps/api/test/fake-google.ts"
       ],
       "linter": {
         "rules": {

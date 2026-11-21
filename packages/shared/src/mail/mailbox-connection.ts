@@ -6,6 +6,13 @@ const MAILBOX_NAME_MAX_LENGTH = 40;
 
 export const mailboxIdSchema = z.uuid();
 
+/**
+ * The page of the web app a provider sends the browser back to once the user signed in there.
+ * Whoever installs the app registers this address at the provider: changing it breaks every
+ * installation until they register the new one.
+ */
+export const MAILBOX_CONNECTION_PATH = '/mailbox-connection';
+
 /** Adding a mailbox: what the user chose before signing in at the provider. */
 export const mailboxConnectionRequestSchema = z.object({
   provider: mailProviderNameSchema,

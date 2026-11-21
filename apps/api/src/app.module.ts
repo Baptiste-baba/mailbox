@@ -8,7 +8,7 @@ import { createValidationPipe } from './errors/create-validation-pipe.ts';
 import { GlobalExceptionFilter } from './errors/global-exception.filter.ts';
 import { HealthModule } from './health/health.module.ts';
 import { createHttpLoggerOptions } from './logging/logger-options.ts';
-import { MailboxesModule } from './mailboxes/mailboxes.module.ts';
+import { createMailboxesModule } from './mailboxes/mailboxes.module.ts';
 import { ThreadsModule } from './threads/threads.module.ts';
 
 @Module({})
@@ -22,7 +22,7 @@ export function createAppModule(config: ApiConfig): DynamicModule {
       DatabaseModule.register(config.databaseUrl),
       HealthModule,
       createAuthModule(config.secretKey, config.appUrl),
-      MailboxesModule,
+      createMailboxesModule(config),
       ThreadsModule,
     ],
     providers: [

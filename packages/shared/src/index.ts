@@ -59,6 +59,7 @@ export {
   type ProviderGrant,
 } from './mail/mail-provider.ts';
 export {
+  MAILBOX_CONNECTION_PATH,
   type MailboxAuthorization,
   type MailboxConnectionCompletion,
   type MailboxConnectionRequest,

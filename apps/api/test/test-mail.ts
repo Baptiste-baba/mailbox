@@ -1,16 +1,36 @@
 import { randomUUID } from 'node:crypto';
-import { type Database, mailbox, message, thread } from '@mailbox/db';
-import { sql } from 'drizzle-orm';
+import { type Database, mailbox, message, SecretBox, thread } from '@mailbox/db';
+import { eq, sql } from 'drizzle-orm';
 
 /** What stands for the encrypted token of a test mailbox: no answer of the api may contain it. */
 export const TEST_REFRESH_TOKEN = 'sealed-refresh-token';
+
+function testSecretBox(): SecretBox {
+  return new SecretBox(Buffer.from(process.env.MAILBOX_SECRET_KEY ?? '', 'base64'));
+}
+
+/** A refresh token as the api stores it, encrypted with the key of `.env.test`. */
+export function sealTestToken(refreshToken: string): string {
+  return testSecretBox().seal(refreshToken);
+}
+
+/** The stored fields of a mailbox, its refresh token in clear, or nothing when it is gone. */
+export async function storedMailbox(database: Database, mailboxId: string) {
+  const [stored] = await database.select().from(mailbox).where(eq(mailbox.id, mailboxId));
+  return stored && { ...stored, refreshToken: testSecretBox().open(stored.refreshTokenEncrypted) };
+}
 
 /** No mailbox, and so no mail: everything a mailbox owns goes with it. */
 export async function resetMailTables(database: Database): Promise<void> {
   await database.execute(sql`truncate mailbox cascade`);
 }
 
-type TestMailbox = Pick<typeof mailbox.$inferInsert, 'name' | 'address' | 'status' | 'createdAt'>;
+type TestMailbox = Pick<
+  typeof mailbox.$inferInsert,
+  'name' | 'address' | 'status' | 'createdAt'
+> & {
+  refreshTokenEncrypted?: string;
+};
 
 /** A connected mailbox, stored as if the user had signed in at the provider: its id. */
 export async function insertTestMailbox(database: Database, values: TestMailbox): Promise<string> {

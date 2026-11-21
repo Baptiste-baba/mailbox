@@ -23,11 +23,15 @@ import type { Request } from 'express';
 import { RecentIdentityConfirmation } from '../auth/recent-identity-confirmation.decorator.ts';
 import { requireSessionToken } from '../auth/session-cookie.ts';
 import { MailboxConnectionService } from './mailbox-connection.service.ts';
+import { MailboxRemovalService } from './mailbox-removal.service.ts';
 
 /** Connecting and removing mailboxes, from the settings. */
 @Controller()
 export class MailboxConnectionController {
-  constructor(private readonly connection: MailboxConnectionService) {}
+  constructor(
+    private readonly connection: MailboxConnectionService,
+    private readonly removal: MailboxRemovalService,
+  ) {}
 
   @Get('mail-providers')
   providers(): MailProviderList {
@@ -69,6 +73,6 @@ export class MailboxConnectionController {
   @Delete('mailboxes/:mailboxId')
   @HttpCode(HttpStatus.NO_CONTENT)
   remove(@Param('mailboxId', { schema: mailboxIdSchema }) mailboxId: string): Promise<void> {
-    return this.connection.remove(mailboxId);
+    return this.removal.remove(mailboxId);
   }
 }
