@@ -3,6 +3,8 @@ dist/
 .turbo/
 .DS_Store
 .env
+# Secrets a developer adds to .env.development, such as the OAuth client of Google.
+.env.development.local
 # Local instructions for Claude Code, kept out of the public repository.
 CLAUDE.md
 .backups/

@@ -63,6 +63,34 @@ less than ten minutes ago. Passkeys work at the address set in `MAILBOX_URL` onl
 
 Sessions only work over HTTPS, such as `tailscale serve` gives, or on `localhost`.
 
+### Connecting Gmail
+
+Google has no shared MailBox application: each installation reads Gmail through its own OAuth
+client, created once in Google Cloud, free of charge. MailBox only asks Google for the right to
+read mail.
+
+Google calls "Personal mode" a client that works for the account that created it and for no other:
+it needs no review by Google, shows no warning when you connect, and its access does not expire.
+Signed in to Google with the account whose mail you want to read:
+1. Open the [Personal mode onboarding](https://console.cloud.google.com/auth/overview/personal)
+   page of the Google Cloud console.
+2. Leave "Create a new project" selected, and choose the application type **Web application**.
+3. Under "Authorized redirect URIs", add the address of `MAILBOX_URL` followed by
+   `/mailbox-connection`, such as `https://mail.your-tailnet.ts.net/mailbox-connection`.
+4. Accept the user data policy, then Continue. Copy the client ID and the client secret right away:
+   Google shows the secret in full only once.
+5. Enable the Gmail API in the project just created: menu › APIs & Services › Library, open
+   "Gmail API", then Enable.
+6. Set `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` in `.env`, then apply with
+   `docker compose up --detach`.
+
+Google may take from five minutes to a few hours to apply a change made to the client. The redirect
+address must match `MAILBOX_URL` exactly: after changing one, change the other.
+
+As such a client serves one Google account, an installation connects the mailbox of one Google
+account for now. With a Google Workspace account, the administrator of the domain may have to allow
+the app first.
+
 ### Lost access
 
 Without the password, or without both the authenticator app and the recovery codes, reset the
@@ -185,6 +213,11 @@ again after an upgrade of Playwright.
 reload the web app on `http://localhost:5173`, the api on `http://127.0.0.1:3000` and the worker
 (health check on port `3001`). Local backups land in `.backups/`. Development and test settings
 live in `.env.development` and `.env.test`; they only hold local values.
+
+To connect Gmail in development, follow "Connecting Gmail" with
+`http://localhost:5173/mailbox-connection` as the redirect address, and write `GOOGLE_CLIENT_ID` and
+`GOOGLE_CLIENT_SECRET` to `.env.development.local` at the root of the repository: Git ignores that
+file, and the api reads it on top of `.env.development`.
 
 `http://localhost:5173/design.html` shows every design token and interface component in both
 themes. It exists in development only.

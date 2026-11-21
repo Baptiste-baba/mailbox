@@ -8,7 +8,7 @@
   ],
   "scripts": {
     "build": "nest build",
-    "dev": "nest start --watch --preserveWatchOutput --env-file ../../.env.development",
+    "dev": "nest start --watch --preserveWatchOutput --env-file ../../.env.development --env-file ../../.env.development.local",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
