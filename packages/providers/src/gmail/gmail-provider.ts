@@ -1,22 +1,14 @@
-import type {
-  AuthorizationCode,
-  AuthorizationRequest,
-  MailProvider,
-  ProviderGrant,
-} from '@mailbox/shared';
+import type { MailProvider } from '@mailbox/shared';
 import type { OauthClient } from '../oauth-client.ts';
+import { googleAuthorizationUrl } from './google-authorization-url.ts';
+import { redeemGoogleCode } from './redeem-google-code.ts';
+import { revokeGoogleToken } from './revoke-google-token.ts';
 
 /** Gmail, personal or Google Workspace, read through the Gmail API. */
-export function createGmailProvider(_client: OauthClient): MailProvider {
+export function createGmailProvider(client: OauthClient): MailProvider {
   return {
-    authorizationUrl(_request: AuthorizationRequest): string {
-      throw new Error('Not implemented yet');
-    },
-    redeem(_code: AuthorizationCode): Promise<ProviderGrant> {
-      throw new Error('Not implemented yet');
-    },
-    revoke(_refreshToken: string): Promise<void> {
-      throw new Error('Not implemented yet');
-    },
+    authorizationUrl: (request) => googleAuthorizationUrl(client.clientId, request),
+    redeem: (code) => redeemGoogleCode(client, code),
+    revoke: revokeGoogleToken,
   };
 }
