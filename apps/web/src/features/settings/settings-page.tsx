@@ -3,23 +3,27 @@ import type { ErrorComponentProps } from '@tanstack/react-router';
 import { useId } from 'react';
 import { fr } from '../../i18n/fr.ts';
 import { PasskeySettings, SessionActions } from '../auth/index.ts';
+import { MailboxSettings } from '../mailboxes/index.ts';
 
-/** The settings of the app: for now, the security of the account. */
+/** The settings of the app: the connected mailboxes, then the security of the account. */
 export function SettingsPage() {
   const securityId = useId();
   return (
     <main className="h-full overflow-y-auto bg-page">
       <div className="mx-auto flex w-full max-w-216 flex-col px-8 pt-5 pb-16">
         <h1 className="text-title font-semibold text-heading">{fr.settings.title}</h1>
-        <section aria-labelledby={securityId} className="mt-8 flex flex-col gap-6">
-          <h2 id={securityId} className="text-subject font-semibold text-heading">
-            {fr.settings.security}
-          </h2>
-          <PasskeySettings />
-          <div className="border-t border-line pt-6">
-            <SessionActions />
-          </div>
-        </section>
+        <div className="mt-8 flex flex-col gap-12">
+          <MailboxSettings />
+          <section aria-labelledby={securityId} className="flex flex-col gap-6">
+            <h2 id={securityId} className="text-subject font-semibold text-heading">
+              {fr.settings.security}
+            </h2>
+            <PasskeySettings />
+            <div className="border-t border-line pt-6">
+              <SessionActions />
+            </div>
+          </section>
+        </div>
       </div>
     </main>
   );
