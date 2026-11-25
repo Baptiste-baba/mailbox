@@ -37,6 +37,7 @@ export { Skeleton } from './components/skeleton.tsx';
 export { StateMessage } from './components/state-message.tsx';
 export { Stepper } from './components/stepper.tsx';
 export { Swatch } from './components/swatch.tsx';
+export { SwatchPicker } from './components/swatch-picker.tsx';
 export { TextField } from './components/text-field.tsx';
 export { Toolbar, ToolbarGroup, ToolbarSeparator } from './components/toolbar.tsx';
 export { deviceStorage } from './device-storage.ts';
