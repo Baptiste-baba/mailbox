@@ -1,6 +1,12 @@
 import { createHash, randomUUID } from 'node:crypto';
 import type { Database } from '@mailbox/db';
-import { mailboxListSchema, mailboxSummarySchema, mailProviderListSchema } from '@mailbox/shared';
+import {
+  errorResponseSchema,
+  mailboxConnectionFailureDetailsSchema,
+  mailboxListSchema,
+  mailboxSummarySchema,
+  mailProviderListSchema,
+} from '@mailbox/shared';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { errorCode } from './auth-requests.ts';
 import { type FakeGoogle, installFakeGoogle } from './fake-google.ts';
@@ -44,6 +50,13 @@ beforeEach(async () => {
 afterEach(() => {
   vi.unstubAllGlobals();
 });
+
+/** Why the api says a connection failed, once checked to be that error. */
+async function connectionFailure(response: Response) {
+  const error = errorResponseSchema.parse(await response.json());
+  expect(error.code).toBe('MAILBOX_CONNECTION_FAILED');
+  return mailboxConnectionFailureDetailsSchema.parse(error.details);
+}
 
 async function listedMailboxes() {
   const response = await callApi(user, 'GET', '/mailboxes');
@@ -200,7 +213,7 @@ describe('a connection that cannot be finished', () => {
     const response = await callApi(user, 'POST', '/mailboxes/connection/completion', COMPLETION);
 
     expect(response.status).toBe(400);
-    expect(await errorCode(response)).toBe('MAILBOX_CONNECTION_FAILED');
+    expect(await connectionFailure(response)).toEqual({ reason: 'connectionExpired' });
     expect(google.redemptions).toHaveLength(0);
   });
 
@@ -211,7 +224,7 @@ describe('a connection that cannot be finished', () => {
     const response = await completeConnection(user, url);
 
     expect(response.status).toBe(400);
-    expect(await errorCode(response)).toBe('MAILBOX_CONNECTION_FAILED');
+    expect(await connectionFailure(response)).toEqual({ reason: 'connectionExpired' });
     expect(await listedMailboxes()).toHaveLength(1);
   });
 
@@ -221,7 +234,10 @@ describe('a connection that cannot be finished', () => {
     const response = await completeConnection(user, await startConnection(user));
 
     expect(response.status).toBe(400);
-    expect(await errorCode(response)).toBe('MAILBOX_CONNECTION_FAILED');
+    expect(await connectionFailure(response)).toEqual({
+      reason: 'codeRefused',
+      providerDetail: 'invalid_grant',
+    });
     expect(await listedMailboxes()).toEqual([]);
   });
 

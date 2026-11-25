@@ -7,6 +7,7 @@ import {
   type MailboxSummary,
   type MailProviderList,
   type MailProviderName,
+  mailboxConnectionFailure,
   type ProviderGrant,
 } from '@mailbox/shared';
 import { Inject, Injectable } from '@nestjs/common';
@@ -85,7 +86,10 @@ export class MailboxConnectionService {
   ): Promise<MailboxSummary> {
     const pending = this.pendingConnections.consume(state, sessionToken);
     if (pending === undefined) {
-      throw new AppError('MAILBOX_CONNECTION_FAILED', 'No connection is waiting for this state');
+      throw mailboxConnectionFailure(
+        'connectionExpired',
+        'No connection is waiting for this state',
+      );
     }
     const { provider, codeVerifier, target } = pending;
     const grant = await requireMailProvider(this.mailProviders, provider).redeem({

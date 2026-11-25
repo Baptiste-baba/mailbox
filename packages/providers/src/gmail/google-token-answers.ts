@@ -12,4 +12,6 @@ export const googleTokenGrantSchema = z.object({
 /** What Google answers when it refuses a request for a token (RFC 6749, section 5.2). */
 export const googleTokenRefusalSchema = z.object({
   error: z.string().regex(/^[a-z_]{1,40}$/),
+  /** A short sentence of Google about the refusal, such as "Malformed auth code.". */
+  error_description: z.string().optional(),
 });

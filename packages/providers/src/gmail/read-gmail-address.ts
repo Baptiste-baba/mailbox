@@ -1,7 +1,8 @@
-import { AppError } from '@mailbox/shared';
+import { mailboxConnectionFailure } from '@mailbox/shared';
 import * as z from 'zod';
 import { readAnswer } from '../http/read-answer.ts';
 import { sendRequest } from '../http/send-request.ts';
+import { readGoogleApiRefusal } from './google-api-refusal.ts';
 
 const PROFILE_ENDPOINT = 'https://gmail.googleapis.com/gmail/v1/users/me/profile';
 
@@ -18,10 +19,11 @@ export async function readGmailAddress(accessToken: string): Promise<string> {
     headers: { authorization: `Bearer ${accessToken}` },
   });
   if (!response.ok) {
-    await response.body?.cancel();
-    throw new AppError(
-      'MAILBOX_CONNECTION_FAILED',
-      `Google refused to give the address of the account (HTTP ${response.status})`,
+    const refusal = await readGoogleApiRefusal(response);
+    throw mailboxConnectionFailure(
+      refusal.apiDisabled ? 'apiDisabled' : 'accountUnreadable',
+      `Google refused to give the address of the account (${refusal.summary})`,
+      refusal.summary,
     );
   }
   const profile = await readAnswer(response, gmailProfileSchema);

@@ -1,4 +1,9 @@
-import { AppError, type AuthorizationCode, type ProviderGrant } from '@mailbox/shared';
+import {
+  type AppError,
+  type AuthorizationCode,
+  mailboxConnectionFailure,
+  type ProviderGrant,
+} from '@mailbox/shared';
 import { readAnswer } from '../http/read-answer.ts';
 import { sendRequest } from '../http/send-request.ts';
 import type { OauthClient } from '../oauth-client.ts';
@@ -10,8 +15,8 @@ const TOKEN_ENDPOINT = 'https://oauth2.googleapis.com/token';
 
 /**
  * Redeems the code Google sent the user back with, and tells which account it was for.
- * @throws AppError MAILBOX_CONNECTION_FAILED when Google refuses the code or the client, or
- * grants less than a lasting read access to the mail.
+ * @throws AppError MAILBOX_CONNECTION_FAILED when Google refuses the code or the client, grants
+ * less than a lasting read access to the mail, or will not tell which account signed in.
  * @throws AppError MAIL_PROVIDER_UNAVAILABLE
  */
 export async function redeemGoogleCode(
@@ -30,14 +35,14 @@ export async function redeemGoogleCode(
     ]),
   });
   if (!response.ok) {
-    throw new AppError('MAILBOX_CONNECTION_FAILED', await refusalMessage(response));
+    throw await refusal(response);
   }
   const grant = await readAnswer(response, googleTokenGrantSchema);
   if (grant.refresh_token === undefined) {
-    throw new AppError('MAILBOX_CONNECTION_FAILED', 'Google granted no lasting access');
+    throw mailboxConnectionFailure('accessNotGranted', 'Google granted no lasting access');
   }
   if (!grant.scope.split(' ').includes(GMAIL_READ_SCOPE)) {
-    throw new AppError('MAILBOX_CONNECTION_FAILED', 'Google granted no read access to the mail');
+    throw mailboxConnectionFailure('accessNotGranted', 'Google granted no read access to the mail');
   }
   return {
     address: await readGmailAddress(grant.access_token),
@@ -45,10 +50,21 @@ export async function redeemGoogleCode(
   };
 }
 
-async function refusalMessage(response: Response): Promise<string> {
+// The codes by which Google says it does not accept the client itself, whatever the code.
+const CLIENT_REFUSALS = new Set(['invalid_client', 'unauthorized_client', 'deleted_client']);
+
+async function refusal(response: Response): Promise<AppError> {
   // A refusal whose body cannot be read is still a refusal: only its reason is lost.
   const body: unknown = await response.json().catch(() => undefined);
-  const refusal = googleTokenRefusalSchema.safeParse(body);
-  const reason = refusal.success ? refusal.data.error : `HTTP ${response.status}`;
-  return `Google refused the code (${reason})`;
+  const parsed = googleTokenRefusalSchema.safeParse(body);
+  if (!parsed.success) {
+    const status = `HTTP ${response.status}`;
+    return mailboxConnectionFailure('codeRefused', `Google refused the code (${status})`, status);
+  }
+  const { error, error_description: description } = parsed.data;
+  return mailboxConnectionFailure(
+    CLIENT_REFUSALS.has(error) ? 'clientRefused' : 'codeRefused',
+    `Google refused the code (${error})`,
+    description === undefined ? error : `${error}: ${description}`,
+  );
 }

@@ -91,8 +91,26 @@ describe('a Gmail connection Google does not fully grant', () => {
     await expect(provider.redeem(code)).rejects.toMatchObject({
       code: 'MAILBOX_CONNECTION_FAILED',
       message: 'Google refused the code (invalid_grant)',
+      details: { reason: 'codeRefused', providerDetail: 'invalid_grant' },
     });
     expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('tells a refused client from a refused code, with what Google says of it', async () => {
+    const refusal = {
+      error: 'invalid_client',
+      error_description: 'The provided client secret is invalid.',
+    };
+    stubGoogle(Response.json(refusal, { status: 401 }));
+
+    await expect(provider.redeem(code)).rejects.toMatchObject({
+      code: 'MAILBOX_CONNECTION_FAILED',
+      message: 'Google refused the code (invalid_client)',
+      details: {
+        reason: 'clientRefused',
+        providerDetail: 'invalid_client: The provided client secret is invalid.',
+      },
+    });
   });
 
   it('repeats nothing of a refusal that is not a plain reason', async () => {
@@ -100,14 +118,18 @@ describe('a Gmail connection Google does not fully grant', () => {
 
     await expect(provider.redeem(code)).rejects.toMatchObject({
       message: 'Google refused the code (HTTP 400)',
+      details: { reason: 'codeRefused', providerDetail: 'HTTP 400' },
     });
   });
+});
 
+describe('a Gmail connection Google grants too little of', () => {
   it('fails when Google grants no token to renew the access', async () => {
     stubGoogle(granted({ access_token: 'the-access-token', scope: READ_SCOPE }));
 
     await expect(provider.redeem(code)).rejects.toMatchObject({
       code: 'MAILBOX_CONNECTION_FAILED',
+      details: { reason: 'accessNotGranted' },
     });
   });
 
@@ -116,18 +138,60 @@ describe('a Gmail connection Google does not fully grant', () => {
 
     await expect(provider.redeem(code)).rejects.toMatchObject({
       code: 'MAILBOX_CONNECTION_FAILED',
+      details: { reason: 'accessNotGranted' },
     });
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 });
 
+describe('a Gmail connection whose account Google will not name', () => {
+  it('says so when the Gmail API is not enabled for the client of the installation', async () => {
+    const disabled = {
+      error: {
+        code: 403,
+        message: 'Gmail API has not been used in project 123 before or it is disabled.',
+        status: 'PERMISSION_DENIED',
+        details: [
+          {
+            '@type': 'type.googleapis.com/google.rpc.ErrorInfo',
+            reason: 'SERVICE_DISABLED',
+            domain: 'googleapis.com',
+          },
+        ],
+      },
+    };
+    stubGoogle(granted(), Response.json(disabled, { status: 403 }));
+
+    await expect(provider.redeem(code)).rejects.toMatchObject({
+      code: 'MAILBOX_CONNECTION_FAILED',
+      details: {
+        reason: 'apiDisabled',
+        providerDetail: 'HTTP 403 PERMISSION_DENIED SERVICE_DISABLED',
+      },
+    });
+  });
+
+  it('gives the status of any other refusal, and none of its sentences', async () => {
+    const refused = {
+      error: { code: 401, message: 'Mail of a@b.example', status: 'UNAUTHENTICATED' },
+    };
+    stubGoogle(granted(), Response.json(refused, { status: 401 }));
+
+    await expect(provider.redeem(code)).rejects.toMatchObject({
+      message: 'Google refused to give the address of the account (HTTP 401 UNAUTHENTICATED)',
+      details: { reason: 'accountUnreadable', providerDetail: 'HTTP 401 UNAUTHENTICATED' },
+    });
+  });
+});
+
 describe('a Gmail connection Google answers oddly to', () => {
-  it('fails when Google refuses to say whose account it is', async () => {
+  it('fails when Google refuses to say whose account it is, without a word', async () => {
     stubGoogle(granted(), new Response(null, { status: 403 }));
 
     await expect(provider.redeem(code)).rejects.toMatchObject({
       code: 'MAILBOX_CONNECTION_FAILED',
       message: 'Google refused to give the address of the account (HTTP 403)',
+      details: { reason: 'accountUnreadable', providerDetail: 'HTTP 403' },
     });
   });
 
