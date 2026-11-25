@@ -1,6 +1,8 @@
 import type {
   AuthStatus,
+  MailboxAuthorization,
   MailboxList,
+  MailProviderList,
   PasskeyCreationOptions,
   PasskeyList,
   PasskeyRequestOptions,
@@ -47,6 +49,10 @@ interface FakeApi {
   threadPages?: (url: URL) => Answer<ThreadPage>;
   thread?: (threadId: string) => Answer<Thread>;
   mailboxes?: () => Answer<MailboxList>;
+  /** The providers the server has a client for. */
+  mailProviders?: () => Answer<MailProviderList>;
+  /** Answers the start of a mailbox connection, given what the app sent. */
+  startMailboxConnection?: (body: unknown) => Answer<MailboxAuthorization>;
   authStatus?: () => Answer<AuthStatus>;
   /** Answers the setup requests, given the body the app sent. */
   setupEnrollment?: (body: unknown) => Answer<TotpEnrollment>;
@@ -129,6 +135,8 @@ export function fakeApi({
   threadPages = noThread,
   thread = notFound,
   mailboxes = () => testMailboxes,
+  mailProviders = () => ({ providers: ['gmail'] }),
+  startMailboxConnection = serverError,
   authStatus = signedIn,
   setupEnrollment = serverError,
   setup = serverError,
@@ -150,6 +158,8 @@ export function fakeApi({
     'GET /api/threads': ({ url }) => threadPages(url),
     'GET /api/threads/:id': ({ id }) => thread(id),
     'GET /api/mailboxes': () => mailboxes(),
+    'GET /api/mail-providers': () => mailProviders(),
+    'POST /api/mailboxes/connection': ({ sent }) => startMailboxConnection(sent),
     'GET /api/auth/status': () => authStatus(),
     'POST /api/auth/setup/totp-secret': ({ sent }) => setupEnrollment(sent),
     'POST /api/auth/setup': ({ sent }) => setup(sent),

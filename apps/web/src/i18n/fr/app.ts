@@ -7,6 +7,8 @@ export const common = {
   back: 'Retour',
   cancel: 'Annuler',
   close: 'Fermer',
+  serverUnreachable: 'Impossible de joindre le serveur. Vérifie qu’il est démarré, puis réessaie.',
+  serverProblem: 'Le serveur a rencontré un problème. Réessaie dans un instant.',
   unreadCount: (count: number) => `${count} non ${count >= 2 ? 'lus' : 'lu'}`,
   reconnect: 'Reconnecter',
   noMailbox: 'Aucune boîte connectée.',

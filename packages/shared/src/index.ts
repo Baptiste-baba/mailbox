@@ -60,6 +60,7 @@ export {
 } from './mail/mail-provider.ts';
 export {
   MAILBOX_CONNECTION_PATH,
+  MAILBOX_NAME_MAX_LENGTH,
   type MailboxAuthorization,
   type MailboxConnectionCompletion,
   type MailboxConnectionRequest,

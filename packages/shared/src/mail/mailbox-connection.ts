@@ -2,7 +2,8 @@ import * as z from 'zod';
 import { mailProviderNameSchema } from './mail-provider.ts';
 import { paletteColorSchema } from './palette-color.ts';
 
-const MAILBOX_NAME_MAX_LENGTH = 40;
+/** A name longer than this would not fit in the sidebar. */
+export const MAILBOX_NAME_MAX_LENGTH = 40;
 
 export const mailboxIdSchema = z.uuid();
 

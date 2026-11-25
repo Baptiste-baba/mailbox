@@ -33,7 +33,13 @@ function RemovePasskeyConfirmation({
 }) {
   const removal = useRemovePasskey(passkey.id, onDone);
   if (removal.confirming) {
-    return <IdentityConfirmationForm onConfirmed={removal.confirmed} onCancel={onDone} />;
+    return (
+      <IdentityConfirmationForm
+        intro={fr.identity.intro}
+        onConfirmed={removal.confirmed}
+        onCancel={onDone}
+      />
+    );
   }
   return (
     <DialogConfirmation

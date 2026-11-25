@@ -1,24 +1,46 @@
 import type { MailboxSummary } from '@mailbox/shared';
-import { Card, Chip, Skeleton, StateMessage, Swatch } from '@mailbox/ui';
+import { Button, Card, Chip, Skeleton, StateMessage, Swatch } from '@mailbox/ui';
 import { useQuery } from '@tanstack/react-query';
-import { useId } from 'react';
+import { PlusIcon } from 'lucide-react';
+import { useId, useState } from 'react';
+import { mailProvidersQuery } from '../../api/mail-providers-query.ts';
 import { mailboxesQuery } from '../../api/mailboxes-query.ts';
 import { fr } from '../../i18n/fr.ts';
+import { AddMailboxDialog } from './add-mailbox-dialog.tsx';
 
-/** The connected mailboxes, in the settings. */
+/** The connected mailboxes, in the settings: seeing them, adding one. */
 export function MailboxSettings() {
   const titleId = useId();
+  const [adding, setAdding] = useState(false);
+  const providers = useQuery(mailProvidersQuery);
+  const gmailConfigured = providers.data?.providers.includes('gmail');
   return (
     <section aria-labelledby={titleId} className="flex flex-col gap-3">
       <div className="flex flex-col gap-0.5">
-        <h2 id={titleId} className="text-subject font-semibold text-heading">
-          {fr.mailboxes.title}
-        </h2>
+        <div className="flex items-center justify-between gap-6">
+          <h2 id={titleId} className="text-subject font-semibold text-heading">
+            {fr.mailboxes.title}
+          </h2>
+          <Button
+            variant="primary"
+            onClick={() => setAdding(true)}
+            disabled={gmailConfigured !== true}
+          >
+            <PlusIcon />
+            {fr.mailboxes.add}
+          </Button>
+        </div>
         <p className="text-small text-ink-2">{fr.mailboxes.intro}</p>
       </div>
+      {gmailConfigured === false && (
+        <p className="rounded-md bg-field px-4 py-3 text-small text-ink">
+          {fr.mailboxes.notConfigured}
+        </p>
+      )}
       <Card>
         <MailboxList />
       </Card>
+      <AddMailboxDialog open={adding} onClose={() => setAdding(false)} />
     </section>
   );
 }
