@@ -24,4 +24,22 @@ export const mailboxes = {
   },
   continueAtGoogle: 'Continuer chez Google',
   confirmIdentity: 'Pour connecter une boîte, confirme d’abord que c’est toi.',
+  connecting: 'Connexion de la boîte…',
+  backToSettings: 'Retour aux réglages',
+  refusedByUser: 'Tu n’as pas autorisé MailBox à lire cette boîte. Elle n’a pas été ajoutée.',
+  providerUnavailable: 'Google ne répond pas pour le moment. Réessaie dans quelques minutes.',
+  failures: {
+    connectionExpired:
+      'La connexion a expiré ou a déjà servi. Elle doit être terminée en moins de dix minutes, sur le même appareil. Recommence depuis les réglages.',
+    codeRefused: 'Google a refusé de valider la connexion. Recommence depuis les réglages.',
+    clientRefused:
+      'Google refuse les identifiants de ce serveur. Vérifie GOOGLE_CLIENT_ID et GOOGLE_CLIENT_SECRET dans sa configuration, puis redémarre-le.',
+    accessNotGranted:
+      'Google n’a pas accordé la lecture de tes mails. Recommence et accepte l’accès demandé.',
+    apiDisabled:
+      'L’API Gmail n’est pas activée dans le projet Google de ce serveur. Active-la en suivant le guide d’installation, section «\u00a0Connecting Gmail\u00a0», puis recommence.',
+    accountUnreadable:
+      'Google n’a pas voulu indiquer quel compte s’est connecté. Recommence dans quelques minutes.',
+  },
+  providerDetail: (detail: string) => `Détail donné par Google\u00a0: ${detail}`,
 };
