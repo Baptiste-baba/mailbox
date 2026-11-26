@@ -7,11 +7,13 @@ import { mailProvidersQuery } from '../../api/mail-providers-query.ts';
 import { mailboxesQuery } from '../../api/mailboxes-query.ts';
 import { fr } from '../../i18n/fr.ts';
 import { AddMailboxDialog } from './add-mailbox-dialog.tsx';
+import { RemoveMailboxDialog } from './remove-mailbox-dialog.tsx';
 
-/** The connected mailboxes, in the settings: seeing them, adding one. */
+/** The connected mailboxes, in the settings: seeing them, adding one, removing one. */
 export function MailboxSettings() {
   const titleId = useId();
   const [adding, setAdding] = useState(false);
+  const [removing, setRemoving] = useState<MailboxSummary>();
   const providers = useQuery(mailProvidersQuery);
   const gmailConfigured = providers.data?.providers.includes('gmail');
   return (
@@ -38,15 +40,16 @@ export function MailboxSettings() {
         </p>
       )}
       <Card>
-        <MailboxList />
+        <MailboxList onRemove={setRemoving} />
       </Card>
       <AddMailboxDialog open={adding} onClose={() => setAdding(false)} />
+      <RemoveMailboxDialog mailbox={removing} onClose={() => setRemoving(undefined)} />
     </section>
   );
 }
 
 /** The mailboxes, in the order they were connected, or why there is none to show. */
-function MailboxList() {
+function MailboxList({ onRemove }: { onRemove: (mailbox: MailboxSummary) => void }) {
   const mailboxes = useQuery(mailboxesQuery);
   if (mailboxes.data === undefined) {
     return mailboxes.isError ? (
@@ -65,15 +68,15 @@ function MailboxList() {
   return (
     <ul className="divide-y divide-line">
       {mailboxes.data.mailboxes.map((mailbox) => (
-        <MailboxRow key={mailbox.id} mailbox={mailbox} />
+        <MailboxRow key={mailbox.id} mailbox={mailbox} onRemove={() => onRemove(mailbox)} />
       ))}
     </ul>
   );
 }
 
-function MailboxRow({ mailbox }: { mailbox: MailboxSummary }) {
+function MailboxRow({ mailbox, onRemove }: { mailbox: MailboxSummary; onRemove: () => void }) {
   return (
-    <li className="flex items-center gap-4 px-6 py-4">
+    <li className="flex items-center gap-4 py-4 pr-4 pl-6">
       <span className="grid size-4.5 flex-none place-items-center">
         <Swatch color={mailbox.color} shape="circle" />
       </span>
@@ -86,6 +89,14 @@ function MailboxRow({ mailbox }: { mailbox: MailboxSummary }) {
       ) : (
         <span className="flex-none text-small text-ink-2">{fr.mailboxes.connected}</span>
       )}
+      <Button
+        variant="text"
+        size="sm"
+        onClick={onRemove}
+        aria-label={fr.mailboxes.removeLabel(mailbox.name)}
+      >
+        {fr.mailboxes.remove}
+      </Button>
     </li>
   );
 }

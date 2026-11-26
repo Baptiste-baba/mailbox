@@ -56,6 +56,7 @@ interface FakeApi {
   startMailboxConnection?: (body: unknown) => Answer<MailboxAuthorization>;
   /** Answers the end of a mailbox connection, given what the provider sent the browser back with. */
   completeMailboxConnection?: (body: unknown) => Answer<MailboxSummary>;
+  removeMailbox?: (mailboxId: string) => Answer;
   authStatus?: () => Answer<AuthStatus>;
   /** Answers the setup requests, given the body the app sent. */
   setupEnrollment?: (body: unknown) => Answer<TotpEnrollment>;
@@ -141,6 +142,7 @@ export function fakeApi({
   mailProviders = () => ({ providers: ['gmail'] }),
   startMailboxConnection = serverError,
   completeMailboxConnection = serverError,
+  removeMailbox = serverError,
   authStatus = signedIn,
   setupEnrollment = serverError,
   setup = serverError,
@@ -165,6 +167,7 @@ export function fakeApi({
     'GET /api/mail-providers': () => mailProviders(),
     'POST /api/mailboxes/connection': ({ sent }) => startMailboxConnection(sent),
     'POST /api/mailboxes/connection/completion': ({ sent }) => completeMailboxConnection(sent),
+    'DELETE /api/mailboxes/:id': ({ id }) => removeMailbox(id),
     'GET /api/auth/status': () => authStatus(),
     'POST /api/auth/setup/totp-secret': ({ sent }) => setupEnrollment(sent),
     'POST /api/auth/setup': ({ sent }) => setup(sent),

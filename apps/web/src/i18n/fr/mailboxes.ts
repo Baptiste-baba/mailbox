@@ -23,7 +23,7 @@ export const mailboxes = {
     slate: 'Ardoise',
   },
   continueAtGoogle: 'Continuer chez Google',
-  confirmIdentity: 'Pour connecter une boîte, confirme d’abord que c’est toi.',
+  confirmIdentityToConnect: 'Pour connecter une boîte, confirme d’abord que c’est toi.',
   connecting: 'Connexion de la boîte…',
   backToSettings: 'Retour aux réglages',
   refusedByUser: 'Tu n’as pas autorisé MailBox à lire cette boîte. Elle n’a pas été ajoutée.',
@@ -42,4 +42,12 @@ export const mailboxes = {
       'Google n’a pas voulu indiquer quel compte s’est connecté. Recommence dans quelques minutes.',
   },
   providerDetail: (detail: string) => `Détail donné par Google\u00a0: ${detail}`,
+  remove: 'Retirer',
+  removeLabel: (name: string) => `Retirer la boîte «\u00a0${name}\u00a0»`,
+  removeTitle: (name: string) => `Retirer la boîte «\u00a0${name}\u00a0»\u00a0?`,
+  removeText:
+    'Ses mails disparaîtront de MailBox et l’accès de MailBox sera retiré chez Google. Rien n’est supprimé dans ta boîte Gmail.',
+  removeProviderUnavailable:
+    'Google ne répond pas, la boîte n’a pas été retirée. Réessaie dans quelques minutes.',
+  confirmIdentityToRemove: 'Pour retirer une boîte, confirme d’abord que c’est toi.',
 };

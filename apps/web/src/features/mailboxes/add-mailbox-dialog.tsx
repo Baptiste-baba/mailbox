@@ -24,7 +24,7 @@ function AddMailboxForm({ onCancel }: { onCancel: () => void }) {
   if (form.confirming) {
     return (
       <IdentityConfirmationForm
-        intro={fr.mailboxes.confirmIdentity}
+        intro={fr.mailboxes.confirmIdentityToConnect}
         onConfirmed={form.confirmed}
         onCancel={onCancel}
       />

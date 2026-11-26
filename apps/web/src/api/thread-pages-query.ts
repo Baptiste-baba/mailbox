@@ -24,11 +24,14 @@ function threadsPath(filters: ThreadFilters, cursor: string | null): string {
   return `/threads?${query}`;
 }
 
+/** Starts the key of every list of threads kept in the cache. */
+export const THREAD_PAGES_KEY = 'threads';
+
 /** The threads of a view, page after page, most recent first. */
 export function threadPagesQuery(filters: ThreadFilters) {
   return infiniteQueryOptions<ThreadPage, Error, InfiniteData<ThreadPage>, QueryKey, string | null>(
     {
-      queryKey: ['threads', filters],
+      queryKey: [THREAD_PAGES_KEY, filters],
       queryFn: ({ pageParam, signal }) =>
         fetchApi(threadsPath(filters, pageParam), threadPageSchema, signal),
       initialPageParam: null,
