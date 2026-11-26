@@ -22,6 +22,26 @@ describe('NavItem', () => {
   });
 });
 
+describe('NavItem, with an action of its own', () => {
+  test('keeps the action beside its link, each leading where it says', async () => {
+    const screen = await render(
+      <NavItem
+        icon={icon}
+        label="Travail"
+        href="/inbox?mailbox=travail"
+        action={<a href="/settings">Reconnecter</a>}
+      />,
+    );
+
+    const link = screen.getByRole('link', { name: 'Travail' });
+    await expect.element(link).toHaveAttribute('href', '/inbox?mailbox=travail');
+    await expect
+      .element(screen.getByRole('link', { name: 'Reconnecter' }))
+      .toHaveAttribute('href', '/settings');
+    expect(link.element().querySelector('a')).toBeNull();
+  });
+});
+
 describe('NavGroup', () => {
   test('gives its items a heading', async () => {
     const screen = await render(

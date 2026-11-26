@@ -9,6 +9,11 @@ interface NavItemProps extends ComponentProps<'a'> {
   description?: string;
   /** A count, a keyboard shortcut or a short status, at the end of the item. */
   trailing?: ReactNode;
+  /**
+   * A control of its own at the end of the item, such as a link to what settles its status. It
+   * sits beside the link, a link holding no other control, and hides with the label.
+   */
+  action?: ReactNode;
   /** Dot on the icon once the item is reduced to it, standing for what its trailing content said. */
   marker?: 'accent' | 'warn' | undefined;
 }
@@ -24,7 +29,34 @@ const markerClassNames: Record<NonNullable<NavItemProps['marker']>, string> = {
  * its look and its hint says why. In a container narrower than `rail`, it shrinks to its icon and
  * keeps its label for screen readers only.
  */
-export function NavItem({
+export function NavItem({ action, ...link }: NavItemProps) {
+  if (action === undefined) {
+    return <NavItemLink {...link} />;
+  }
+  const twoLines = link.description !== undefined;
+  return (
+    // The background of the link goes on to its action: both read as one item.
+    <div className="flex rounded-md not-has-[[aria-current=page]]:hover:bg-page has-[[aria-current=page]]:bg-field">
+      <NavItemLink {...link} className={joinClassNames('min-w-0 flex-1', link.className)} />
+      <span
+        className={joinClassNames(
+          'flex flex-none items-center pr-3 @max-rail:hidden',
+          twoLines ? 'mt-2 self-start' : 'self-center',
+          firstLineHeight(twoLines),
+        )}
+      >
+        {action}
+      </span>
+    </div>
+  );
+}
+
+/** The height of the first line of the label: what stands beside the label sits level with it. */
+function firstLineHeight(twoLines: boolean): string {
+  return twoLines ? 'h-5' : 'h-5.5';
+}
+
+function NavItemLink({
   icon,
   label,
   description,
@@ -32,10 +64,8 @@ export function NavItem({
   marker,
   className,
   ...props
-}: NavItemProps) {
+}: Omit<NavItemProps, 'action'>) {
   const twoLines = description !== undefined;
-  // The height of the first line of the label: the icon and the trailing content sit level with it.
-  const firstLineHeight = twoLines ? 'h-5' : 'h-5.5';
   return (
     <a
       className={joinClassNames(
@@ -51,7 +81,7 @@ export function NavItem({
       <span
         className={joinClassNames(
           'relative grid w-4.5 flex-none place-items-center text-ink-2 group-aria-[current=page]:text-ink [&>svg]:icon-18',
-          firstLineHeight,
+          firstLineHeight(twoLines),
         )}
       >
         {icon}
@@ -72,7 +102,7 @@ export function NavItem({
         <span
           className={joinClassNames(
             'flex flex-none items-center text-caption text-ink-2 group-aria-[current=page]:font-semibold group-aria-[current=page]:text-link @max-rail:hidden',
-            firstLineHeight,
+            firstLineHeight(twoLines),
           )}
         >
           {trailing}

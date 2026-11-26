@@ -23,15 +23,14 @@ export function ThreadListSkeleton() {
   );
 }
 
+interface ThreadListMessageProps {
+  message: string;
+  action?: { label: string; onClick: () => void };
+}
+
 /** What the list shows instead of threads: why there is none, and what to do about it. */
-export function ThreadListMessage({ message, onRetry }: { message: string; onRetry?: () => void }) {
-  return (
-    <StateMessage
-      message={message}
-      action={onRetry === undefined ? undefined : { label: fr.common.retry, onClick: onRetry }}
-      className="px-8 pt-16"
-    />
-  );
+export function ThreadListMessage({ message, action }: ThreadListMessageProps) {
+  return <StateMessage message={message} action={action} className="px-8 pt-16" />;
 }
 
 /** The end of a list whose next page failed to load, with the way to ask for it again. */
@@ -48,5 +47,10 @@ export function LoadMoreError({ onRetry }: { onRetry: () => void }) {
 
 /** Stands in for the list when it fails to render, so that the rest of the app stays usable. */
 export function ThreadListCrash({ reset }: ErrorComponentProps) {
-  return <ThreadListMessage message={fr.inbox.crash} onRetry={reset} />;
+  return (
+    <ThreadListMessage
+      message={fr.inbox.crash}
+      action={{ label: fr.common.retry, onClick: reset }}
+    />
+  );
 }

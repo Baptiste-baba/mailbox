@@ -1,20 +1,22 @@
 import type { MailboxSummary } from '@mailbox/shared';
 import { Chip, NavGroup, NavGroupAction, Swatch } from '@mailbox/ui';
 import { useQuery } from '@tanstack/react-query';
+import { Link, useNavigate } from '@tanstack/react-router';
 import { LayoutGridIcon } from 'lucide-react';
 import { mailboxesQuery } from '../api/mailboxes-query.ts';
-import { comingSoon, hint } from '../hint.ts';
+import { hint } from '../hint.ts';
 import { fr } from '../i18n/fr.ts';
 import { NavItemSkeletons, SidebarError } from './sidebar-message.tsx';
 import { SidebarNavLink } from './sidebar-nav-link.tsx';
 
 /** "Boîtes": every mail of every mailbox, then the inbox of each mailbox. */
 export function MailboxNavGroup() {
+  const navigate = useNavigate();
   return (
     <NavGroup
       title={fr.sidebar.mailboxes}
       action={
-        <NavGroupAction {...comingSoon(fr.sidebar.manageMailboxes)}>
+        <NavGroupAction onClick={() => navigate({ to: '/settings' })}>
           {fr.sidebar.manageMailboxes}
         </NavGroupAction>
       }
@@ -70,12 +72,18 @@ function MailboxLink({ mailbox }: { mailbox: MailboxSummary }) {
           ? fr.common.reconnect
           : mailbox.unreadCount > 0 && fr.common.unreadCount(mailbox.unreadCount),
       )}
-      trailing={
+      trailing={reconnect ? undefined : mailbox.unreadCount || undefined}
+      // Reconnecting is done in the settings, where the row itself still opens the mailbox.
+      action={
         reconnect ? (
-          <Chip tone="warn">{fr.common.reconnect}</Chip>
-        ) : (
-          mailbox.unreadCount || undefined
-        )
+          <Link
+            to="/settings"
+            aria-label={fr.mailboxes.reconnectMailbox(mailbox.name)}
+            className="rounded-full hover:underline"
+          >
+            <Chip tone="warn">{fr.common.reconnect}</Chip>
+          </Link>
+        ) : undefined
       }
       marker={reconnect ? 'warn' : mailbox.unreadCount > 0 ? 'accent' : undefined}
     />

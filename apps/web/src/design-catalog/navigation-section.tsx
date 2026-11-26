@@ -76,7 +76,11 @@ function SampleNavigation() {
           label="Association"
           description="tresorerie@asso-exemple.example"
           href="#"
-          trailing={<Chip tone="warn">Reconnecter</Chip>}
+          action={
+            <a href="#top" className="rounded-full hover:underline">
+              <Chip tone="warn">Reconnecter</Chip>
+            </a>
+          }
           marker="warn"
         />
       </NavGroup>
