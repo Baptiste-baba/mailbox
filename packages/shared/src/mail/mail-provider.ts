@@ -39,6 +39,13 @@ export interface ProviderGrant {
   refreshToken: string;
 }
 
+/** What reads the mail of an account for a short while. Never leaves the server. */
+export interface ProviderAccess {
+  accessToken: string;
+  /** When the provider stops accepting it. */
+  expiresAt: Date;
+}
+
 /**
  * A mail service, as the rest of the app sees it. Nothing outside the implementations knows the
  * API of Gmail or of any other provider.
@@ -54,6 +61,15 @@ export interface MailProvider {
    * @throws AppError MAIL_PROVIDER_UNAVAILABLE when the provider cannot be reached.
    */
   redeem(code: AuthorizationCode): Promise<ProviderGrant>;
+
+  /**
+   * Renews the access to the mail of an account, for as long as the provider says.
+   * @throws AppError MAILBOX_RECONNECTION_REQUIRED when the provider no longer accepts the refresh
+   * token: the user has to sign in again.
+   * @throws AppError MAIL_PROVIDER_UNAVAILABLE when the provider cannot be reached, or refuses for
+   * a reason signing in again would not settle.
+   */
+  renewAccess(refreshToken: string): Promise<ProviderAccess>;
 
   /**
    * Ends the access a refresh token gives. One the provider no longer knows is already ended.

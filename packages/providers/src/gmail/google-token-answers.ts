@@ -9,6 +9,13 @@ export const googleTokenGrantSchema = z.object({
   scope: z.string(),
 });
 
+/** What Google answers when it renews an access. Fields the app has no use for are left out. */
+export const googleAccessRenewalSchema = z.object({
+  access_token: z.string().min(1),
+  /** How long the access holds, in seconds. */
+  expires_in: z.number().positive(),
+});
+
 /** What Google answers when it refuses a request for a token (RFC 6749, section 5.2). */
 export const googleTokenRefusalSchema = z.object({
   error: z.string().regex(/^[a-z_]{1,40}$/),

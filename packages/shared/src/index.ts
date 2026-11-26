@@ -56,6 +56,7 @@ export {
   type MailProviderName,
   mailProviderListSchema,
   mailProviderNameSchema,
+  type ProviderAccess,
   type ProviderGrant,
 } from './mail/mail-provider.ts';
 export {

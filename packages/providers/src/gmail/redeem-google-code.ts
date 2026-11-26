@@ -8,10 +8,10 @@ import { readAnswer } from '../http/read-answer.ts';
 import { sendRequest } from '../http/send-request.ts';
 import type { OauthClient } from '../oauth-client.ts';
 import { GMAIL_READ_SCOPE } from './gmail-read-scope.ts';
-import { googleTokenGrantSchema, googleTokenRefusalSchema } from './google-token-answers.ts';
+import { googleTokenGrantSchema } from './google-token-answers.ts';
+import { GOOGLE_TOKEN_ENDPOINT } from './google-token-endpoint.ts';
 import { readGmailAddress } from './read-gmail-address.ts';
-
-const TOKEN_ENDPOINT = 'https://oauth2.googleapis.com/token';
+import { readGoogleTokenRefusal } from './read-google-token-refusal.ts';
 
 /**
  * Redeems the code Google sent the user back with, and tells which account it was for.
@@ -23,7 +23,7 @@ export async function redeemGoogleCode(
   client: OauthClient,
   code: AuthorizationCode,
 ): Promise<ProviderGrant> {
-  const response = await sendRequest(TOKEN_ENDPOINT, {
+  const response = await sendRequest(GOOGLE_TOKEN_ENDPOINT, {
     method: 'POST',
     body: new URLSearchParams([
       ['grant_type', 'authorization_code'],
@@ -54,14 +54,12 @@ export async function redeemGoogleCode(
 const CLIENT_REFUSALS = new Set(['invalid_client', 'unauthorized_client', 'deleted_client']);
 
 async function refusal(response: Response): Promise<AppError> {
-  // A refusal whose body cannot be read is still a refusal: only its reason is lost.
-  const body: unknown = await response.json().catch(() => undefined);
-  const parsed = googleTokenRefusalSchema.safeParse(body);
-  if (!parsed.success) {
+  const said = await readGoogleTokenRefusal(response);
+  if (said === undefined) {
     const status = `HTTP ${response.status}`;
     return mailboxConnectionFailure('codeRefused', `Google refused the code (${status})`, status);
   }
-  const { error, error_description: description } = parsed.data;
+  const { error, error_description: description } = said;
   return mailboxConnectionFailure(
     CLIENT_REFUSALS.has(error) ? 'clientRefused' : 'codeRefused',
     `Google refused the code (${error})`,
