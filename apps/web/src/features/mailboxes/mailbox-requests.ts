@@ -11,6 +11,15 @@ export function startMailboxConnection(request: MailboxConnectionRequest) {
   return postApi('/mailboxes/connection', request, mailboxAuthorizationSchema);
 }
 
+/** Starts signing in again to a mailbox whose provider no longer lets MailBox in. */
+export function startMailboxReconnection(mailboxId: string) {
+  return postApi(
+    `/mailboxes/${encodeURIComponent(mailboxId)}/reconnection`,
+    undefined,
+    mailboxAuthorizationSchema,
+  );
+}
+
 /** Hands the api what the provider sent the browser back with: the api answers the mailbox. */
 export function completeMailboxConnection(completion: MailboxConnectionCompletion) {
   return postApi('/mailboxes/connection/completion', completion, mailboxSummarySchema);

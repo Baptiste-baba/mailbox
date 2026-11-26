@@ -56,6 +56,8 @@ interface FakeApi {
   startMailboxConnection?: (body: unknown) => Answer<MailboxAuthorization>;
   /** Answers the end of a mailbox connection, given what the provider sent the browser back with. */
   completeMailboxConnection?: (body: unknown) => Answer<MailboxSummary>;
+  /** Answers the start of a reconnection, given the mailbox it is for. */
+  startMailboxReconnection?: (mailboxId: string) => Answer<MailboxAuthorization>;
   removeMailbox?: (mailboxId: string) => Answer;
   authStatus?: () => Answer<AuthStatus>;
   /** Answers the setup requests, given the body the app sent. */
@@ -120,15 +122,24 @@ interface FakeRequest {
 
 type FakeRoute = (request: FakeRequest) => Answer<object>;
 
-/** The route for `METHOD /path`, else for `METHOD /parent/:id`, with what stands for its id. */
+/**
+ * The route for `METHOD /path`, else the one whose path has `:id` in place of one part of it, with
+ * what stands for its id.
+ */
 function findRoute(routes: Record<string, FakeRoute>, method: string, path: string) {
   const exact = routes[`${method} ${path}`];
   if (exact !== undefined) {
     return { route: exact, id: '' };
   }
-  const slash = path.lastIndexOf('/');
-  const route = routes[`${method} ${path.slice(0, slash)}/:id`];
-  return route === undefined ? undefined : { route, id: decodeURIComponent(path.slice(slash + 1)) };
+  const parts = path.split('/');
+  for (const [position, part] of parts.entries()) {
+    const withId = parts.map((kept, index) => (index === position ? ':id' : kept)).join('/');
+    const route = routes[`${method} ${withId}`];
+    if (route !== undefined) {
+      return { route, id: decodeURIComponent(part) };
+    }
+  }
+  return undefined;
 }
 
 /**
@@ -142,6 +153,7 @@ export function fakeApi({
   mailProviders = () => ({ providers: ['gmail'] }),
   startMailboxConnection = serverError,
   completeMailboxConnection = serverError,
+  startMailboxReconnection = serverError,
   removeMailbox = serverError,
   authStatus = signedIn,
   setupEnrollment = serverError,
@@ -167,6 +179,7 @@ export function fakeApi({
     'GET /api/mail-providers': () => mailProviders(),
     'POST /api/mailboxes/connection': ({ sent }) => startMailboxConnection(sent),
     'POST /api/mailboxes/connection/completion': ({ sent }) => completeMailboxConnection(sent),
+    'POST /api/mailboxes/:id/reconnection': ({ id }) => startMailboxReconnection(id),
     'DELETE /api/mailboxes/:id': ({ id }) => removeMailbox(id),
     'GET /api/auth/status': () => authStatus(),
     'POST /api/auth/setup/totp-secret': ({ sent }) => setupEnrollment(sent),

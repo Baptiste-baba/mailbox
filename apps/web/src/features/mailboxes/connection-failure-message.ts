@@ -37,6 +37,8 @@ export function connectionFailureMessage(error: unknown): ConnectionFailureMessa
       MAILBOX_CONNECTION_FAILED: fr.mailboxes.failures.codeRefused,
       MAIL_PROVIDER_UNAVAILABLE: fr.mailboxes.providerUnavailable,
       MAIL_PROVIDER_NOT_CONFIGURED: fr.mailboxes.notConfigured,
+      MAILBOX_ACCOUNT_MISMATCH: fr.mailboxes.accountMismatch,
+      MAILBOX_NOT_FOUND: fr.mailboxes.removedMeanwhile,
     }),
   };
 }

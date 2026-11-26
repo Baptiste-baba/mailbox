@@ -105,15 +105,33 @@ describe('a connection that failed', () => {
   });
 });
 
+describe('a reconnection that failed', () => {
+  test.each([
+    [
+      'MAILBOX_ACCOUNT_MISMATCH',
+      409,
+      /Tu t’es connecté avec un autre compte que celui de cette boîte/,
+    ],
+    ['MAILBOX_NOT_FOUND', 404, /Cette boîte a été retirée entre-temps/],
+  ])('says why a reconnection ended on %s', async (code, status, message) => {
+    fakeApi({ completeMailboxConnection: apiError(status, code) });
+    const { screen } = await renderApp(BACK_FROM_GOOGLE);
+
+    await expect.element(screen.getByText(message)).toBeVisible();
+  });
+});
+
 describe('coming back from Google without its agreement', () => {
-  test('says the mailbox was not added when the user refused, without asking the api', async () => {
+  test('says nothing changed when the user refused, without asking the api', async () => {
     const fetchMock = fakeApi();
     const { screen } = await renderApp(
       `${MAILBOX_CONNECTION_PATH}?error=access_denied&state=the-state`,
     );
 
     await expect
-      .element(screen.getByText(/Tu n’as pas autorisé MailBox à lire cette boîte/))
+      .element(
+        screen.getByText(/Tu n’as pas autorisé MailBox à lire cette boîte. Rien n’a été modifié/),
+      )
       .toBeVisible();
     expect(lastBodySentTo(fetchMock, COMPLETION_PATH)).toBeUndefined();
   });

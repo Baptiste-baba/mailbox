@@ -7,12 +7,14 @@ import { mailProvidersQuery } from '../../api/mail-providers-query.ts';
 import { mailboxesQuery } from '../../api/mailboxes-query.ts';
 import { fr } from '../../i18n/fr.ts';
 import { AddMailboxDialog } from './add-mailbox-dialog.tsx';
+import { ReconnectMailboxDialog } from './reconnect-mailbox-dialog.tsx';
 import { RemoveMailboxDialog } from './remove-mailbox-dialog.tsx';
 
-/** The connected mailboxes, in the settings: seeing them, adding one, removing one. */
+/** The connected mailboxes, in the settings: seeing them, adding, reconnecting or removing one. */
 export function MailboxSettings() {
   const titleId = useId();
   const [adding, setAdding] = useState(false);
+  const [reconnecting, setReconnecting] = useState<MailboxSummary>();
   const [removing, setRemoving] = useState<MailboxSummary>();
   const providers = useQuery(mailProvidersQuery);
   const gmailConfigured = providers.data?.providers.includes('gmail');
@@ -40,16 +42,22 @@ export function MailboxSettings() {
         </p>
       )}
       <Card>
-        <MailboxList onRemove={setRemoving} />
+        <MailboxList onReconnect={setReconnecting} onRemove={setRemoving} />
       </Card>
       <AddMailboxDialog open={adding} onClose={() => setAdding(false)} />
+      <ReconnectMailboxDialog mailbox={reconnecting} onClose={() => setReconnecting(undefined)} />
       <RemoveMailboxDialog mailbox={removing} onClose={() => setRemoving(undefined)} />
     </section>
   );
 }
 
+interface MailboxListProps {
+  onReconnect: (mailbox: MailboxSummary) => void;
+  onRemove: (mailbox: MailboxSummary) => void;
+}
+
 /** The mailboxes, in the order they were connected, or why there is none to show. */
-function MailboxList({ onRemove }: { onRemove: (mailbox: MailboxSummary) => void }) {
+function MailboxList({ onReconnect, onRemove }: MailboxListProps) {
   const mailboxes = useQuery(mailboxesQuery);
   if (mailboxes.data === undefined) {
     return mailboxes.isError ? (
@@ -68,13 +76,24 @@ function MailboxList({ onRemove }: { onRemove: (mailbox: MailboxSummary) => void
   return (
     <ul className="divide-y divide-line">
       {mailboxes.data.mailboxes.map((mailbox) => (
-        <MailboxRow key={mailbox.id} mailbox={mailbox} onRemove={() => onRemove(mailbox)} />
+        <MailboxRow
+          key={mailbox.id}
+          mailbox={mailbox}
+          onReconnect={() => onReconnect(mailbox)}
+          onRemove={() => onRemove(mailbox)}
+        />
       ))}
     </ul>
   );
 }
 
-function MailboxRow({ mailbox, onRemove }: { mailbox: MailboxSummary; onRemove: () => void }) {
+interface MailboxRowProps {
+  mailbox: MailboxSummary;
+  onReconnect: () => void;
+  onRemove: () => void;
+}
+
+function MailboxRow({ mailbox, onReconnect, onRemove }: MailboxRowProps) {
   return (
     <li className="flex items-center gap-4 py-4 pr-4 pl-6">
       <span className="grid size-4.5 flex-none place-items-center">
@@ -85,7 +104,17 @@ function MailboxRow({ mailbox, onRemove }: { mailbox: MailboxSummary; onRemove: 
         <span className="truncate text-small text-ink-2">{mailbox.address}</span>
       </div>
       {mailbox.status === 'reconnectRequired' ? (
-        <Chip tone="warn">{fr.mailboxes.reconnectRequired}</Chip>
+        <>
+          <Chip tone="warn">{fr.mailboxes.reconnectRequired}</Chip>
+          <Button
+            variant="text"
+            size="sm"
+            onClick={onReconnect}
+            aria-label={fr.mailboxes.reconnectMailbox(mailbox.name)}
+          >
+            {fr.mailboxes.reconnect}
+          </Button>
+        </>
       ) : (
         <span className="flex-none text-small text-ink-2">{fr.mailboxes.connected}</span>
       )}

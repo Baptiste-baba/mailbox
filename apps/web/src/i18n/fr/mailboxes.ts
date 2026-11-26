@@ -26,7 +26,7 @@ export const mailboxes = {
   confirmIdentityToConnect: 'Pour connecter une boîte, confirme d’abord que c’est toi.',
   connecting: 'Connexion de la boîte…',
   backToSettings: 'Retour aux réglages',
-  refusedByUser: 'Tu n’as pas autorisé MailBox à lire cette boîte. Elle n’a pas été ajoutée.',
+  refusedByUser: 'Tu n’as pas autorisé MailBox à lire cette boîte. Rien n’a été modifié.',
   providerUnavailable: 'Google ne répond pas pour le moment. Réessaie dans quelques minutes.',
   failures: {
     connectionExpired:
@@ -50,4 +50,12 @@ export const mailboxes = {
   removeProviderUnavailable:
     'Google ne répond pas, la boîte n’a pas été retirée. Réessaie dans quelques minutes.',
   confirmIdentityToRemove: 'Pour retirer une boîte, confirme d’abord que c’est toi.',
+  reconnect: 'Reconnecter',
+  reconnectMailbox: (name: string) => `Reconnecter la boîte «\u00a0${name}\u00a0»`,
+  reconnectIntro: (address: string) =>
+    `Google ne laisse plus MailBox lire cette boîte. Connecte-toi chez Google avec ${address} pour lui redonner l’accès.`,
+  accountMismatch:
+    'Tu t’es connecté avec un autre compte que celui de cette boîte. Recommence avec son adresse.',
+  removedMeanwhile:
+    'Cette boîte a été retirée entre-temps. Pour la retrouver, ajoute-la de nouveau depuis les réglages.',
 };
