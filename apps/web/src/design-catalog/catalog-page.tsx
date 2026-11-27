@@ -13,6 +13,7 @@ import { SegmentedControlSection } from './segmented-control-section.tsx';
 import { ShadowSection } from './shadow-section.tsx';
 import { StepperSection } from './stepper-section.tsx';
 import { SurfacesSection } from './surfaces-section.tsx';
+import { SwatchPickerSection } from './swatch-picker-section.tsx';
 import { TypographySection } from './typography-section.tsx';
 
 const themes = [
@@ -44,6 +45,7 @@ export function CatalogPage() {
             <SegmentedControlSection />
             <SearchFieldSection />
             <FormSection />
+            <SwatchPickerSection />
             <StepperSection />
             <NavigationSection />
             <SurfacesSection />

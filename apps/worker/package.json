@@ -8,12 +8,15 @@
     "!src/**/*.test.ts"
   ],
   "scripts": {
-    "dev": "node --watch --env-file=../../.env.development src/main.ts",
+    "dev": "node --watch --env-file=../../.env.development --env-file-if-exists=../../.env.development.local src/main.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@mailbox/config": "workspace:*",
+    "@mailbox/db": "workspace:*",
+    "@mailbox/providers": "workspace:*",
     "@mailbox/shared": "workspace:*",
+    "drizzle-orm": "catalog:",
     "pg-boss": "12.38.0",
     "pino": "catalog:",
     "zod": "catalog:"

@@ -1,7 +1,8 @@
-type SwatchColor = 'navy' | 'azur' | 'ciel' | 'glacier' | 'slate';
+export type SwatchColor = 'navy' | 'azur' | 'ciel' | 'glacier' | 'slate';
 type SwatchShape = 'circle' | 'square';
 
-const colorClassNames: Record<SwatchColor, string> = {
+/** The background of each palette colour. */
+export const swatchColorClassNames: Record<SwatchColor, string> = {
   navy: 'bg-navy',
   azur: 'bg-azur',
   ciel: 'bg-ciel',
@@ -24,7 +25,7 @@ export function Swatch({ color, shape }: SwatchProps) {
   return (
     <span
       aria-hidden="true"
-      className={`block flex-none ${shapeClassNames[shape]} ${colorClassNames[color]}`}
+      className={`block flex-none ${shapeClassNames[shape]} ${swatchColorClassNames[color]}`}
     />
   );
 }

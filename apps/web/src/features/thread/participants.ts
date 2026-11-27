@@ -1,4 +1,5 @@
 import type { MailAddress, Message } from '@mailbox/shared';
+import { displayName } from '../../display-name.ts';
 import { fr } from '../../i18n/fr.ts';
 import { LOCALE } from '../../locale.ts';
 
@@ -15,7 +16,7 @@ export function personName(person: MailAddress, ownAddress: string | undefined):
   if (isOwn(person, ownAddress)) {
     return fr.thread.meInSentence;
   }
-  return person.name || person.address;
+  return displayName(person);
 }
 
 function uniqueByAddress(people: MailAddress[]): MailAddress[] {

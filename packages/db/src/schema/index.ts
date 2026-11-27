@@ -1,6 +1,14 @@
 export { account } from './account.ts';
+export { attachment, isAttachedFile } from './attachment.ts';
 export { authAttempt, authAttemptKind } from './auth-attempt.ts';
+export { folder } from './folder.ts';
+export { mailbox, mailboxStatus, mailProvider, syncFailureReason } from './mailbox.ts';
+export { message } from './message.ts';
+export { messageFolder } from './message-folder.ts';
+export { paletteColor } from './palette-color.ts';
 export { passkey } from './passkey.ts';
 export { recoveryCode } from './recovery-code.ts';
+export { attachmentRelations, messageRelations, threadRelations } from './relations.ts';
 export { session } from './session.ts';
 export { setupCode } from './setup-code.ts';
+export { thread } from './thread.ts';

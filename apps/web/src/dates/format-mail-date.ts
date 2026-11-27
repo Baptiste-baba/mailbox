@@ -1,7 +1,8 @@
 import { fr } from '../i18n/fr.ts';
 import { calendarDay, dateFormatter, formatShortDate } from './calendar-day.ts';
 
-function formatTime(date: Date): string {
+/** The time of a date, "08:47". */
+export function formatTime(date: Date): string {
   return dateFormatter({ hour: '2-digit', minute: '2-digit' }).format(date);
 }
 

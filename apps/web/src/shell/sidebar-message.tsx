@@ -14,10 +14,11 @@ export function SidebarError({ message, onRetry }: { message: string; onRetry: (
   );
 }
 
+const PLACEHOLDER_IDS = ['first', 'second', 'third'];
+
 /** Placeholders for navigation items while they load. */
-export function NavItemSkeletons({ count }: { count: number }) {
-  const placeholderIds = Array.from({ length: count }, (_, index) => `placeholder-${index}`);
-  return placeholderIds.map((placeholderId) => (
+export function NavItemSkeletons() {
+  return PLACEHOLDER_IDS.map((placeholderId) => (
     <div key={placeholderId} className="flex h-10 items-center gap-3 px-3">
       <Skeleton className="size-4.5" />
       <Skeleton className="h-3 w-28" />

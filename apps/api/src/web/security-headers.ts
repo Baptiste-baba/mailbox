@@ -1,3 +1,4 @@
+import { MAIL_FRAME_PATH } from '@mailbox/shared';
 import type { NextFunction, Request, Response } from 'express';
 
 // Everything comes from the app itself: no inline script or style, no remote image (tracking
@@ -10,8 +11,21 @@ const CONTENT_SECURITY_POLICY = [
   "frame-ancestors 'none'",
 ].join('; ');
 
+// The page a mail is shown in: the styles of the mail apply, and its images load as soon as it
+// opens (the owner's choice), over https alone: a mail cannot have the browser call a device of
+// the local network, which seldom has a valid certificate. Nothing else: no script, no remote font
+// or stylesheet, no form; only the app may show it in a frame.
+const MAIL_FRAME_POLICY = [
+  "default-src 'none'",
+  "style-src 'unsafe-inline'",
+  'img-src data: https:',
+  'font-src data:',
+  "base-uri 'self'",
+  "form-action 'none'",
+  "frame-ancestors 'self'",
+].join('; ');
+
 const SECURITY_HEADERS = {
-  'Content-Security-Policy': CONTENT_SECURITY_POLICY,
   // A link opened from a mail must not tell the site it leads to where it was clicked.
   'Referrer-Policy': 'no-referrer',
   'X-Content-Type-Options': 'nosniff',
@@ -20,11 +34,11 @@ const SECURITY_HEADERS = {
   'Permissions-Policy': 'camera=(), microphone=(), geolocation=(), payment=(), usb=()',
 };
 
-export function setSecurityHeaders(
-  _request: Request,
-  response: Response,
-  next: NextFunction,
-): void {
-  response.set(SECURITY_HEADERS);
+export function setSecurityHeaders(request: Request, response: Response, next: NextFunction): void {
+  response.set({
+    ...SECURITY_HEADERS,
+    'Content-Security-Policy':
+      request.path === MAIL_FRAME_PATH ? MAIL_FRAME_POLICY : CONTENT_SECURITY_POLICY,
+  });
   next();
 }

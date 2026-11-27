@@ -15,6 +15,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as NewAuthenticatorRouteImport } from './routes/new-authenticator'
 import { Route as SetupRouteImport } from './routes/setup'
 import { Route as ShellViewRouteRouteImport } from './routes/_shell/$view/route'
+import { Route as ShellMailboxConnectionRouteImport } from './routes/_shell/mailbox-connection'
 import { Route as ShellSettingsRouteImport } from './routes/_shell/settings'
 import { Route as ShellViewIndexRouteImport } from './routes/_shell/$view/index'
 import { Route as ShellViewIdRouteImport } from './routes/_shell/$view/$id'
@@ -49,6 +50,11 @@ const ShellViewRouteRoute = ShellViewRouteRouteImport.update({
   path: '/$view',
   getParentRoute: () => ShellRoute,
 } as any)
+const ShellMailboxConnectionRoute = ShellMailboxConnectionRouteImport.update({
+  id: '/mailbox-connection',
+  path: '/mailbox-connection',
+  getParentRoute: () => ShellRoute,
+} as any)
 const ShellSettingsRoute = ShellSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -76,6 +82,7 @@ export interface FileRoutesByFullPath {
   '/new-authenticator': typeof NewAuthenticatorRoute
   '/setup': typeof SetupRoute
   '/$view': typeof ShellViewRouteRouteWithChildren
+  '/mailbox-connection': typeof ShellMailboxConnectionRoute
   '/settings': typeof ShellSettingsRoute
   '/$view/$id': typeof ShellViewIdRoute
   '/$view/new': typeof ShellViewNewRoute
@@ -86,6 +93,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/new-authenticator': typeof NewAuthenticatorRoute
   '/setup': typeof SetupRoute
+  '/mailbox-connection': typeof ShellMailboxConnectionRoute
   '/settings': typeof ShellSettingsRoute
   '/$view/$id': typeof ShellViewIdRoute
   '/$view/new': typeof ShellViewNewRoute
@@ -99,6 +107,7 @@ export interface FileRoutesById {
   '/new-authenticator': typeof NewAuthenticatorRoute
   '/setup': typeof SetupRoute
   '/_shell/$view': typeof ShellViewRouteRouteWithChildren
+  '/_shell/mailbox-connection': typeof ShellMailboxConnectionRoute
   '/_shell/settings': typeof ShellSettingsRoute
   '/_shell/$view/$id': typeof ShellViewIdRoute
   '/_shell/$view/new': typeof ShellViewNewRoute
@@ -112,6 +121,7 @@ export interface FileRouteTypes {
     | '/new-authenticator'
     | '/setup'
     | '/$view'
+    | '/mailbox-connection'
     | '/settings'
     | '/$view/$id'
     | '/$view/new'
@@ -122,6 +132,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/new-authenticator'
     | '/setup'
+    | '/mailbox-connection'
     | '/settings'
     | '/$view/$id'
     | '/$view/new'
@@ -134,6 +145,7 @@ export interface FileRouteTypes {
     | '/new-authenticator'
     | '/setup'
     | '/_shell/$view'
+    | '/_shell/mailbox-connection'
     | '/_shell/settings'
     | '/_shell/$view/$id'
     | '/_shell/$view/new'
@@ -192,6 +204,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShellViewRouteRouteImport
       parentRoute: typeof ShellRoute
     }
+    '/_shell/mailbox-connection': {
+      id: '/_shell/mailbox-connection'
+      path: '/mailbox-connection'
+      fullPath: '/mailbox-connection'
+      preLoaderRoute: typeof ShellMailboxConnectionRouteImport
+      parentRoute: typeof ShellRoute
+    }
     '/_shell/settings': {
       id: '/_shell/settings'
       path: '/settings'
@@ -241,11 +260,13 @@ const ShellViewRouteRouteWithChildren = ShellViewRouteRoute._addFileChildren(
 
 interface ShellRouteChildren {
   ShellViewRouteRoute: typeof ShellViewRouteRouteWithChildren
+  ShellMailboxConnectionRoute: typeof ShellMailboxConnectionRoute
   ShellSettingsRoute: typeof ShellSettingsRoute
 }
 
 const ShellRouteChildren: ShellRouteChildren = {
   ShellViewRouteRoute: ShellViewRouteRouteWithChildren,
+  ShellMailboxConnectionRoute: ShellMailboxConnectionRoute,
   ShellSettingsRoute: ShellSettingsRoute,
 }
 

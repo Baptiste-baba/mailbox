@@ -106,6 +106,32 @@
       }
     },
     {
+      "includes": [
+        "packages/providers/src/gmail/google-token-answers.ts",
+        "packages/providers/src/gmail/*.test.ts",
+        "apps/api/test/fake-google.ts"
+      ],
+      "linter": {
+        "rules": {
+          "style": {
+            "useNamingConvention": {
+              "level": "error",
+              "options": {
+                "conventions": [
+                  {
+                    "selector": {
+                      "kind": "objectLiteralProperty"
+                    },
+                    "formats": ["camelCase", "CONSTANT_CASE", "snake_case"]
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
       "includes": ["apps/api/**"],
       "javascript": {
         "parser": {

@@ -1,6 +1,10 @@
 import type {
   AuthStatus,
+  MailboxAuthorization,
   MailboxList,
+  MailboxSummary,
+  MailProviderList,
+  MessageBody,
   PasskeyCreationOptions,
   PasskeyList,
   PasskeyRequestOptions,
@@ -11,17 +15,12 @@ import type {
   TotpEnrollment,
 } from '@mailbox/shared';
 import { vi } from 'vitest';
+import { FakeEventSource } from './fake-event-source.ts';
+import { personalMailbox } from './test-mailboxes.ts';
 
 export const testMailboxes: MailboxList = {
   mailboxes: [
-    {
-      id: 'mailbox-personal',
-      name: 'Perso',
-      address: 'alex@example.com',
-      color: 'azur',
-      unreadCount: 1,
-      status: 'connected',
-    },
+    { ...personalMailbox, id: 'mailbox-personal', address: 'alex@example.com', unreadCount: 1 },
   ],
 };
 
@@ -45,7 +44,18 @@ type Answer<Data = never> = Data | Response | Promise<Data | Response>;
 interface FakeApi {
   threadPages?: (url: URL) => Answer<ThreadPage>;
   thread?: (threadId: string) => Answer<Thread>;
+  /** The HTML body of a message, given its id. */
+  messageBody?: (messageId: string) => Answer<MessageBody>;
   mailboxes?: () => Answer<MailboxList>;
+  /** The providers the server has a client for. */
+  mailProviders?: () => Answer<MailProviderList>;
+  /** Answers the start of a mailbox connection, given what the app sent. */
+  startMailboxConnection?: (body: unknown) => Answer<MailboxAuthorization>;
+  /** Answers the end of a mailbox connection, given what the provider sent the browser back with. */
+  completeMailboxConnection?: (body: unknown) => Answer<MailboxSummary>;
+  /** Answers the start of a reconnection, given the mailbox it is for. */
+  startMailboxReconnection?: (mailboxId: string) => Answer<MailboxAuthorization>;
+  removeMailbox?: (mailboxId: string) => Answer;
   authStatus?: () => Answer<AuthStatus>;
   /** Answers the setup requests, given the body the app sent. */
   setupEnrollment?: (body: unknown) => Answer<TotpEnrollment>;
@@ -109,25 +119,41 @@ interface FakeRequest {
 
 type FakeRoute = (request: FakeRequest) => Answer<object>;
 
-/** The route for `METHOD /path`, else for `METHOD /parent/:id`, with what stands for its id. */
+/**
+ * The route for `METHOD /path`, else the one whose path has `:id` in place of one part of it, with
+ * what stands for its id.
+ */
 function findRoute(routes: Record<string, FakeRoute>, method: string, path: string) {
   const exact = routes[`${method} ${path}`];
   if (exact !== undefined) {
     return { route: exact, id: '' };
   }
-  const slash = path.lastIndexOf('/');
-  const route = routes[`${method} ${path.slice(0, slash)}/:id`];
-  return route === undefined ? undefined : { route, id: decodeURIComponent(path.slice(slash + 1)) };
+  const parts = path.split('/');
+  for (const [position, part] of parts.entries()) {
+    const withId = parts.map((kept, index) => (index === position ? ':id' : kept)).join('/');
+    const route = routes[`${method} ${withId}`];
+    if (route !== undefined) {
+      return { route, id: decodeURIComponent(part) };
+    }
+  }
+  return undefined;
 }
 
 /**
  * Answers the app's requests to the api as the given functions say, and records them. A request
- * no route expects fails, naming it.
+ * no route expects fails, naming it. The events of the server are told by the test, through
+ * serverEvents().
  */
 export function fakeApi({
   threadPages = noThread,
   thread = notFound,
+  messageBody = apiError(404, 'MESSAGE_NOT_FOUND'),
   mailboxes = () => testMailboxes,
+  mailProviders = () => ({ providers: ['gmail'] }),
+  startMailboxConnection = serverError,
+  completeMailboxConnection = serverError,
+  startMailboxReconnection = serverError,
+  removeMailbox = serverError,
   authStatus = signedIn,
   setupEnrollment = serverError,
   setup = serverError,
@@ -148,8 +174,13 @@ export function fakeApi({
   const routes: Record<string, FakeRoute> = {
     'GET /api/threads': ({ url }) => threadPages(url),
     'GET /api/threads/:id': ({ id }) => thread(id),
+    'GET /api/messages/:id/body': ({ id }) => messageBody(id),
     'GET /api/mailboxes': () => mailboxes(),
-    'GET /api/folders': () => ({ folders: [] }),
+    'GET /api/mail-providers': () => mailProviders(),
+    'POST /api/mailboxes/connection': ({ sent }) => startMailboxConnection(sent),
+    'POST /api/mailboxes/connection/completion': ({ sent }) => completeMailboxConnection(sent),
+    'POST /api/mailboxes/:id/reconnection': ({ id }) => startMailboxReconnection(id),
+    'DELETE /api/mailboxes/:id': ({ id }) => removeMailbox(id),
     'GET /api/auth/status': () => authStatus(),
     'POST /api/auth/setup/totp-secret': ({ sent }) => setupEnrollment(sent),
     'POST /api/auth/setup': ({ sent }) => setup(sent),
@@ -179,6 +210,9 @@ export function fakeApi({
     return body instanceof Response ? body : Response.json(body);
   });
   vi.stubGlobal('fetch', fetchMock);
+  // The server's events too: a test tells them through serverEvents().
+  FakeEventSource.opened = [];
+  vi.stubGlobal('EventSource', FakeEventSource);
   return fetchMock;
 }
 

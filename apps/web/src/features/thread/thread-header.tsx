@@ -1,29 +1,12 @@
-import type { MailboxSummary, Thread } from '@mailbox/shared';
-import { Swatch } from '@mailbox/ui';
+import type { ReactNode } from 'react';
 import { fr } from '../../i18n/fr.ts';
-import { participantsLine } from './participants.ts';
 
-interface ThreadHeaderProps {
-  thread: Thread;
-  mailbox: MailboxSummary | undefined;
-}
-
-/** Subject of the thread, who takes part in it and the mailbox it is in. */
-export function ThreadHeader({ thread, mailbox }: ThreadHeaderProps) {
+/** Subject of the thread, then what is given under it to tell who takes part. */
+export function ThreadHeader({ subject, children }: { subject: string; children: ReactNode }) {
   return (
-    <header className="flex flex-col gap-2.5">
-      <h2 className="text-subject font-semibold break-words">
-        {thread.subject || fr.inbox.noSubject}
-      </h2>
-      <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-small text-ink-2">
-        <span>{participantsLine(thread.messages, mailbox?.address)}</span>
-        {mailbox !== undefined && (
-          <span className="flex items-center gap-2.5" title={mailbox.address}>
-            <Swatch color={mailbox.color} shape="circle" />
-            {mailbox.name}
-          </span>
-        )}
-      </div>
+    <header className="flex flex-col gap-3">
+      <h2 className="text-subject font-semibold break-words">{subject || fr.inbox.noSubject}</h2>
+      {children}
     </header>
   );
 }

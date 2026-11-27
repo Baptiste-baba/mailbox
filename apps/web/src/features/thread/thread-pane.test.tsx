@@ -1,4 +1,4 @@
-import type { Thread } from '@mailbox/shared';
+import type { Message, Thread } from '@mailbox/shared';
 import { afterEach, describe, expect, test, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { fakeApi, serverError, testMailboxes, testThread } from '../../testing/fake-api.ts';
@@ -7,6 +7,19 @@ import { renderApp } from '../../testing/render-app.tsx';
 
 const own = testMailboxes.mailboxes[0]?.address ?? '';
 const nadia = { name: 'Nadia Benali', address: 'nadia@example.com' };
+
+const finalVersion: Message = {
+  id: 'message-2',
+  from: nadia,
+  to: [{ name: 'Alex', address: own }],
+  cc: [],
+  sentAt: '2026-11-07T17:42:00.000Z',
+  bodyText: 'Bonjour Alex,\n\nVoici la version finale.',
+  hasHtml: false,
+  attachments: [
+    { id: 'file-1', fileName: 'Contrat_v3.pdf', mimeType: 'application/pdf', size: 214_016 },
+  ],
+};
 
 const contract: Thread = {
   id: 'thread-a',
@@ -20,19 +33,10 @@ const contract: Thread = {
       cc: [],
       sentAt: '2026-11-01T09:00:00.000Z',
       bodyText: 'Première version du contrat.',
+      hasHtml: false,
       attachments: [],
     },
-    {
-      id: 'message-2',
-      from: nadia,
-      to: [{ name: 'Alex', address: own }],
-      cc: [],
-      sentAt: '2026-11-07T17:42:00.000Z',
-      bodyText: 'Bonjour Alex,\n\nVoici la version finale.',
-      attachments: [
-        { id: 'file-1', fileName: 'Contrat_v3.pdf', mimeType: 'application/pdf', size: 214_016 },
-      ],
-    },
+    finalVersion,
   ],
 };
 
@@ -40,7 +44,25 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-describe('thread pane', () => {
+describe('thread pane, a mail alone', () => {
+  test('tells its sender under the subject, with who it went to and its mailbox, and nothing to fold', async () => {
+    fakeApi({
+      threadPages: () => ({ threads: [testThread('thread-a', false)], nextCursor: null }),
+      thread: () => ({ ...contract, messages: [{ ...finalVersion, attachments: [] }] }),
+    });
+    const { screen } = await renderApp('/inbox/thread-a');
+    const mail = screen.getByRole('article');
+
+    await expect.element(mail.getByText('Voici la version finale.')).toBeVisible();
+    await expect.element(mail.getByText('Nadia Benali', { exact: true })).toBeVisible();
+    await expect.element(mail.getByText('à toi')).toBeVisible();
+    await expect.element(mail.getByText('Perso')).toBeVisible();
+    expect(mail.getByText('Nadia Benali et toi').query()).toBeNull();
+    expect(mail.getByRole('button').query()).toBeNull();
+  });
+});
+
+describe('thread pane, a conversation', () => {
   test('opens the latest message and folds the earlier ones until asked', async () => {
     fakeApi({
       threadPages: () => ({ threads: [testThread('thread-a', false)], nextCursor: null }),
@@ -51,6 +73,7 @@ describe('thread pane', () => {
     await expect
       .element(screen.getByRole('heading', { name: 'Contrat de prestation' }))
       .toBeVisible();
+    await expect.element(screen.getByText('Nadia Benali et toi')).toBeVisible();
     await expect.element(screen.getByText('Voici la version finale.')).toBeVisible();
     await expect.element(screen.getByText('Contrat_v3.pdf')).toBeVisible();
     const earlier = screen.getByRole('button', { name: /Première version du contrat/ });

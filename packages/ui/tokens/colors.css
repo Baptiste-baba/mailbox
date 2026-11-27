@@ -49,6 +49,8 @@
   --ciel: #6e78ff;
   --glacier: #a5b4fc;
   --slate: #94a3b8;
+  /* Around the white sheet of an HTML mail: none on a white card, the mail reads as part of it. */
+  --mail-sheet-inset: 0;
 }
 
 .dark {
@@ -82,6 +84,8 @@
   --ciel: #8a94ff;
   --glacier: #5b67c7;
   --slate: #6e739c;
+  /* On a dark card, the white sheet of an HTML mail keeps its text off its edges. */
+  --mail-sheet-inset: 1rem;
 }
 
 /* `inline` makes utilities read the variable where they apply, so a `.dark` block inside a light page stays dark. */
@@ -116,6 +120,8 @@
   --color-ciel: var(--ciel);
   --color-glacier: var(--glacier);
   --color-slate: var(--slate);
+  /* An HTML mail stays on white in both themes, as its sender designed it. */
+  --color-mail-sheet: #ffffff;
   /* A QR code stays dark on light in both themes: some scanners cannot read it inverted. */
   --color-qr-module: #1e293b;
   --color-qr-background: #ffffff;

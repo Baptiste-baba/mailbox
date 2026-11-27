@@ -3,23 +3,15 @@ import { afterEach, describe, expect, test, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { fakeApi, serverError } from '../../testing/fake-api.ts';
 import { renderApp } from '../../testing/render-app.tsx';
+import { personalMailbox, workMailbox } from '../../testing/test-mailboxes.ts';
 
 const twoMailboxes: MailboxList = {
   mailboxes: [
+    { ...personalMailbox, id: 'mailbox-personal', address: 'alex@example.com', unreadCount: 0 },
     {
-      id: 'mailbox-personal',
-      name: 'Perso',
-      address: 'alex@example.com',
-      color: 'azur',
-      unreadCount: 0,
-      status: 'connected',
-    },
-    {
+      ...workMailbox,
       id: 'mailbox-work',
-      name: 'Travail',
       address: 'alex@work.example',
-      color: 'navy',
-      unreadCount: 0,
       status: 'reconnectRequired',
     },
   ],

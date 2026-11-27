@@ -6,9 +6,9 @@ import { ApiError } from '../../api/api-error.ts';
 import { mailboxesQuery } from '../../api/mailboxes-query.ts';
 import { threadQuery } from '../../api/thread-query.ts';
 import { fr } from '../../i18n/fr.ts';
+import { Conversation } from './conversation.tsx';
 import { ReplyBar } from './reply-bar.tsx';
-import { ThreadHeader } from './thread-header.tsx';
-import { ThreadMessages } from './thread-messages.tsx';
+import { SingleMessage } from './single-message.tsx';
 import { ThreadMessage, ThreadSkeleton } from './thread-states.tsx';
 import { ThreadToolbar } from './thread-toolbar.tsx';
 
@@ -43,14 +43,18 @@ function OpenThread({ thread }: { thread: Thread }) {
   const mailbox = useQuery(mailboxesQuery).data?.mailboxes.find(
     (candidate) => candidate.id === thread.mailboxId,
   );
+  const onlyMessage = thread.messages.length === 1 ? thread.messages[0] : undefined;
   const latestMessage = thread.messages.at(-1);
   return (
     <PaneCard>
       <ThreadToolbar />
       <div className="min-h-0 flex-1 overflow-y-auto overscroll-none">
         <article className="flex flex-col gap-6 px-9 py-7">
-          <ThreadHeader thread={thread} mailbox={mailbox} />
-          <ThreadMessages thread={thread} ownAddress={mailbox?.address} />
+          {onlyMessage === undefined ? (
+            <Conversation thread={thread} mailbox={mailbox} />
+          ) : (
+            <SingleMessage subject={thread.subject} message={onlyMessage} mailbox={mailbox} />
+          )}
         </article>
       </div>
       {latestMessage !== undefined && (

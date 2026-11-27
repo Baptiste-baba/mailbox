@@ -5,6 +5,7 @@ import { useEffect, useRef } from 'react';
 import { mailboxesQuery, selectMailboxesById } from '../../api/mailboxes-query.ts';
 import { type ThreadFilters, threadPagesQuery } from '../../api/thread-pages-query.ts';
 import { fr } from '../../i18n/fr.ts';
+import { EmptyThreadList } from './empty-thread-list.tsx';
 import { LoadMoreError, ThreadListMessage, ThreadListSkeleton } from './thread-list-states.tsx';
 import { ThreadRow } from './thread-row.tsx';
 import { useThreadKeyboard } from './use-thread-keyboard.ts';
@@ -25,16 +26,17 @@ export function ThreadList({ filters }: { filters: ThreadFilters }) {
   const pages = useInfiniteQuery(threadPagesQuery(filters));
   if (pages.data === undefined) {
     return pages.isError ? (
-      <ThreadListMessage message={fr.inbox.error} onRetry={() => pages.refetch()} />
+      <ThreadListMessage
+        message={fr.inbox.error}
+        action={{ label: fr.common.retry, onClick: () => pages.refetch() }}
+      />
     ) : (
       <ThreadListSkeleton />
     );
   }
   const threads = pages.data.pages.flatMap((page) => page.threads);
   if (threads.length === 0) {
-    return (
-      <ThreadListMessage message={filters.unreadOnly ? fr.inbox.emptyUnread : fr.inbox.empty} />
-    );
+    return <EmptyThreadList filters={filters} />;
   }
   return (
     <VirtualThreadList

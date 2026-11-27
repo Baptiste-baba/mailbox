@@ -47,13 +47,56 @@ export {
   type TooManyAttemptsDetails,
   tooManyAttemptsDetailsSchema,
 } from './errors/too-many-attempts-details.ts';
-export { type FolderList, type FolderSummary, folderListSchema } from './mail/folder-summary.ts';
+export {
+  SERVER_EVENTS_PATH,
+  type ServerEvent,
+  serverEventSchema,
+} from './events/server-event.ts';
 export { type MailAddress, mailAddressSchema } from './mail/mail-address.ts';
+export { MAIL_FRAME_PATH } from './mail/mail-frame.ts';
+export {
+  type AuthorizationCode,
+  type AuthorizationRequest,
+  type MailProvider,
+  type MailProviderList,
+  type MailProviderName,
+  mailProviderListSchema,
+  mailProviderNameSchema,
+  type ProviderAccess,
+  type ProviderGrant,
+  type ProviderMailboxState,
+} from './mail/mail-provider.ts';
+export {
+  MAILBOX_CONNECTION_PATH,
+  MAILBOX_NAME_MAX_LENGTH,
+  type MailboxAuthorization,
+  type MailboxConnectionCompletion,
+  type MailboxConnectionRequest,
+  mailboxAuthorizationSchema,
+  mailboxConnectionCompletionSchema,
+  mailboxConnectionRequestSchema,
+  mailboxIdSchema,
+} from './mail/mailbox-connection.ts';
+export {
+  mailboxConnectionFailure,
+  mailboxConnectionFailureDetailsSchema,
+} from './mail/mailbox-connection-failure.ts';
 export {
   type MailboxList,
   type MailboxSummary,
+  type MailboxSync,
   mailboxListSchema,
+  mailboxSummarySchema,
 } from './mail/mailbox-summary.ts';
+export { type MessageBody, messageBodySchema } from './mail/message-body.ts';
+export { type PaletteColor, paletteColorSchema } from './mail/palette-color.ts';
+export type {
+  ProviderAttachment,
+  ProviderChanges,
+  ProviderFolder,
+  ProviderMessage,
+  ProviderMessagePage,
+} from './mail/provider-message.ts';
 export {
   type Attachment,
   type Message,

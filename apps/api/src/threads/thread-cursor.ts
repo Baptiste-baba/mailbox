@@ -4,7 +4,7 @@ import * as z from 'zod';
 /** Where a page ends: the sort key of its last thread. */
 const threadCursorSchema = z.object({
   lastMessageAt: z.iso.datetime(),
-  id: z.string().min(1),
+  id: z.uuid(),
 });
 
 export type ThreadCursor = z.infer<typeof threadCursorSchema>;

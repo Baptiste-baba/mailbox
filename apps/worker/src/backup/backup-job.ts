@@ -1,6 +1,7 @@
 import { basename } from 'node:path';
 import type { Job, PgBoss } from 'pg-boss';
 import type { Logger } from 'pino';
+import { workJobs } from '../job-queue.ts';
 import { pruneBackups } from './backup-files.ts';
 import { dumpDatabase } from './dump-database.ts';
 
@@ -33,11 +34,7 @@ export async function registerBackupJob(
     tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
     missed: 'once',
   });
-  await jobQueue.work(BACKUP_QUEUE, async (jobs) => {
-    for (const job of jobs) {
-      await runBackup(target, job, logger);
-    }
-  });
+  await workJobs(jobQueue, BACKUP_QUEUE, (job) => runBackup(target, job, logger));
 }
 
 async function runBackup(target: BackupTarget, job: Job<unknown>, logger: Logger): Promise<void> {

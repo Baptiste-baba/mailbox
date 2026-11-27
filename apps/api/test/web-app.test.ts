@@ -1,7 +1,7 @@
 import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { errorResponseSchema } from '@mailbox/shared';
+import { errorResponseSchema, MAIL_FRAME_PATH } from '@mailbox/shared';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { type RunningApi, startApi } from './start-api.ts';
 
@@ -14,6 +14,7 @@ async function startApiWithWebApp(): Promise<RunningApi> {
   await writeFile(join(webDirectory, 'index.html'), '<!doctype html><title>MailBox</title>');
   await writeFile(join(webDirectory, 'assets', 'index-abc123.js'), 'export {};');
   await writeFile(join(webDirectory, 'sw.js'), 'self.skipWaiting;');
+  await writeFile(join(webDirectory, 'mail-frame.html'), '<!doctype html><title>Mail</title>');
   const api = await startApi({ WEB_DIRECTORY: webDirectory });
   return {
     ...api,
@@ -85,5 +86,28 @@ describe('static files of the web app', () => {
     const response = await fetch(`${api.url}/assets/missing.js`);
 
     expect(response.status).toBe(404);
+  });
+});
+
+describe('the page a mail is shown in', () => {
+  let api: RunningApi;
+
+  beforeAll(async () => {
+    api = await startApiWithWebApp();
+  });
+
+  afterAll(async () => {
+    await api.close();
+  });
+
+  // The styles of the mail apply; nothing else loads or runs, and only the app may frame it.
+  it('comes with a policy of its own', async () => {
+    const response = await fetch(`${api.url}${MAIL_FRAME_PATH}`, asBrowserPage);
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get('content-security-policy')).toBe(
+      "default-src 'none'; style-src 'unsafe-inline'; img-src data: https:; font-src data:; base-uri 'self'; form-action 'none'; frame-ancestors 'self'",
+    );
+    expect(response.headers.get('referrer-policy')).toBe('no-referrer');
   });
 });

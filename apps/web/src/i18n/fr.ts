@@ -4,6 +4,7 @@ import { compose } from './fr/compose.ts';
 import { notFound, serverUnreachable, unexpectedError } from './fr/errors.ts';
 import { inbox } from './fr/inbox.ts';
 import { login, setup } from './fr/login.ts';
+import { mailboxes } from './fr/mailboxes.ts';
 import { settings } from './fr/settings.ts';
 import { sidebar } from './fr/sidebar.ts';
 import { thread } from './fr/thread.ts';
@@ -24,6 +25,7 @@ export const fr = {
   passkey,
   identity,
   signOut,
+  mailboxes,
   settings,
   login,
   setup,

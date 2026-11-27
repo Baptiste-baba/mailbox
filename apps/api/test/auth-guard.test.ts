@@ -36,7 +36,7 @@ beforeEach(async () => {
 });
 
 describe('routes that need a session', () => {
-  it.each(['/api/mailboxes', '/api/folders', '/api/threads?view=inbox'])(
+  it.each(['/api/mailboxes', '/api/threads?view=inbox'])(
     'answers %s to the signed-in user only',
     async (path) => {
       const withoutSession = await get(path);

@@ -16,6 +16,8 @@ const messageSchema = z.object({
   cc: z.array(mailAddressSchema),
   sentAt: z.iso.datetime(),
   bodyText: z.string(),
+  /** Whether the mail also has an HTML body, read apart when the message is opened. */
+  hasHtml: z.boolean(),
   attachments: z.array(attachmentSchema),
 });
 

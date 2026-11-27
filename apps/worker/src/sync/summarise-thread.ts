@@ -1,0 +1,87 @@
+import { attachment, isAttachedFile, message, type Transaction, thread } from '@mailbox/db';
+import { and, asc, count, desc, eq, type SQL, sql } from 'drizzle-orm';
+
+/** A mail just stored, and what the list shows of its thread when it is the one that opened it. */
+interface StoredMail {
+  messageId: string;
+  subject: string;
+}
+
+async function countMessages(transaction: Transaction, ofThread: SQL) {
+  const [facts] = await transaction
+    .select({
+      messageCount: count(),
+      unread: sql<boolean>`coalesce(bool_or(${message.unread}), false)`,
+      inInbox: sql<boolean>`coalesce(bool_or(${message.inInbox}), false)`,
+    })
+    .from(message)
+    .where(ofThread);
+  return facts;
+}
+
+async function readLatestMessage(transaction: Transaction, ofThread: SQL) {
+  const [latest] = await transaction
+    .select({
+      senderName: message.fromName,
+      senderAddress: message.fromAddress,
+      snippet: message.snippet,
+      lastMessageAt: message.sentAt,
+    })
+    .from(message)
+    .where(ofThread)
+    .orderBy(desc(message.sentAt), desc(message.id))
+    .limit(1);
+  return latest;
+}
+
+async function findOldestMessageId(transaction: Transaction, ofThread: SQL) {
+  const [oldest] = await transaction
+    .select({ id: message.id })
+    .from(message)
+    .where(ofThread)
+    .orderBy(asc(message.sentAt), asc(message.id))
+    .limit(1);
+  return oldest?.id;
+}
+
+async function hasAttachedFile(transaction: Transaction, ofThread: SQL): Promise<boolean> {
+  const [file] = await transaction
+    .select({ id: attachment.id })
+    .from(attachment)
+    .innerJoin(message, eq(attachment.messageId, message.id))
+    .where(and(ofThread, isAttachedFile))
+    .limit(1);
+  return file !== undefined;
+}
+
+/**
+ * Works out again what a mail list shows of a thread, from the messages it has left: lists read
+ * the thread alone. A thread left without a message goes. The subject is the one of the oldest
+ * message stored, as the conversation was named; it stays when that message goes.
+ * @param justStored The mail whose storing calls for this, when a mail was stored.
+ */
+export async function summariseThread(
+  transaction: Transaction,
+  threadId: string,
+  justStored?: StoredMail,
+): Promise<void> {
+  const ofThread = eq(message.threadId, threadId);
+  const facts = await countMessages(transaction, ofThread);
+  const latest = await readLatestMessage(transaction, ofThread);
+  if (facts === undefined || latest === undefined) {
+    await transaction.delete(thread).where(eq(thread.id, threadId));
+    return;
+  }
+  const opensThread =
+    justStored !== undefined &&
+    (await findOldestMessageId(transaction, ofThread)) === justStored.messageId;
+  await transaction
+    .update(thread)
+    .set({
+      ...facts,
+      ...latest,
+      hasAttachments: await hasAttachedFile(transaction, ofThread),
+      ...(opensThread ? { subject: justStored.subject } : {}),
+    })
+    .where(eq(thread.id, threadId));
+}

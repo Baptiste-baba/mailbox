@@ -141,3 +141,15 @@ describe('mail list, while loading', () => {
     await expect.element(screen.getByRole('button', { name: 'Réessayer' })).toBeVisible();
   });
 });
+
+describe('mail list, for a mail that names no sender', () => {
+  test('says the sender is unknown', async () => {
+    const thread = { ...testThread('thread-a', false), sender: { name: '', address: '' } };
+    fakeApi({ threadPages: () => ({ threads: [thread], nextCursor: null }) });
+    const { screen } = await renderApp('/inbox');
+
+    await expect
+      .element(screen.getByRole('link', { name: /Expéditeur inconnu.*Sujet thread-a/ }))
+      .toBeVisible();
+  });
+});

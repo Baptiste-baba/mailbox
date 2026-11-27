@@ -14,8 +14,6 @@ export const auth = {
   tooManyAttempts: (wait: string) => `Trop d’essais. Réessaie dans ${wait}.`,
   waitSeconds: (seconds: number) => `${seconds} s`,
   waitMinutes: (minutes: number) => `${minutes} min`,
-  unreachable: 'Impossible de joindre le serveur. Vérifie qu’il est démarré, puis réessaie.',
-  unexpected: 'Le serveur a rencontré un problème. Réessaie dans un instant.',
 };
 
 export const authenticator = {

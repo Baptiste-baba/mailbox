@@ -15,7 +15,13 @@ export function AddPasskeyDialog({ open, onClose }: { open: boolean; onClose: ()
 function AddPasskeyForm({ onDone }: { onDone: () => void }) {
   const form = useAddPasskey(onDone);
   if (form.confirming) {
-    return <IdentityConfirmationForm onConfirmed={form.confirmed} onCancel={onDone} />;
+    return (
+      <IdentityConfirmationForm
+        intro={fr.identity.intro}
+        onConfirmed={form.confirmed}
+        onCancel={onDone}
+      />
+    );
   }
   return (
     <form

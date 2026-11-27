@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="color-scheme" content="light" />
+    <!-- The policies the api also sends with this page: here, they hold wherever the page is served
+      from, the development server included. Nothing runs; of what is remote, only images load,
+      over https, and they tell their senders nothing of the address of the app. -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; style-src 'unsafe-inline'; img-src data: https:; font-src data:; base-uri 'self'; form-action 'none'"
+    />
+    <meta name="referrer" content="no-referrer" />
+    <!-- Every link of a mail opens outside the app. -->
+    <base target="_blank" />
+    <title>Mail</title>
+    <style>
+      /* The sheet a mail is shown on: white, as its sender designed it, whatever the theme of the app. */
+      /* The frame takes the height of the mail, and a mail wider than the pane is shrunk to it from
+         its top left corner: nothing to scroll. */
+      html {
+        background: #fff;
+        color: #000;
+        color-scheme: light;
+        overflow: hidden;
+        transform-origin: 0 0;
+      }
+      body {
+        margin: 0;
+        font: 15px/1.5 system-ui, sans-serif;
+        overflow-wrap: break-word;
+      }
+      img {
+        max-width: 100%;
+        height: auto;
+      }
+    </style>
+  </head>
+  <body></body>
+</html>

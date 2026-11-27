@@ -7,8 +7,12 @@ export const common = {
   back: 'Retour',
   cancel: 'Annuler',
   close: 'Fermer',
+  serverUnreachable: 'Impossible de joindre le serveur. Vérifie qu’il est démarré, puis réessaie.',
+  serverProblem: 'Le serveur a rencontré un problème. Réessaie dans un instant.',
+  unknownSender: 'Expéditeur inconnu',
   unreadCount: (count: number) => `${count} non ${count >= 2 ? 'lus' : 'lu'}`,
   reconnect: 'Reconnecter',
+  syncInterrupted: 'Synchronisation interrompue',
   noMailbox: 'Aucune boîte connectée.',
   mailboxesError: 'Impossible de charger tes boîtes.',
 };

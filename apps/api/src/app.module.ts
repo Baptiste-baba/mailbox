@@ -6,10 +6,11 @@ import type { ApiConfig } from './config/api-config.ts';
 import { DatabaseModule } from './database/database.module.ts';
 import { createValidationPipe } from './errors/create-validation-pipe.ts';
 import { GlobalExceptionFilter } from './errors/global-exception.filter.ts';
-import { FoldersModule } from './folders/folders.module.ts';
+import { createEventsModule } from './events/events.module.ts';
 import { HealthModule } from './health/health.module.ts';
-import { createLoggerOptions } from './logging/logger-options.ts';
-import { MailboxesModule } from './mailboxes/mailboxes.module.ts';
+import { createHttpLoggerOptions } from './logging/logger-options.ts';
+import { createMailboxesModule } from './mailboxes/mailboxes.module.ts';
+import { MessagesModule } from './messages/messages.module.ts';
 import { ThreadsModule } from './threads/threads.module.ts';
 
 @Module({})
@@ -19,13 +20,14 @@ export function createAppModule(config: ApiConfig): DynamicModule {
   return {
     module: AppModule,
     imports: [
-      LoggerModule.forRoot(createLoggerOptions(config.logLevel)),
+      LoggerModule.forRoot({ pinoHttp: createHttpLoggerOptions(config.logLevel) }),
       DatabaseModule.register(config.databaseUrl),
       HealthModule,
       createAuthModule(config.secretKey, config.appUrl),
-      MailboxesModule,
-      FoldersModule,
+      createMailboxesModule(config),
       ThreadsModule,
+      MessagesModule,
+      createEventsModule(config.databaseUrl),
     ],
     providers: [
       { provide: APP_FILTER, useClass: GlobalExceptionFilter },

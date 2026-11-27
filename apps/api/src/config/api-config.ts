@@ -1,6 +1,15 @@
 import { existsSync } from 'node:fs';
 import { join, resolve } from 'node:path';
-import { databaseUrlSchema, logLevelSchema, portSchema } from '@mailbox/config';
+import {
+  databaseUrlSchema,
+  googleClientOf,
+  googleClientVariables,
+  HALF_GOOGLE_CLIENT_ISSUE,
+  isWholeGoogleClient,
+  logLevelSchema,
+  portSchema,
+  secretKeySchema,
+} from '@mailbox/config';
 import * as z from 'zod';
 import { appUrlSchema } from './app-url.ts';
 import { trustedProxiesSchema } from './trusted-proxies.ts';
@@ -11,15 +20,6 @@ const webDirectorySchema = z
   .transform((directory) => resolve(directory))
   .refine((directory) => existsSync(join(directory, 'index.html')), {
     message: 'Must be the folder of the built web app, containing index.html',
-  });
-
-const SECRET_KEY_LENGTH = 32;
-
-const secretKeySchema = z
-  .base64()
-  .transform((key) => Buffer.from(key, 'base64'))
-  .refine((key) => key.length === SECRET_KEY_LENGTH, {
-    message: 'Must be 32 bytes in base64: generate one with openssl rand -base64 32',
   });
 
 const apiEnvironmentSchema = z
@@ -34,7 +34,10 @@ const apiEnvironmentSchema = z
     LOG_LEVEL: logLevelSchema.default('info'),
     // Unset, no X-Forwarded-For header is trusted: every request counts as the proxy's own.
     TRUSTED_PROXIES: trustedProxiesSchema.optional(),
+    // Unset, no Gmail mailbox can be connected: the rest of the app works without them.
+    ...googleClientVariables,
   })
+  .refine(isWholeGoogleClient, HALF_GOOGLE_CLIENT_ISSUE)
   .transform((environment) => ({
     databaseUrl: environment.DATABASE_URL,
     secretKey: environment.MAILBOX_SECRET_KEY,
@@ -44,6 +47,7 @@ const apiEnvironmentSchema = z
     webDirectory: environment.WEB_DIRECTORY,
     logLevel: environment.LOG_LEVEL,
     trustedProxies: environment.TRUSTED_PROXIES ?? [],
+    google: googleClientOf(environment),
   }));
 
 export type ApiConfig = z.output<typeof apiEnvironmentSchema>;

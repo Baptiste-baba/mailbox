@@ -48,7 +48,13 @@ function SignOutOthersConfirmation({ onCancel, onSignedOut }: SignOutOthersConfi
     errorMessage: authErrorMessage,
   });
   if (signOut.confirming) {
-    return <IdentityConfirmationForm onConfirmed={signOut.confirmed} onCancel={onCancel} />;
+    return (
+      <IdentityConfirmationForm
+        intro={fr.identity.intro}
+        onConfirmed={signOut.confirmed}
+        onCancel={onCancel}
+      />
+    );
   }
   return (
     <DialogConfirmation

@@ -63,6 +63,45 @@ less than ten minutes ago. Passkeys work at the address set in `MAILBOX_URL` onl
 
 Sessions only work over HTTPS, such as `tailscale serve` gives, or on `localhost`.
 
+### Connecting Gmail
+
+Google has no shared MailBox application: each installation reads Gmail through its own OAuth
+client, created once in Google Cloud, free of charge. MailBox only asks Google for the right to
+read mail.
+
+Google calls "Personal mode" a client that works for the account that created it and for no other:
+it needs no review by Google, shows no warning when you connect, and its access does not expire.
+Signed in to Google with the account whose mail you want to read:
+1. Open the [Personal mode onboarding](https://console.cloud.google.com/auth/overview/personal)
+   page of the Google Cloud console.
+2. Leave "Create a new project" selected, and choose the application type **Web application**.
+3. Under "Authorized redirect URIs", add the address of `MAILBOX_URL` followed by
+   `/mailbox-connection`, such as `https://mail.your-tailnet.ts.net/mailbox-connection`.
+4. Accept the user data policy, then Continue. Copy the client ID and the client secret right away:
+   Google shows the secret in full only once.
+5. Enable the Gmail API in the project just created: menu › APIs & Services › Library, open
+   "Gmail API", then Enable.
+6. Set `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` in `.env`, then apply with
+   `docker compose up --detach`.
+
+Google may take from five minutes to a few hours to apply a change made to the client. The redirect
+address must match `MAILBOX_URL` exactly: after changing one, change the other.
+
+Once a mailbox is connected in Réglages › Boîtes mail, the worker copies its mail in the background,
+most recent first, leaving out spam, the bin and drafts. Google lets a mailbox be read at about 80
+mails a minute: count two hours for 10,000 mails. The copy picks up where it stopped after a
+restart, and the mails already copied can be read meanwhile.
+
+From then on, the worker asks Google every minute what changed in the mailbox: new mail, mail
+read, archived, filed or deleted there shows in MailBox within a minute or two, without reloading
+the page. Google keeps about
+a week of these changes: after a longer stop of the server, the mailbox is copied again from the
+start, which takes as long as the first time.
+
+As such a client serves one Google account, an installation connects the mailbox of one Google
+account for now. With a Google Workspace account, the administrator of the domain may have to allow
+the app first.
+
 ### Lost access
 
 Without the password, or without both the authenticator app and the recovery codes, reset the
@@ -95,19 +134,21 @@ Services read their configuration from environment variables, validated at start
 invalid variable stops the service with an explicit message. With Docker Compose, `compose.yaml`
 sets them from `.env`; the table below matters to run a service on its own.
 
-| Variable             | Used by     | Required | Default     | Purpose                                                        |
-| -------------------- | ----------- | -------- | ----------- | -------------------------------------------------------------- |
-| `DATABASE_URL`       | api, worker | yes      |             | PostgreSQL connection string (`postgres://…`)                  |
-| `MAILBOX_SECRET_KEY` | api         | yes      |             | 32 bytes in base64 encrypting the secrets kept in the database |
-| `MAILBOX_URL`        | api         | yes      |             | HTTPS address the app is opened at (`http` for `localhost`)    |
-| `API_HOST`           | api         | no       | `127.0.0.1` | Address the api listens on (`0.0.0.0` inside a container)      |
-| `API_PORT`           | api         | no       | `3000`      | Port the api listens on                                        |
-| `WEB_DIRECTORY`      | api         | no       |             | Built web app (`apps/web/dist`) to serve; unset, API only      |
-| `BACKUP_DIRECTORY`   | worker      | yes      |             | Folder receiving the nightly database backups                  |
-| `WORKER_HEALTH_PORT` | worker      | no       | `3001`      | Port of the worker health check, bound to loopback only        |
-| `TRUSTED_PROXIES`    | api         | no       |             | Proxies whose `X-Forwarded-For` names the device (see below)   |
-| `LOG_LEVEL`          | api, worker | no       | `info`      | `fatal`, `error`, `warn`, `info`, `debug`, `trace` or `silent` |
-| `TZ`                 | worker      | no       | `UTC`       | Time zone, e.g. `Europe/Paris`; sets the hour of the backup    |
+| Variable               | Used by     | Required | Default     | Purpose                                                        |
+| ---------------------- | ----------- | -------- | ----------- | -------------------------------------------------------------- |
+| `DATABASE_URL`         | api, worker | yes      |             | PostgreSQL connection string (`postgres://…`)                  |
+| `MAILBOX_SECRET_KEY`   | api, worker | yes      |             | 32 bytes in base64 encrypting the secrets kept in the database |
+| `MAILBOX_URL`          | api         | yes      |             | HTTPS address the app is opened at (`http` for `localhost`)    |
+| `API_HOST`             | api         | no       | `127.0.0.1` | Address the api listens on (`0.0.0.0` inside a container)      |
+| `API_PORT`             | api         | no       | `3000`      | Port the api listens on                                        |
+| `WEB_DIRECTORY`        | api         | no       |             | Built web app (`apps/web/dist`) to serve; unset, API only      |
+| `GOOGLE_CLIENT_ID`     | api, worker | no       |             | OAuth client of this installation at Google, to connect Gmail  |
+| `GOOGLE_CLIENT_SECRET` | api, worker | no       |             | Secret of that client; set both, or neither                    |
+| `BACKUP_DIRECTORY`     | worker      | yes      |             | Folder receiving the nightly database backups                  |
+| `WORKER_HEALTH_PORT`   | worker      | no       | `3001`      | Port of the worker health check, bound to loopback only        |
+| `TRUSTED_PROXIES`      | api         | no       |             | Proxies whose `X-Forwarded-For` names the device (see below)   |
+| `LOG_LEVEL`            | api, worker | no       | `info`      | `fatal`, `error`, `warn`, `info`, `debug`, `trace` or `silent` |
+| `TZ`                   | worker      | no       | `UTC`       | Time zone, e.g. `Europe/Paris`; sets the hour of the backup    |
 
 `TRUSTED_PROXIES` lists addresses, subnets (`172.16.0.0/12`) or the names `loopback`, `linklocal`
 and `uniquelocal`, separated by commas. Failed sign-ins slow down the device that made them, known
@@ -183,6 +224,11 @@ again after an upgrade of Playwright.
 reload the web app on `http://localhost:5173`, the api on `http://127.0.0.1:3000` and the worker
 (health check on port `3001`). Local backups land in `.backups/`. Development and test settings
 live in `.env.development` and `.env.test`; they only hold local values.
+
+To connect Gmail in development, follow "Connecting Gmail" with
+`http://localhost:5173/mailbox-connection` as the redirect address, and write `GOOGLE_CLIENT_ID` and
+`GOOGLE_CLIENT_SECRET` to `.env.development.local` at the root of the repository: Git ignores that
+file, and the api and the worker read it on top of `.env.development`.
 
 `http://localhost:5173/design.html` shows every design token and interface component in both
 themes. It exists in development only.

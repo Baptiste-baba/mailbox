@@ -7,15 +7,21 @@ import { useHasPasskey } from './use-has-passkey.ts';
 import { useIdentityConfirmation } from './use-identity-confirmation.ts';
 
 interface IdentityConfirmationFormProps {
+  /** Why the identity is asked again, in a sentence. */
+  intro: string;
   onConfirmed: () => void;
   onCancel: () => void;
 }
 
 /**
- * In a dialog, before a change of how one signs in: a passkey, when the account has one, or the
- * password and a code.
+ * In a dialog, before a change the api holds back for want of a recent proof of identity: a
+ * passkey, when the account has one, or the password and a code.
  */
-export function IdentityConfirmationForm({ onConfirmed, onCancel }: IdentityConfirmationFormProps) {
+export function IdentityConfirmationForm({
+  intro,
+  onConfirmed,
+  onCancel,
+}: IdentityConfirmationFormProps) {
   const form = useIdentityConfirmation(onConfirmed);
   const withPasskey = useHasPasskey();
   return (
@@ -27,7 +33,7 @@ export function IdentityConfirmationForm({ onConfirmed, onCancel }: IdentityConf
       }}
     >
       <div className="flex flex-col gap-4">
-        <p className="text-center text-ink-2">{fr.identity.intro}</p>
+        <p className="text-center text-ink-2">{intro}</p>
         {withPasskey && passkeysSupported() && (
           <>
             <Button
