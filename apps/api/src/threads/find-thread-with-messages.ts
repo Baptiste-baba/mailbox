@@ -17,6 +17,7 @@ export function findThreadWithMessages(database: Database, threadId: string) {
           toRecipients: true,
           ccRecipients: true,
           sentAt: true,
+          snippet: true,
           bodyText: true,
         },
         with: {

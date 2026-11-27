@@ -1,6 +1,7 @@
 import type { Message } from '@mailbox/shared';
 import { Avatar } from '@mailbox/ui';
 import { formatMessageDate } from '../../dates/format-mail-date.ts';
+import { displayName } from '../../display-name.ts';
 import { fr } from '../../i18n/fr.ts';
 import { MessageBody } from './message-body.tsx';
 import { isOwn, recipientsLine } from './participants.ts';
@@ -19,7 +20,7 @@ interface MessageItemProps {
 /** One message of a thread: folded to a line with its start, or open on its whole text. */
 export function MessageItem({ message, ownAddress, open, onToggle, now }: MessageItemProps) {
   const own = isOwn(message.from, ownAddress);
-  const name = message.from.name || message.from.address;
+  const name = displayName(message.from);
   const sender = own ? fr.thread.me : name;
   const date = (
     <time dateTime={message.sentAt} className="flex-none text-caption text-ink-2">

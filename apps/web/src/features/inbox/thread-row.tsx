@@ -3,6 +3,7 @@ import { Avatar, Chip, RowLink, Swatch } from '@mailbox/ui';
 import { createLink } from '@tanstack/react-router';
 import { PaperclipIcon } from 'lucide-react';
 import { formatListDate } from '../../dates/format-mail-date.ts';
+import { displayName } from '../../display-name.ts';
 import { fr } from '../../i18n/fr.ts';
 
 const ThreadRowLink = createLink(RowLink);
@@ -16,7 +17,7 @@ interface ThreadRowProps {
 
 /** One thread of the list: who wrote last, when, the subject and the start of the latest message. */
 export function ThreadRow({ thread, view, mailbox, now }: ThreadRowProps) {
-  const sender = thread.sender.name || thread.sender.address;
+  const sender = displayName(thread.sender);
   return (
     <ThreadRowLink to="/$view/$id" params={{ view, id: thread.id }} search={(previous) => previous}>
       <Avatar name={sender} className="self-center" />

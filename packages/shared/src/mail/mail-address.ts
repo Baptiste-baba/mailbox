@@ -4,7 +4,8 @@ import * as z from 'zod';
 export const mailAddressSchema = z.object({
   /** Display name, empty when the sender gave none. */
   name: z.string(),
-  address: z.string().min(1),
+  /** Empty for the sender of a mail that names none the app could read. */
+  address: z.string(),
 });
 
 export type MailAddress = z.infer<typeof mailAddressSchema>;

@@ -209,6 +209,35 @@ describe('GET /api/threads/:threadId', () => {
   });
 });
 
+describe('GET /api/threads/:threadId, for mails that lack what most have', () => {
+  // Until HTML bodies are shown, the start Gmail gives as text stands for a mail without text.
+  it('gives the start of a mail that only has an HTML body, as its text', async () => {
+    const messageId = await firstMessageOf(conversation);
+    await database
+      .update(message)
+      .set({ bodyText: null, bodyHtml: '<p>Bonjour</p>', snippet: 'Bonjour' })
+      .where(eq(message.id, messageId));
+
+    const thread = threadSchema.parse(await (await get(`/threads/${conversation}`)).json());
+
+    expect(thread.messages[0]?.bodyText).toBe('Bonjour');
+  });
+
+  it('gives a mail that names no sender the app could read, with an empty address', async () => {
+    const messageId = await firstMessageOf(conversation);
+    await database
+      .update(message)
+      .set({ fromName: '', fromAddress: '' })
+      .where(eq(message.id, messageId));
+
+    const response = await get(`/threads/${conversation}`);
+
+    expect(response.status).toBe(200);
+    const thread = threadSchema.parse(await response.json());
+    expect(thread.messages[0]?.from).toEqual({ name: '', address: '' });
+  });
+});
+
 describe('GET /api/threads/:threadId, refused', () => {
   it.each([
     ['a thread that does not exist', randomUUID()],

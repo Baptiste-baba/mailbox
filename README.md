@@ -87,6 +87,11 @@ Signed in to Google with the account whose mail you want to read:
 Google may take from five minutes to a few hours to apply a change made to the client. The redirect
 address must match `MAILBOX_URL` exactly: after changing one, change the other.
 
+Once a mailbox is connected in Réglages › Boîtes mail, the worker copies its mail in the background,
+most recent first, leaving out spam, the bin and drafts. Google lets a mailbox be read at about 80
+mails a minute: count two hours for 10,000 mails. The copy picks up where it stopped after a
+restart, and the mails already copied can be read meanwhile.
+
 As such a client serves one Google account, an installation connects the mailbox of one Google
 account for now. With a Google Workspace account, the administrator of the domain may have to allow
 the app first.

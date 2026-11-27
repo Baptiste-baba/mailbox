@@ -27,8 +27,9 @@ export function toThread(stored: StoredThreadWithMessages): Thread {
       to: message.toRecipients,
       cc: message.ccRecipients,
       sentAt: message.sentAt.toISOString(),
-      // A mail may have no plain text body, only an HTML one.
-      bodyText: message.bodyText ?? '',
+      // A mail may have no plain text body, only an HTML one: its start, which the provider gives
+      // as text, stands for it.
+      bodyText: message.bodyText ?? message.snippet,
       attachments: message.attachments,
     })),
   };
