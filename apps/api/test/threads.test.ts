@@ -186,6 +186,7 @@ describe('GET /api/threads/:threadId', () => {
       to: [{ name: 'Alex Martin', address: 'alex.martin@example.com' }],
       cc: [],
       bodyText: 'Bonjour, voici le devis signé.\n\nMessage 1',
+      hasHtml: false,
       attachments: [],
     });
   });
@@ -221,6 +222,21 @@ describe('GET /api/threads/:threadId, for mails that lack what most have', () =>
     const thread = threadSchema.parse(await (await get(`/threads/${conversation}`)).json());
 
     expect(thread.messages[0]?.bodyText).toBe('Bonjour');
+  });
+
+  it('tells which mails have an HTML body, without giving it', async () => {
+    const messageId = await firstMessageOf(conversation);
+    await database
+      .update(message)
+      .set({ bodyHtml: '<p>Bonjour</p>' })
+      .where(eq(message.id, messageId));
+
+    const response = await get(`/threads/${conversation}`);
+
+    const text = await response.text();
+    expect(text).not.toContain('<p>Bonjour</p>');
+    const thread = threadSchema.parse(JSON.parse(text));
+    expect(thread.messages.map((sent) => sent.hasHtml)).toEqual([true, false, false]);
   });
 
   it('gives a mail that names no sender the app could read, with an empty address', async () => {

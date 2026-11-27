@@ -1,5 +1,5 @@
 import { attachment, type Database, isAttachedFile, message, thread } from '@mailbox/db';
-import { asc, eq } from 'drizzle-orm';
+import { asc, eq, sql } from 'drizzle-orm';
 
 /** One query: the thread, its messages oldest first, and the files attached to each. */
 export function findThreadWithMessages(database: Database, threadId: string) {
@@ -20,6 +20,7 @@ export function findThreadWithMessages(database: Database, threadId: string) {
           snippet: true,
           bodyText: true,
         },
+        extras: { hasHtml: sql<boolean>`${message.bodyHtml} is not null`.as('has_html') },
         with: {
           attachments: {
             where: isAttachedFile,

@@ -22,6 +22,7 @@ function openThread(id: string): Thread {
         cc: [],
         sentAt: lastMessageAt,
         bodyText: 'Bonjour,',
+        hasHtml: false,
         attachments: [],
       },
     ],

@@ -16,6 +16,7 @@ function message(from: Message['from'], to: Message['to'], cc: Message['cc'] = [
     cc,
     sentAt: '2026-11-08T08:00:00.000Z',
     bodyText: '',
+    hasHtml: false,
     attachments: [],
   };
 }

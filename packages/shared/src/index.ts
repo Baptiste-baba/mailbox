@@ -53,6 +53,7 @@ export {
   serverEventSchema,
 } from './events/server-event.ts';
 export { type MailAddress, mailAddressSchema } from './mail/mail-address.ts';
+export { MAIL_FRAME_PATH } from './mail/mail-frame.ts';
 export {
   type AuthorizationCode,
   type AuthorizationRequest,

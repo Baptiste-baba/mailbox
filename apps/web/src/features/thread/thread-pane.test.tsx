@@ -20,6 +20,7 @@ const contract: Thread = {
       cc: [],
       sentAt: '2026-11-01T09:00:00.000Z',
       bodyText: 'Première version du contrat.',
+      hasHtml: false,
       attachments: [],
     },
     {
@@ -29,6 +30,7 @@ const contract: Thread = {
       cc: [],
       sentAt: '2026-11-07T17:42:00.000Z',
       bodyText: 'Bonjour Alex,\n\nVoici la version finale.',
+      hasHtml: false,
       attachments: [
         { id: 'file-1', fileName: 'Contrat_v3.pdf', mimeType: 'application/pdf', size: 214_016 },
       ],

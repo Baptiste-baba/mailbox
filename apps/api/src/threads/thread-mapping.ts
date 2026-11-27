@@ -30,6 +30,7 @@ export function toThread(stored: StoredThreadWithMessages): Thread {
       // A mail may have no plain text body, only an HTML one: its start, which the provider gives
       // as text, stands for it.
       bodyText: message.bodyText ?? message.snippet,
+      hasHtml: message.hasHtml,
       attachments: message.attachments,
     })),
   };
