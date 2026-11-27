@@ -73,11 +73,13 @@ export interface MailProvider {
   renewAccess(refreshToken: string): Promise<ProviderAccess>;
 
   /**
-   * A page of the mails of the account, most recent first; spam and deleted mail are left out.
+   * A page of the mails of the account worth mirroring, most recent first: spam, deleted mail and
+   * drafts are left out. Null when the provider no longer knows the page asked for: the listing
+   * starts again from its first page.
    * @param pageToken What the previous page gave to ask for this one; null for the first page.
    * @throws AppError MAIL_PROVIDER_UNAVAILABLE when the provider cannot be reached or refuses.
    */
-  listMessages(accessToken: string, pageToken: string | null): Promise<ProviderMessagePage>;
+  listMessages(accessToken: string, pageToken: string | null): Promise<ProviderMessagePage | null>;
 
   /**
    * A mail of the account; null when the provider no longer has it, deleted since it was listed.

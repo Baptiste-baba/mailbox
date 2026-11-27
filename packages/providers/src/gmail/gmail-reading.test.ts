@@ -72,7 +72,7 @@ describe('listing the messages of a Gmail mailbox', () => {
       nextPageToken: 'the-next-page',
     });
     expect(requestSent()).toEqual({
-      url: `${API}/messages?maxResults=500`,
+      url: `${API}/messages?maxResults=100&q=-in%3Adraft`,
       authorization: 'Bearer the-access-token',
     });
   });
@@ -83,7 +83,15 @@ describe('listing the messages of a Gmail mailbox', () => {
     const page = await provider.listMessages('the-access-token', 'the-next-page');
 
     expect(page).toEqual({ providerMessageIds: ['message-0'], nextPageToken: null });
-    expect(requestSent().url).toBe(`${API}/messages?maxResults=500&pageToken=the-next-page`);
+    expect(requestSent().url).toBe(
+      `${API}/messages?maxResults=100&q=-in%3Adraft&pageToken=the-next-page`,
+    );
+  });
+
+  it('gives nothing for a page Gmail no longer knows', async () => {
+    fetchMock.mockResolvedValueOnce(refused(400, 'INVALID_ARGUMENT'));
+
+    await expect(provider.listMessages('the-access-token', 'a-lost-page')).resolves.toBeNull();
   });
 
   it('gives no message for an empty mailbox', async () => {
@@ -179,6 +187,14 @@ describe('a request Gmail refuses', () => {
       code: 'MAIL_PROVIDER_UNAVAILABLE',
     });
     expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not take a first page Gmail calls invalid for a lost page', async () => {
+    fetchMock.mockResolvedValueOnce(refused(400, 'INVALID_ARGUMENT'));
+
+    await expect(provider.listMessages('the-access-token', null)).rejects.toMatchObject({
+      code: 'MAIL_PROVIDER_UNAVAILABLE',
+    });
   });
 
   it('does not take a list Gmail says it has not for an empty one', async () => {

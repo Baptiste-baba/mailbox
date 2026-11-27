@@ -10,6 +10,8 @@ const NOT_FOUND = 404;
 /**
  * Asks the Gmail API for what is at `path` in the mailbox of the access; null when Gmail has
  * nothing there.
+ * @param absentStatus The status by which Gmail says it has nothing there: 404 for a message, 400
+ * for a page of a listing it no longer knows.
  * @throws AppError MAIL_PROVIDER_UNAVAILABLE when Gmail cannot be reached, refuses, keeps asking to
  * slow down, or answers something else than it documents.
  */
@@ -17,13 +19,14 @@ export async function askGmailIfThere<Schema extends z.ZodType>(
   accessToken: string,
   path: string,
   schema: Schema,
+  absentStatus: number = NOT_FOUND,
 ): Promise<z.output<Schema> | null> {
   const response = await sendRequest(
     `${GMAIL_API}${path}`,
     { headers: { authorization: `Bearer ${accessToken}` } },
     async (refusal) => (await readGoogleApiRefusal(refusal)).rateLimited,
   );
-  if (response.status === NOT_FOUND) {
+  if (response.status === absentStatus) {
     await response.body?.cancel();
     return null;
   }
