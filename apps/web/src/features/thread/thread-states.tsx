@@ -30,7 +30,7 @@ export function ThreadSkeleton() {
   return (
     <PaneCard>
       <ThreadToolbar />
-      <div aria-hidden="true" className="flex flex-col gap-6 px-9 py-7">
+      <div aria-hidden="true" className="flex flex-col gap-6 px-9 py-7 compact:px-4 compact:py-5">
         <div className="flex flex-col gap-3">
           <Skeleton className="h-6 w-3/5" />
           <Skeleton className="h-3.5 w-2/5" />

@@ -43,9 +43,12 @@ describe('mail view on a phone', () => {
 });
 
 describe('list on a phone', () => {
-  test('keeps the cards and the search close to the edges of the screen', async () => {
+  test.each([
+    ['upright', 390, 844],
+    ['turned sideways', 844, 390],
+  ])('keeps the cards and the search close to the edges, %s', async (_, width, height) => {
     fakeThreads(3);
-    await page.viewport(390, 844);
+    await page.viewport(width, height);
     const { screen } = await renderApp('/inbox');
     const card = screen.getByRole('link', { name: /Sujet thread-0\b/ });
     await expect.element(card).toBeVisible();

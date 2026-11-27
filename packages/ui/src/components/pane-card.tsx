@@ -2,11 +2,16 @@ import type { ReactNode } from 'react';
 import { Card } from './card.tsx';
 import { StateMessage } from './state-message.tsx';
 
-/** The card that fills a pane inside a margin, whatever it shows, such as an open thread. */
+/**
+ * The card that fills a pane inside a margin, whatever it shows, such as an open thread. On a phone
+ * it takes the whole pane, edge to edge: every pixel goes to what it shows.
+ */
 export function PaneCard({ children }: { children: ReactNode }) {
   return (
-    <div className="flex min-h-0 flex-1 p-5">
-      <Card className="flex min-w-0 flex-1 flex-col overflow-hidden">{children}</Card>
+    <div className="flex min-h-0 flex-1 p-5 compact:p-0">
+      <Card className="flex min-w-0 flex-1 flex-col overflow-hidden compact:rounded-none compact:border-0 compact:shadow-none">
+        {children}
+      </Card>
     </div>
   );
 }

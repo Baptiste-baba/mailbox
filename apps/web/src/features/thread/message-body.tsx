@@ -17,10 +17,13 @@ function paragraphsOf(message: Message): Paragraph[] {
     .map((text, position) => ({ id: `${message.id}-paragraph-${position}`, text }));
 }
 
-/** The text of an open message, then its attachments, in the second column of the message. */
+/**
+ * The text of an open message, then its attachments, in the second column of the message, or across
+ * both on a phone.
+ */
 export function MessageBody({ message }: { message: Message }) {
   return (
-    <div className="col-start-2 flex min-w-0 flex-col gap-3.5 pt-4.5">
+    <div className="col-start-2 flex min-w-0 flex-col gap-3.5 pt-4.5 compact:col-span-2 compact:col-start-1">
       {paragraphsOf(message).map((paragraph) => (
         <p key={paragraph.id} className="max-w-reading text-body break-words whitespace-pre-line">
           {paragraph.text}

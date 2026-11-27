@@ -23,8 +23,14 @@ export function ReplyBar({ latestMessage, ownAddress }: ReplyBarProps) {
       >
         {label}
       </BarButton>
-      <Button variant="primary" size="field" {...comingSoon(fr.thread.send)}>
-        {fr.thread.send}
+      {/* On a phone, the icon alone leaves the room to the reply. */}
+      <Button
+        variant="primary"
+        size="field"
+        {...comingSoon(fr.thread.send)}
+        className="phone:w-11 phone:px-0"
+      >
+        <span className="phone:sr-only">{fr.thread.send}</span>
         <SendHorizontalIcon />
       </Button>
     </div>
