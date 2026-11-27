@@ -107,3 +107,44 @@ describe('copying a mailbox again, the provider having lost what changed', () =>
     expect(stored.map((row) => row.id)).toContain('m2');
   });
 });
+
+describe('a copy started over while one of its pages is being copied', () => {
+  /** Before the next mail is read, the changes are read and Gmail no longer keeps them. */
+  function loseChangesDuringNextRead(): void {
+    provider.beforeRead = async () => {
+      provider.beforeRead = undefined;
+      provider.oldestCursorKept = Number.MAX_SAFE_INTEGER;
+      await syncMailboxChanges(context, mailboxId, neverStopped);
+      provider.oldestCursorKept = 0;
+    };
+  }
+
+  // Regression: the page then wrote its own progress over the new copy, which left the mailbox
+  // copied without a cursor, never to be read again.
+  it('goes on with the new copy when it was the last page, and ends with a cursor', async () => {
+    provider.mails = [testMail('m2'), testMail('m1')];
+    loseChangesDuringNextRead();
+
+    expect(await copyMailboxPage(context, mailboxId, neverStopped)).toBe('more');
+    expect(await storedMailbox()).toMatchObject({ initialSyncCompletedAt: null, syncCursor: null });
+    await copyWholeMailbox();
+
+    expect((await storedMailbox())?.syncCursor).not.toBeNull();
+    expect((await storedMailbox())?.initialSyncCompletedAt).toBeInstanceOf(Date);
+  });
+
+  // Regression: the new copy then went on from the page after, and removed at its end the most
+  // recent mails, stored before it started, although Gmail still had them.
+  it('starts the listing again from its first page, and keeps every mail Gmail has', async () => {
+    provider.mails = ['m5', 'm4', 'm3', 'm2', 'm1'].map((id) => testMail(id));
+    await copyMailboxPage(context, mailboxId, neverStopped);
+    loseChangesDuringNextRead();
+
+    await copyMailboxPage(context, mailboxId, neverStopped);
+    expect((await storedMailbox())?.initialSyncPageToken).toBeNull();
+    await copyWholeMailbox();
+
+    const stored = await database.select({ id: message.providerMessageId }).from(message);
+    expect(stored.map((row) => row.id).sort()).toEqual(['m1', 'm2', 'm3', 'm4', 'm5']);
+  });
+});

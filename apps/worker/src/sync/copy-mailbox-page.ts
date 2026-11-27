@@ -1,4 +1,5 @@
 import { mailbox, message } from '@mailbox/db';
+import type { ProviderMessagePage } from '@mailbox/shared';
 import { and, eq, gte, inArray, isNull, lt } from 'drizzle-orm';
 import { type MailboxAccess, openMailboxAccess } from './open-mailbox-access.ts';
 import { refreshMessage } from './refresh-message.ts';
@@ -67,19 +68,56 @@ async function removeMessagesNotFound(context: SyncContext, copied: CopiedMailbo
   }
 }
 
+/**
+ * The mailbox, while the copy a page belongs to is still the one under way. Reading changes may
+ * start the copy over meanwhile, which moves its start later: the progress of the page is then no
+ * longer the copy's to write. Postgres keeps microseconds where a Date keeps milliseconds: a start
+ * within the millisecond of the one loaded is that very start.
+ */
+function underSameCopy(copied: CopiedMailbox) {
+  const loadedStart = copied.initialSyncStartedAt.getTime();
+  return and(
+    eq(mailbox.id, copied.id),
+    lt(mailbox.initialSyncStartedAt, new Date(loadedStart + 1)),
+  );
+}
+
+/** @returns Whether the progress was written: false when the copy was started over meanwhile. */
 async function rememberProgress(
   context: SyncContext,
-  mailboxId: string,
+  copied: CopiedMailbox,
   nextPageToken: string | null,
   completed: boolean,
-): Promise<void> {
-  await context.database
+): Promise<boolean> {
+  const written = await context.database
     .update(mailbox)
     .set({
       initialSyncPageToken: nextPageToken,
       initialSyncCompletedAt: completed ? new Date() : null,
     })
-    .where(eq(mailbox.id, mailboxId));
+    .where(underSameCopy(copied))
+    .returning({ id: mailbox.id });
+  return written.length > 0;
+}
+
+/** Reads and stores the mails of a page this copy has not stored yet: how many are stored. */
+async function copyListedMessages(
+  context: SyncContext,
+  access: MailboxAccess,
+  copied: CopiedMailbox,
+  page: ProviderMessagePage,
+  signal: AbortSignal,
+): Promise<number> {
+  let stored = 0;
+  for (const providerMessageId of await unseenMessageIds(
+    context,
+    copied,
+    page.providerMessageIds,
+  )) {
+    const mail = { mailboxId: copied.id, providerMessageId };
+    stored += Number(await refreshMessage(context, access, mail, signal));
+  }
+  return stored;
 }
 
 async function findMailboxToCopy(
@@ -125,33 +163,25 @@ export async function copyMailboxPage(
   const page = await access.provider.listMessages(access.accessToken, copied.initialSyncPageToken);
   if (page === null) {
     // The provider lost the page: the listing starts again, and skips what this copy stored.
-    await rememberProgress(context, mailboxId, null, false);
+    await rememberProgress(context, copied, null, false);
     return 'more';
   }
-  let stored = 0;
-  for (const providerMessageId of await unseenMessageIds(
-    context,
-    copied,
-    page.providerMessageIds,
-  )) {
-    stored += Number(
-      await refreshMessage(context, access, { mailboxId, providerMessageId }, signal),
-    );
-  }
-  const completed = page.nextPageToken === null;
-  if (completed) {
+  const stored = await copyListedMessages(context, access, copied, page, signal);
+  const lastPage = page.nextPageToken === null;
+  if (lastPage) {
+    // What this copy did not find is gone, whether or not the copy was started over meanwhile.
     await removeMessagesNotFound(context, copied);
   }
-  await rememberProgress(context, mailboxId, page.nextPageToken, completed);
+  const written = await rememberProgress(context, copied, page.nextPageToken, lastPage);
   context.logger.info(
     {
       mailboxId,
       listed: page.providerMessageIds.length,
       stored,
-      completed,
+      startedOver: !written,
       durationMs: Date.now() - startedAt,
     },
     'Mailbox page copied',
   );
-  return completed ? 'done' : 'more';
+  return lastPage && written ? 'done' : 'more';
 }
