@@ -21,12 +21,23 @@ export const mailbox = pgTable(
     refreshTokenEncrypted: text().notNull(),
     createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
     /**
-     * Where the first copy of the mailbox resumes: what asks the provider for the next page of its
+     * When the copy of the whole mailbox started: at its connection, or since, each time the
+     * provider no longer told what had changed and the copy was started over. A mail stored
+     * before that date has not been seen by the current copy.
+     */
+    initialSyncStartedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+    /**
+     * Where the copy of the mailbox resumes: what asks the provider for the next page of its
      * mails. Null before the first page, and once the last one was read.
      */
     initialSyncPageToken: text(),
-    /** When every mail the mailbox held was copied once; null until then. */
+    /** When the copy of the whole mailbox ended; null while it is under way. */
     initialSyncCompletedAt: timestamp({ withTimezone: true }),
+    /**
+     * What asks the provider for the changes of the mailbox since they were last read. Null until
+     * a copy starts, and when the provider no longer knows the one it gave.
+     */
+    syncCursor: text(),
   },
   (table) => [unique('mailbox_provider_address_unique').on(table.provider, table.address)],
 );

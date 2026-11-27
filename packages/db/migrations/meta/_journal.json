@@ -43,6 +43,13 @@
       "when": 1795790578130,
       "tag": "0005_add_mailbox_initial_sync",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1795793215862,
+      "tag": "0006_add_sync_cursor",
+      "breakpoints": true
     }
   ]
 }

@@ -33,6 +33,8 @@ export const message = pgTable(
     bodyHtml: text(),
     unread: boolean().notNull(),
     inInbox: boolean().notNull(),
+    /** When the mail was last read at the provider and stored. */
+    syncedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [
     unique('message_provider_id_unique').on(table.mailboxId, table.providerMessageId),
