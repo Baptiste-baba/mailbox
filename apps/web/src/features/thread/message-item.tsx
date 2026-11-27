@@ -1,13 +1,6 @@
 import type { Message } from '@mailbox/shared';
-import { Avatar } from '@mailbox/ui';
-import { formatMessageDate } from '../../dates/format-mail-date.ts';
-import { displayName } from '../../display-name.ts';
-import { fr } from '../../i18n/fr.ts';
 import { MessageBody } from './message-body.tsx';
-import { isOwn, recipientsLine } from './participants.ts';
-
-/** Longest start of a text worth folding into one line: the rest would only be cut off. */
-const FOLDED_LENGTH = 300;
+import { FoldedMessageHeading, MessageHeading } from './message-heading.tsx';
 
 interface MessageItemProps {
   message: Message;
@@ -17,50 +10,21 @@ interface MessageItemProps {
   now: Date;
 }
 
-/** One message of a thread: folded to a line with its start, or open on its whole text. */
+/** One message of a conversation: folded to a line with its start, or open on its whole body. */
 export function MessageItem({ message, ownAddress, open, onToggle, now }: MessageItemProps) {
-  const own = isOwn(message.from, ownAddress);
-  const name = displayName(message.from);
-  const sender = own ? fr.thread.me : name;
-  const date = (
-    <time dateTime={message.sentAt} className="flex-none text-caption text-ink-2">
-      {formatMessageDate(message.sentAt, now)}
-    </time>
-  );
   return (
-    // Open, two columns: the avatar, then everything else, so that the text lines up with the name.
-    // Both states keep the same button, which would otherwise take the keyboard focus away with it.
-    <div className={open ? 'grid grid-cols-[auto_1fr] gap-x-3.5 px-4.5 pt-5 pb-5.5' : undefined}>
+    <div className={open ? 'flex flex-col gap-2 pb-6' : undefined}>
+      {/* Both states keep the same button, which would otherwise take the keyboard focus away with it. */}
       <button
         type="button"
         aria-expanded={open}
         onClick={onToggle}
-        className={
-          open
-            ? 'col-span-2 grid grid-cols-subgrid items-center text-left'
-            : 'flex w-full items-center gap-3.5 px-4.5 py-3.5 text-left'
-        }
+        className="flex w-full py-4 text-left"
       >
-        {/* The owner reads "Toi", but keeps the initials of their own name. */}
-        <Avatar name={name} size="sm" tone={own ? 'accent' : 'neutral'} />
         {open ? (
-          <span className="flex min-w-0 items-start gap-3">
-            <span className="flex min-w-0 flex-1 flex-col">
-              <span className="truncate leading-5 font-semibold">{sender}</span>
-              <span className="truncate text-caption text-ink-2">
-                {recipientsLine(message, ownAddress)}
-              </span>
-            </span>
-            {date}
-          </span>
+          <MessageHeading message={message} ownAddress={ownAddress} now={now} />
         ) : (
-          <>
-            <span className="flex-none font-semibold">{sender}</span>
-            <span className="min-w-0 flex-1 truncate text-small text-ink-2">
-              {message.bodyText.slice(0, FOLDED_LENGTH).replace(/\s+/g, ' ').trim()}
-            </span>
-            {date}
-          </>
+          <FoldedMessageHeading message={message} ownAddress={ownAddress} now={now} />
         )}
       </button>
       {open && <MessageBody message={message} />}
