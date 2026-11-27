@@ -1,5 +1,6 @@
-import type { Database } from '@mailbox/db';
+import { type Database, message } from '@mailbox/db';
 import { mailboxListSchema } from '@mailbox/shared';
+import { eq } from 'drizzle-orm';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { type RunningApi, startApi } from './start-api.ts';
 import { signInOnFreshInstance } from './test-account.ts';
@@ -88,5 +89,81 @@ describe('unread count of a mailbox', () => {
       ['Travail', 2],
       ['Perso', 0],
     ]);
+  });
+});
+
+describe('synchronisation of a mailbox', () => {
+  const minutesAgo = (minutes: number) => new Date(Date.now() - minutes * 60_000);
+
+  async function syncOf(values: Parameters<typeof insertTestMailbox>[1]) {
+    await insertTestMailbox(database, values);
+    const { mailboxes } = mailboxListSchema.parse(await (await getMailboxes()).json());
+    return mailboxes[0]?.sync;
+  }
+
+  it('tells a copy under way, with the mails it stored against those announced', async () => {
+    const copyStart = minutesAgo(30);
+    const work = await insertTestMailbox(database, {
+      name: 'Travail',
+      address: 'a@work.example',
+      initialSyncStartedAt: copyStart,
+      initialSyncTotal: 9761,
+    });
+    await insertTestThread(database, work, { lastMessageAt: copyStart, messageCount: 3 });
+    const earlier = await insertTestThread(database, work, {
+      lastMessageAt: copyStart,
+      messageCount: 2,
+    });
+    // Stored by an earlier copy, and not read again by this one yet.
+    await database
+      .update(message)
+      .set({ syncedAt: minutesAgo(60) })
+      .where(eq(message.threadId, earlier));
+
+    const { mailboxes } = mailboxListSchema.parse(await (await getMailboxes()).json());
+
+    expect(mailboxes[0]?.sync).toEqual({ state: 'copying', copiedCount: 3, totalCount: 9761 });
+  });
+
+  it('tells a mailbox copied up to date, with when it was last read', async () => {
+    const lastSyncedAt = minutesAgo(1);
+
+    const sync = await syncOf({
+      name: 'Travail',
+      address: 'a@work.example',
+      initialSyncCompletedAt: minutesAgo(90),
+      lastSyncedAt,
+    });
+
+    expect(sync).toEqual({ state: 'upToDate', checkedAt: lastSyncedAt.toISOString() });
+  });
+});
+
+describe('synchronisation of a mailbox that fails', () => {
+  const minutesAgo = (minutes: number) => new Date(Date.now() - minutes * 60_000);
+
+  async function syncOf(failingFor: number) {
+    await insertTestMailbox(database, {
+      name: 'Travail',
+      address: 'a@work.example',
+      initialSyncCompletedAt: minutesAgo(90),
+      lastSyncedAt: minutesAgo(failingFor + 1),
+      syncFailingSince: minutesAgo(failingFor),
+      syncFailureReason: 'provider_unavailable',
+    });
+    const { mailboxes } = mailboxListSchema.parse(await (await getMailboxes()).json());
+    return mailboxes[0]?.sync;
+  }
+
+  it('tells it interrupted once it has failed for ten minutes, and why', async () => {
+    const sync = await syncOf(25);
+
+    expect(sync).toMatchObject({ state: 'interrupted', reason: 'providerUnavailable' });
+  });
+
+  it('says nothing of a failure of a few minutes, which the next runs may get over', async () => {
+    const sync = await syncOf(3);
+
+    expect(sync).toMatchObject({ state: 'upToDate' });
   });
 });

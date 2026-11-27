@@ -78,6 +78,7 @@ export {
 export {
   type MailboxList,
   type MailboxSummary,
+  type MailboxSync,
   mailboxListSchema,
   mailboxSummarySchema,
 } from './mail/mailbox-summary.ts';

@@ -10,6 +10,7 @@ export const personalMailbox: MailboxSummary = {
   color: 'azur',
   unreadCount: 3,
   status: 'connected',
+  sync: { state: 'upToDate', checkedAt: '2026-11-27T13:32:00.000Z' },
 };
 
 /** The work Gmail mailbox of the tests: connected, nothing unread. */
@@ -21,6 +22,7 @@ export const workMailbox: MailboxSummary = {
   color: 'navy',
   unreadCount: 0,
   status: 'connected',
+  sync: { state: 'upToDate', checkedAt: '2026-11-27T13:32:00.000Z' },
 };
 
 /** Where Google has the user sign in, as the api answers the start of a connection. */

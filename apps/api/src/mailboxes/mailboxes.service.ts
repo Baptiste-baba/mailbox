@@ -1,9 +1,10 @@
-import { type Database, mailbox, thread } from '@mailbox/db';
+import { type Database, mailbox, message, thread } from '@mailbox/db';
 import type { MailboxList, MailboxSummary } from '@mailbox/shared';
 import { Inject, Injectable } from '@nestjs/common';
-import { and, asc, eq, type SQL } from 'drizzle-orm';
+import { and, asc, eq, gte, type SQL, sql } from 'drizzle-orm';
 import { DATABASE } from '../database/database.module.ts';
 import { mailboxNotFound } from './mailbox-not-found.ts';
+import { toMailboxSync } from './mailbox-sync-state.ts';
 
 @Injectable()
 export class MailboxesService {
@@ -34,11 +35,35 @@ export class MailboxesService {
         color: mailbox.color,
         status: mailbox.status,
         unreadCount: this.database.$count(thread, unreadInboxThreads),
+        initialSyncCompletedAt: mailbox.initialSyncCompletedAt,
+        initialSyncTotal: mailbox.initialSyncTotal,
+        lastSyncedAt: mailbox.lastSyncedAt,
+        syncFailingSince: mailbox.syncFailingSince,
+        syncFailureReason: mailbox.syncFailureReason,
+        copiedCount: this.copiedCount(),
       })
       .from(mailbox)
       .where(filter)
       .orderBy(asc(mailbox.createdAt), asc(mailbox.id));
-    return mailboxes.map((stored) => ({ ...stored, status: toStatus(stored.status) }));
+    const now = new Date();
+    return mailboxes.map(
+      ({ id, provider, name, address, color, status, unreadCount, ...sync }) => ({
+        ...{ id, provider, name, address, color, unreadCount },
+        status: toStatus(status),
+        sync: toMailboxSync(sync, now),
+      }),
+    );
+  }
+
+  /** The mails the copy under way stored so far: counted only while a copy is under way. */
+  private copiedCount() {
+    const storedByThisCopy = and(
+      eq(message.mailboxId, mailbox.id),
+      gte(message.syncedAt, mailbox.initialSyncStartedAt),
+    );
+    return sql<number>`case when ${mailbox.initialSyncCompletedAt} is null then ${this.database.$count(message, storedByThisCopy)} else 0 end`.mapWith(
+      Number,
+    );
   }
 }
 

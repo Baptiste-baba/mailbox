@@ -25,12 +25,8 @@ export async function resetMailTables(database: Database): Promise<void> {
   await database.execute(sql`truncate mailbox cascade`);
 }
 
-type TestMailbox = Pick<
-  typeof mailbox.$inferInsert,
-  'name' | 'address' | 'status' | 'createdAt'
-> & {
-  refreshTokenEncrypted?: string;
-};
+type TestMailbox = Pick<typeof mailbox.$inferInsert, 'name' | 'address'> &
+  Partial<typeof mailbox.$inferInsert>;
 
 /** A connected mailbox, stored as if the user had signed in at the provider: its id. */
 export async function insertTestMailbox(database: Database, values: TestMailbox): Promise<string> {
