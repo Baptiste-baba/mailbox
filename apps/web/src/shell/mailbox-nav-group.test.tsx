@@ -2,17 +2,9 @@ import type { MailboxSummary } from '@mailbox/shared';
 import { afterEach, describe, expect, test, vi } from 'vitest';
 import { fakeApi } from '../testing/fake-api.ts';
 import { renderApp } from '../testing/render-app.tsx';
+import { workMailbox } from '../testing/test-mailboxes.ts';
 
-const work: MailboxSummary = {
-  id: '9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d',
-  provider: 'gmail',
-  name: 'Travail',
-  address: 'alex@studio.example',
-  color: 'navy',
-  unreadCount: 0,
-  status: 'reconnectRequired',
-};
-
+const work: MailboxSummary = { ...workMailbox, status: 'reconnectRequired' };
 afterEach(() => {
   vi.unstubAllGlobals();
 });

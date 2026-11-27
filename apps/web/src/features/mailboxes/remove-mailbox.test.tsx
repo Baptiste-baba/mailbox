@@ -1,45 +1,27 @@
-import type { MailboxSummary } from '@mailbox/shared';
 import { afterEach, describe, expect, test, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { apiError, fakeApi, noContent, testThread } from '../../testing/fake-api.ts';
 import { type AppScreen, renderApp } from '../../testing/render-app.tsx';
+import { mailboxSection, personalMailbox, workMailbox } from '../../testing/test-mailboxes.ts';
 
-const personal: MailboxSummary = {
-  id: '5d0c1b7e-3f2a-4c8d-9b6e-1a2b3c4d5e6f',
-  provider: 'gmail',
-  name: 'Perso',
-  address: 'alex.martin@example.com',
-  color: 'azur',
-  unreadCount: 3,
-  status: 'connected',
-};
-const work: MailboxSummary = {
-  id: '9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d',
-  provider: 'gmail',
-  name: 'Travail',
-  address: 'alex@studio.example',
-  color: 'navy',
-  unreadCount: 0,
-  status: 'connected',
-};
-const REMOVAL_PATH = `/api/mailboxes/${work.id}`;
+const REMOVAL_PATH = `/api/mailboxes/${workMailbox.id}`;
 
 afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-const workThread = { ...testThread('thread-work', false), mailboxId: work.id };
+const workThread = { ...testThread('thread-work', false), mailboxId: workMailbox.id };
 
 /**
  * The api of a server keeping both mailboxes until `refusal` lets one go. Once the mailbox of the
  * only thread is gone, the list of threads never answers: what shows then comes from the cache.
  */
 function mailboxApi(refusal?: () => Response | undefined) {
-  let stored = [personal, work];
+  let stored = [personalMailbox, workMailbox];
   return fakeApi({
     mailboxes: () => ({ mailboxes: stored }),
     threadPages: () =>
-      stored.includes(work)
+      stored.includes(workMailbox)
         ? { threads: [workThread], nextCursor: null }
         : new Promise<never>(() => undefined),
     removeMailbox: (mailboxId) => {
@@ -56,10 +38,6 @@ function mailboxApi(refusal?: () => Response | undefined) {
 
 function removalsAsked(fetchMock: ReturnType<typeof fakeApi>) {
   return fetchMock.mock.calls.filter(([, init]) => init?.method === 'DELETE').map(([url]) => url);
-}
-
-function mailboxSection(screen: AppScreen) {
-  return screen.getByRole('region', { name: 'Boîtes mail' });
 }
 
 async function openDialog(screen: AppScreen) {

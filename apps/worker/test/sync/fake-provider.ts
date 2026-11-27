@@ -1,12 +1,13 @@
 import {
   AppError,
   type MailProvider,
+  type ProviderAccess,
   type ProviderFolder,
   type ProviderMessage,
 } from '@mailbox/shared';
 
 /** What the fake provider gives for an access it renewed. */
-export const FAKE_ACCESS_TOKEN = 'the-access-token';
+const FAKE_ACCESS_TOKEN = 'the-access-token';
 
 const unused = (): never => {
   throw new Error('Keeping a mailbox in line has no use for this');
@@ -60,7 +61,7 @@ export class FakeProvider implements MailProvider {
     this.changedIds.push(providerMessageId);
   }
 
-  renewAccess(): Promise<{ accessToken: string; expiresAt: Date }> {
+  renewAccess(): Promise<ProviderAccess> {
     this.renewals += 1;
     if (this.accessWithdrawn) {
       return Promise.reject(new AppError('MAILBOX_RECONNECTION_REQUIRED', 'Access withdrawn'));

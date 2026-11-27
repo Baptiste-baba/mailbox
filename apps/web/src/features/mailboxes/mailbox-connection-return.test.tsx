@@ -2,19 +2,11 @@ import { MAILBOX_CONNECTION_PATH, type MailboxSummary } from '@mailbox/shared';
 import { afterEach, describe, expect, test, vi } from 'vitest';
 import { apiError, fakeApi, lastBodySentTo } from '../../testing/fake-api.ts';
 import { renderApp } from '../../testing/render-app.tsx';
+import { personalMailbox } from '../../testing/test-mailboxes.ts';
 
 const BACK_FROM_GOOGLE = `${MAILBOX_CONNECTION_PATH}?state=the-state&code=the-code`;
 const COMPLETION_PATH = '/api/mailboxes/connection/completion';
-const personal: MailboxSummary = {
-  id: '5d0c1b7e-3f2a-4c8d-9b6e-1a2b3c4d5e6f',
-  provider: 'gmail',
-  name: 'Perso',
-  address: 'alex.martin@example.com',
-  color: 'azur',
-  unreadCount: 0,
-  status: 'connected',
-};
-
+const personal: MailboxSummary = { ...personalMailbox, unreadCount: 0 };
 afterEach(() => {
   vi.unstubAllGlobals();
 });

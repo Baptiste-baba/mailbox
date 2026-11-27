@@ -1,6 +1,6 @@
 import { createDatabase, type Database, mailbox, SecretBox } from '@mailbox/db';
 import type { MailProvider, ProviderMessage } from '@mailbox/shared';
-import { sql } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import { pino } from 'pino';
 import { ReadPace } from '../../src/sync/read-pace.ts';
 import type { SyncContext } from '../../src/sync/sync-context.ts';
@@ -8,7 +8,7 @@ import type { SyncContext } from '../../src/sync/sync-context.ts';
 /** The refresh token the test mailboxes were connected with. */
 export const TEST_REFRESH_TOKEN = 'the-refresh-token';
 
-export function testSecretBox(): SecretBox {
+function testSecretBox(): SecretBox {
   return new SecretBox(Buffer.from(process.env.MAILBOX_SECRET_KEY ?? '', 'base64'));
 }
 
@@ -29,6 +29,15 @@ export function testSyncContext(database: Database, provider: MailProvider): Syn
     pace: new ReadPace(0),
     accesses: new Map(),
   };
+}
+
+/** What stops a run that the worker never stops. */
+export const neverStopped = new AbortController().signal;
+
+/** A mailbox as stored now; nothing when it was removed. */
+export async function storedMailbox(database: Database, mailboxId: string) {
+  const [stored] = await database.select().from(mailbox).where(eq(mailbox.id, mailboxId));
+  return stored;
 }
 
 /** No mailbox, and so no mail: everything a mailbox owns goes with it. */

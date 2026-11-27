@@ -1,21 +1,9 @@
-import type { MailboxSummary } from '@mailbox/shared';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { apiError, fakeApi, lastBodySentTo, noContent } from '../../testing/fake-api.ts';
 import { holdDepartures } from '../../testing/hold-departures.ts';
 import { type AppScreen, renderApp } from '../../testing/render-app.tsx';
-
-const GOOGLE_PAGE = 'https://accounts.google.com/o/oauth2/v2/auth?state=the-state';
-const toGoogle = () => ({ authorizationUrl: GOOGLE_PAGE });
-const work: MailboxSummary = {
-  id: '9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d',
-  provider: 'gmail',
-  name: 'Travail',
-  address: 'alex@studio.example',
-  color: 'navy',
-  unreadCount: 0,
-  status: 'connected',
-};
+import { GOOGLE_PAGE, toGoogle, workMailbox } from '../../testing/test-mailboxes.ts';
 
 let departures: ReturnType<typeof holdDepartures>;
 
@@ -52,7 +40,7 @@ describe('adding a mailbox', () => {
   });
 
   test('suggests the first colour no mailbox has yet', async () => {
-    fakeApi({ mailboxes: () => ({ mailboxes: [work] }) });
+    fakeApi({ mailboxes: () => ({ mailboxes: [workMailbox] }) });
     const { screen } = await renderApp('/settings');
 
     const dialog = await openDialog(screen);

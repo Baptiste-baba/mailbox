@@ -1,18 +1,17 @@
 import { type Database, folder, mailbox, message } from '@mailbox/db';
-import { eq } from 'drizzle-orm';
 import { afterAll, beforeEach, describe, expect, it } from 'vitest';
 import { copyMailboxPage } from '../../src/sync/copy-mailbox-page.ts';
 import type { SyncContext } from '../../src/sync/sync-context.ts';
 import { FakeProvider } from './fake-provider.ts';
 import {
   insertTestMailbox,
+  neverStopped,
   openTestDatabase,
   resetMailTables,
+  storedMailbox,
   testMail,
   testSyncContext,
 } from './test-mail.ts';
-
-const neverStopped = new AbortController().signal;
 
 let database: Database;
 let provider: FakeProvider;
@@ -39,18 +38,13 @@ async function storedIds(): Promise<string[]> {
   return stored.map((row) => row.id).sort();
 }
 
-async function storedMailbox() {
-  const [stored] = await database.select().from(mailbox).where(eq(mailbox.id, mailboxId));
-  return stored;
-}
-
 describe('copying a mailbox, page after page', () => {
   it('copies the most recent mails first, and remembers where to go on', async () => {
     const outcome = await copyPage();
 
     expect(outcome).toBe('more');
     expect(await storedIds()).toEqual(['m4', 'm5']);
-    expect(await storedMailbox()).toMatchObject({
+    expect(await storedMailbox(database, mailboxId)).toMatchObject({
       initialSyncPageToken: '2',
       initialSyncCompletedAt: null,
     });
@@ -64,7 +58,7 @@ describe('copying a mailbox, page after page', () => {
 
     expect(await storedIds()).toEqual(['m1', 'm2', 'm3', 'm4', 'm5']);
     expect(provider.pagesAsked).toEqual([null, '2', '4']);
-    const stored = await storedMailbox();
+    const stored = await storedMailbox(database, mailboxId);
     expect(stored?.initialSyncPageToken).toBeNull();
     expect(stored?.initialSyncCompletedAt).toBeInstanceOf(Date);
   });
@@ -97,7 +91,7 @@ describe('copying a mailbox, when a page does not go through', () => {
     provider.unreachableIds.add('m4');
     await expect(copyPage()).rejects.toMatchObject({ code: 'MAIL_PROVIDER_UNAVAILABLE' });
     expect(await storedIds()).toEqual(['m5']);
-    expect((await storedMailbox())?.initialSyncPageToken).toBeNull();
+    expect((await storedMailbox(database, mailboxId))?.initialSyncPageToken).toBeNull();
 
     provider.unreachableIds.clear();
     provider.readIds = [];
@@ -122,7 +116,7 @@ describe('copying a mailbox, when the copy is interrupted', () => {
     provider.lostPages.add('2');
 
     expect(await copyPage()).toBe('more');
-    expect((await storedMailbox())?.initialSyncPageToken).toBeNull();
+    expect((await storedMailbox(database, mailboxId))?.initialSyncPageToken).toBeNull();
     provider.lostPages.clear();
     provider.readIds = [];
     await copyPage();
@@ -130,7 +124,7 @@ describe('copying a mailbox, when the copy is interrupted', () => {
     await copyPage();
 
     expect(provider.readIds).toEqual(['m3', 'm2', 'm1']);
-    expect((await storedMailbox())?.initialSyncCompletedAt).toBeInstanceOf(Date);
+    expect((await storedMailbox(database, mailboxId))?.initialSyncCompletedAt).toBeInstanceOf(Date);
   });
 
   it('stops between two mails when the worker stops', async () => {
@@ -148,7 +142,7 @@ describe('copying a mailbox that cannot be read', () => {
 
     expect(await copyPage()).toBe('done');
 
-    expect((await storedMailbox())?.status).toBe('reconnect_required');
+    expect((await storedMailbox(database, mailboxId))?.status).toBe('reconnect_required');
     expect(await storedIds()).toEqual([]);
   });
 
@@ -157,7 +151,7 @@ describe('copying a mailbox that cannot be read', () => {
 
     expect(await copyPage()).toBe('done');
 
-    expect((await storedMailbox())?.status).toBe('reconnect_required');
+    expect((await storedMailbox(database, mailboxId))?.status).toBe('reconnect_required');
   });
 
   it('leaves alone a mailbox waiting for its user to sign in again', async () => {
@@ -178,6 +172,6 @@ describe('copying a mailbox that cannot be read', () => {
     context.providers = new Map();
 
     await expect(copyPage()).rejects.toMatchObject({ code: 'MAIL_PROVIDER_NOT_CONFIGURED' });
-    expect((await storedMailbox())?.status).toBe('connected');
+    expect((await storedMailbox(database, mailboxId))?.status).toBe('connected');
   });
 });

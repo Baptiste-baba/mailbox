@@ -1,5 +1,4 @@
-import { type Database, mailbox, message } from '@mailbox/db';
-import { eq } from 'drizzle-orm';
+import { type Database, message } from '@mailbox/db';
 import { afterAll, beforeEach, describe, expect, it } from 'vitest';
 import { type CopyOutcome, copyMailboxPage } from '../../src/sync/copy-mailbox-page.ts';
 import type { SyncContext } from '../../src/sync/sync-context.ts';
@@ -7,13 +6,13 @@ import { syncMailboxChanges } from '../../src/sync/sync-mailbox-changes.ts';
 import { FakeProvider } from './fake-provider.ts';
 import {
   insertTestMailbox,
+  neverStopped,
   openTestDatabase,
   resetMailTables,
+  storedMailbox,
   testMail,
   testSyncContext,
 } from './test-mail.ts';
-
-const neverStopped = new AbortController().signal;
 
 let database: Database;
 let provider: FakeProvider;
@@ -40,11 +39,6 @@ async function copyWholeMailbox(): Promise<void> {
   }
 }
 
-async function storedMailbox() {
-  const [stored] = await database.select().from(mailbox).where(eq(mailbox.id, mailboxId));
-  return stored;
-}
-
 describe('what changes while a mailbox is copied', () => {
   it('is read from before the first page was listed', async () => {
     await copyMailboxPage(context, mailboxId, neverStopped);
@@ -63,7 +57,7 @@ describe('what changes while a mailbox is copied', () => {
 
     await copyMailboxPage(context, mailboxId, neverStopped);
 
-    expect((await storedMailbox())?.syncCursor).toBe('0');
+    expect((await storedMailbox(database, mailboxId))?.syncCursor).toBe('0');
   });
 });
 
@@ -96,8 +90,8 @@ describe('copying a mailbox again, the provider having lost what changed', () =>
   it('reads changes again from where the provider stands at that moment', async () => {
     await copyWholeMailbox();
 
-    expect(await storedMailbox()).toMatchObject({ syncCursor: '6' });
-    expect((await storedMailbox())?.initialSyncCompletedAt).toBeInstanceOf(Date);
+    expect(await storedMailbox(database, mailboxId)).toMatchObject({ syncCursor: '6' });
+    expect((await storedMailbox(database, mailboxId))?.initialSyncCompletedAt).toBeInstanceOf(Date);
   });
 
   it('keeps the mails stored until the copy has seen the whole mailbox', async () => {
@@ -126,11 +120,14 @@ describe('a copy started over while one of its pages is being copied', () => {
     loseChangesDuringNextRead();
 
     expect(await copyMailboxPage(context, mailboxId, neverStopped)).toBe('more');
-    expect(await storedMailbox()).toMatchObject({ initialSyncCompletedAt: null, syncCursor: null });
+    expect(await storedMailbox(database, mailboxId)).toMatchObject({
+      initialSyncCompletedAt: null,
+      syncCursor: null,
+    });
     await copyWholeMailbox();
 
-    expect((await storedMailbox())?.syncCursor).not.toBeNull();
-    expect((await storedMailbox())?.initialSyncCompletedAt).toBeInstanceOf(Date);
+    expect((await storedMailbox(database, mailboxId))?.syncCursor).not.toBeNull();
+    expect((await storedMailbox(database, mailboxId))?.initialSyncCompletedAt).toBeInstanceOf(Date);
   });
 
   // Regression: the new copy then went on from the page after, and removed at its end the most
@@ -141,7 +138,7 @@ describe('a copy started over while one of its pages is being copied', () => {
     loseChangesDuringNextRead();
 
     await copyMailboxPage(context, mailboxId, neverStopped);
-    expect((await storedMailbox())?.initialSyncPageToken).toBeNull();
+    expect((await storedMailbox(database, mailboxId))?.initialSyncPageToken).toBeNull();
     await copyWholeMailbox();
 
     const stored = await database.select({ id: message.providerMessageId }).from(message);

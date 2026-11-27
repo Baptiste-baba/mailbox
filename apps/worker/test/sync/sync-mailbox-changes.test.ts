@@ -7,13 +7,13 @@ import { syncMailboxChanges } from '../../src/sync/sync-mailbox-changes.ts';
 import { FakeProvider } from './fake-provider.ts';
 import {
   insertTestMailbox,
+  neverStopped,
   openTestDatabase,
   resetMailTables,
+  storedMailbox,
   testMail,
   testSyncContext,
 } from './test-mail.ts';
-
-const neverStopped = new AbortController().signal;
 
 let database: Database;
 let provider: FakeProvider;
@@ -43,11 +43,6 @@ async function storedMail(providerMessageId: string) {
     .select()
     .from(message)
     .where(eq(message.providerMessageId, providerMessageId));
-  return stored;
-}
-
-async function storedMailbox() {
-  const [stored] = await database.select().from(mailbox).where(eq(mailbox.id, mailboxId));
   return stored;
 }
 
@@ -108,12 +103,12 @@ describe('reading what changed, when it does not go through', () => {
   });
 
   it('starts the copy of the mailbox over when the provider no longer keeps what changed', async () => {
-    const copiedAt = (await storedMailbox())?.initialSyncStartedAt;
+    const copiedAt = (await storedMailbox(database, mailboxId))?.initialSyncStartedAt;
     provider.oldestCursorKept = 5;
 
     await syncChanges();
 
-    const stored = await storedMailbox();
+    const stored = await storedMailbox(database, mailboxId);
     expect(stored).toMatchObject({
       syncCursor: null,
       initialSyncPageToken: null,
@@ -128,7 +123,7 @@ describe('reading what changed, when it does not go through', () => {
 
     await syncChanges();
 
-    expect((await storedMailbox())?.status).toBe('reconnect_required');
+    expect((await storedMailbox(database, mailboxId))?.status).toBe('reconnect_required');
   });
 
   it('waits for the copy to start before reading changes', async () => {

@@ -14,18 +14,11 @@ import type {
   TotpEnrollment,
 } from '@mailbox/shared';
 import { vi } from 'vitest';
+import { personalMailbox } from './test-mailboxes.ts';
 
 export const testMailboxes: MailboxList = {
   mailboxes: [
-    {
-      id: 'mailbox-personal',
-      provider: 'gmail',
-      name: 'Perso',
-      address: 'alex@example.com',
-      color: 'azur',
-      unreadCount: 1,
-      status: 'connected',
-    },
+    { ...personalMailbox, id: 'mailbox-personal', address: 'alex@example.com', unreadCount: 1 },
   ],
 };
 

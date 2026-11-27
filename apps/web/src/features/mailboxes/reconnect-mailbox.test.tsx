@@ -4,28 +4,16 @@ import { userEvent } from 'vitest/browser';
 import { apiError, fakeApi, noContent } from '../../testing/fake-api.ts';
 import { holdDepartures } from '../../testing/hold-departures.ts';
 import { type AppScreen, renderApp } from '../../testing/render-app.tsx';
+import {
+  GOOGLE_PAGE,
+  mailboxSection,
+  personalMailbox,
+  toGoogle,
+  workMailbox,
+} from '../../testing/test-mailboxes.ts';
 
-const GOOGLE_PAGE = 'https://accounts.google.com/o/oauth2/v2/auth?state=the-state';
-const toGoogle = () => ({ authorizationUrl: GOOGLE_PAGE });
-const personal: MailboxSummary = {
-  id: '5d0c1b7e-3f2a-4c8d-9b6e-1a2b3c4d5e6f',
-  provider: 'gmail',
-  name: 'Perso',
-  address: 'alex.martin@example.com',
-  color: 'azur',
-  unreadCount: 3,
-  status: 'connected',
-};
-const work: MailboxSummary = {
-  id: '9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d',
-  provider: 'gmail',
-  name: 'Travail',
-  address: 'alex@studio.example',
-  color: 'navy',
-  unreadCount: 0,
-  status: 'reconnectRequired',
-};
-const mailboxes = () => ({ mailboxes: [personal, work] });
+const work: MailboxSummary = { ...workMailbox, status: 'reconnectRequired' };
+const mailboxes = () => ({ mailboxes: [personalMailbox, work] });
 
 let departures: ReturnType<typeof holdDepartures>;
 
@@ -37,10 +25,6 @@ afterEach(() => {
   departures.release();
   vi.unstubAllGlobals();
 });
-
-function mailboxSection(screen: AppScreen) {
-  return screen.getByRole('region', { name: 'Boîtes mail' });
-}
 
 async function openDialog(screen: AppScreen) {
   await mailboxSection(screen)
