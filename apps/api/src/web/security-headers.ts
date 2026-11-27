@@ -11,12 +11,13 @@ const CONTENT_SECURITY_POLICY = [
   "frame-ancestors 'none'",
 ].join('; ');
 
-// The page a mail is shown in: the styles of the mail apply, and nothing else loads or runs. No
-// script, no remote image, font or stylesheet, no form; only the app may show it in a frame.
+// The page a mail is shown in: the styles of the mail apply, and its images load from wherever
+// they are, as soon as it opens (the owner's choice). Nothing else: no script, no remote font or
+// stylesheet, no form; only the app may show it in a frame.
 const MAIL_FRAME_POLICY = [
   "default-src 'none'",
   "style-src 'unsafe-inline'",
-  'img-src data:',
+  'img-src data: http: https:',
   'font-src data:',
   "base-uri 'self'",
   "form-action 'none'",

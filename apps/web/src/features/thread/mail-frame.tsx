@@ -5,8 +5,8 @@ import { sanitizeMailHtml, showMail } from './sanitize-mail-html.ts';
 
 /**
  * The HTML of a mail, cleaned, in a frame of its own: no script runs there, links open outside
- * the app, and its page lets nothing remote load. The frame takes the height of the mail, and
- * follows it whenever it changes: the pane gets narrower, an image is replaced by its text.
+ * the app, and its page lets nothing remote load but images. The frame takes the height of the
+ * mail, and follows it whenever it changes: the pane gets narrower, an image loads.
  */
 export function MailFrame({ html }: { html: string }) {
   const [height, setHeight] = useState<number>();

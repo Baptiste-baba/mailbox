@@ -117,17 +117,17 @@ describe('the frame of a mail', () => {
   });
 });
 
-describe('the HTML of a mail, and what it would load', () => {
-  // An image the test server holds, which would load were it not for the policy of the page.
-  test('loads no remote image, such as a tracking pixel', async () => {
+describe('the HTML of a mail, and what it loads', () => {
+  // An image the test server holds, as a sender's server would.
+  test('shows its images as soon as it opens, from wherever they are', async () => {
     const { screen } = await openMailWith(
-      `<p>Bonjour</p><img alt="pixel" src="${window.location.origin}/icon-192.png">`,
+      `<p>Bonjour</p><img alt="logo" src="${window.location.origin}/icon-192.png">`,
     );
 
     const image = (await mailPage(screen)).querySelector('img');
 
     await expect.poll(() => image?.complete).toBe(true);
-    expect(image?.naturalWidth).toBe(0);
+    expect(image?.naturalWidth).toBeGreaterThan(0);
   });
 });
 
