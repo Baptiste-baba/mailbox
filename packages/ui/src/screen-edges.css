@@ -1,11 +1,19 @@
-/* The edges of the screen of a phone app installed on the home screen, where the page runs under
-   the status bar and the home bar. Zero in a browser tab and on a computer.
-
-   At the top, a screen's own controls stay clear of the status bar and of the blur iOS lays below
-   it, which cannot be turned off and reaches about half as far again as the bar. */
+/* The edges of the screen that a screen's own controls keep clear of: the camera and the home bar
+   of a phone, which the page runs under. Zero in a browser tab and on a computer. */
 :root {
-  --screen-top: calc(env(safe-area-inset-top, 0px) * 1.5);
+  --screen-top: env(safe-area-inset-top, 0px);
   --screen-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Installed on an iPhone or an iPad held upright, iOS blurs the top of the app below its status
+   bar, and nothing turns the blur off: the controls start below it. Safari on iOS alone knows
+   `-webkit-touch-callout`. */
+@media (display-mode: standalone) and (orientation: portrait) {
+  @supports (-webkit-touch-callout: none) {
+    :root {
+      --screen-top: calc(env(safe-area-inset-top, 0px) + 36px);
+    }
+  }
 }
 
 /* The padding at the top of a screen's first row: its own, or the room the status bar and its

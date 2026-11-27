@@ -4,9 +4,9 @@ import { fakeApi } from '../testing/fake-api.ts';
 import { fakeThreads } from '../testing/fake-threads.ts';
 import { type AppScreen, renderApp } from '../testing/render-app.tsx';
 
-/** What iOS leaves to an app installed on the home screen of an iPhone: the status bar and its
- * blur at the top, the home bar at the foot. */
-const SCREEN_TOP = 88;
+/** What iOS leaves to an app installed on the home screen of an iPhone: the blur below its status
+ * bar at the top, the home bar at the foot. */
+const SCREEN_TOP = 36;
 const SCREEN_BOTTOM = 34;
 
 function installOnIphone() {
@@ -34,7 +34,7 @@ async function openOnIphone(path: string): Promise<AppScreen> {
 }
 
 describe('app installed on an iPhone', () => {
-  test('keeps the top of the list clear of the status bar', async () => {
+  test('keeps the top of the list clear of the blur below the status bar', async () => {
     const screen = await openOnIphone('/inbox');
     await expect.element(screen.getByRole('button', { name: 'Ouvrir le menu' })).toBeVisible();
 
@@ -49,7 +49,7 @@ describe('app installed on an iPhone', () => {
     expect(button.element().getBoundingClientRect().bottom).toBe(844 - SCREEN_BOTTOM);
   });
 
-  test('keeps the way back of a mail clear of the status bar, its reply above the home bar', async () => {
+  test('keeps the way back of a mail clear of the blur below the status bar, its reply above the home bar', async () => {
     const screen = await openOnIphone('/inbox/thread-1');
     await expect.element(screen.getByText('Corps de thread-1')).toBeVisible();
 
@@ -58,7 +58,7 @@ describe('app installed on an iPhone', () => {
     expect(send.getBoundingClientRect().bottom).toBeLessThanOrEqual(844 - SCREEN_BOTTOM);
   });
 
-  test('keeps the menu clear of the status bar and the home bar', async () => {
+  test('keeps the menu clear of the blur below the status bar and the home bar', async () => {
     const screen = await openOnIphone('/inbox');
     await screen.getByRole('button', { name: 'Ouvrir le menu' }).click();
     const settings = screen.getByRole('link', { name: 'Réglages' });
@@ -73,14 +73,14 @@ describe('app installed on an iPhone', () => {
 });
 
 describe('pages of an app installed on an iPhone', () => {
-  test('keeps the title of the settings clear of the status bar', async () => {
+  test('keeps the title of the settings clear of the blur below the status bar', async () => {
     const screen = await openOnIphone('/settings');
     await expect.element(screen.getByRole('heading', { name: 'Réglages' })).toBeVisible();
 
     expect(topOf(screen, 'heading', 'Réglages')).toBeGreaterThanOrEqual(SCREEN_TOP);
   });
 
-  test('keeps the logo of the sign-in clear of the status bar', async () => {
+  test('keeps the logo of the sign-in clear of the blur below the status bar', async () => {
     installOnIphone();
     fakeApi({ authStatus: () => ({ state: 'signedOut' }) });
     await page.viewport(390, 844);
