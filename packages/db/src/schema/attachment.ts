@@ -1,3 +1,4 @@
+import { isNull } from 'drizzle-orm';
 import { integer, pgTable, text, unique, uuid } from 'drizzle-orm/pg-core';
 import { message } from './message.ts';
 
@@ -23,3 +24,9 @@ export const attachment = pgTable(
   },
   (table) => [unique('attachment_position_unique').on(table.messageId, table.position)],
 );
+
+/**
+ * A file attached to its message, as opposed to one its HTML body displays, such as a logo in a
+ * signature: that one is part of the body. Lists and threads only count and show the former.
+ */
+export const isAttachedFile = isNull(attachment.contentId);

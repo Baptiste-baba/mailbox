@@ -1,5 +1,5 @@
-import { attachment, type Database, message, thread } from '@mailbox/db';
-import { asc, eq, isNull } from 'drizzle-orm';
+import { attachment, type Database, isAttachedFile, message, thread } from '@mailbox/db';
+import { asc, eq } from 'drizzle-orm';
 
 /** One query: the thread, its messages oldest first, and the files attached to each. */
 export function findThreadWithMessages(database: Database, threadId: string) {
@@ -22,8 +22,7 @@ export function findThreadWithMessages(database: Database, threadId: string) {
         },
         with: {
           attachments: {
-            // A file the body displays, such as a logo, is part of the body, not an attachment.
-            where: isNull(attachment.contentId),
+            where: isAttachedFile,
             orderBy: asc(attachment.position),
             columns: { id: true, fileName: true, mimeType: true, size: true },
           },

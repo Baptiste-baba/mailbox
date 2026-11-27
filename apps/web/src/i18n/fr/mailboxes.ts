@@ -50,7 +50,6 @@ export const mailboxes = {
   removeProviderUnavailable:
     'Google ne répond pas, la boîte n’a pas été retirée. Réessaie dans quelques minutes.',
   confirmIdentityToRemove: 'Pour retirer une boîte, confirme d’abord que c’est toi.',
-  reconnect: 'Reconnecter',
   reconnectMailbox: (name: string) => `Reconnecter la boîte «\u00a0${name}\u00a0»`,
   reconnectIntro: (address: string) =>
     `Google ne laisse plus MailBox lire cette boîte. Connecte-toi chez Google avec ${address} pour lui redonner l’accès.`,

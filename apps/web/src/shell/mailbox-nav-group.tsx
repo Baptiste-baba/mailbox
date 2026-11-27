@@ -41,7 +41,7 @@ function MailboxLinks() {
     return mailboxes.isError ? (
       <SidebarError message={fr.common.mailboxesError} onRetry={() => mailboxes.refetch()} />
     ) : (
-      <NavItemSkeletons count={3} />
+      <NavItemSkeletons />
     );
   }
   if (mailboxes.data.mailboxes.length === 0) {

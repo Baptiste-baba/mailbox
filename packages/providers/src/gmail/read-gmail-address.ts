@@ -1,10 +1,8 @@
 import { mailboxConnectionFailure } from '@mailbox/shared';
 import * as z from 'zod';
 import { readAnswer } from '../http/read-answer.ts';
-import { sendRequest } from '../http/send-request.ts';
+import { sendGmailRequest } from './ask-gmail.ts';
 import { readGoogleApiRefusal } from './google-api-refusal.ts';
-
-const PROFILE_ENDPOINT = 'https://gmail.googleapis.com/gmail/v1/users/me/profile';
 
 const gmailProfileSchema = z.object({ emailAddress: z.email() });
 
@@ -15,9 +13,7 @@ const gmailProfileSchema = z.object({ emailAddress: z.email() });
  * @throws AppError MAIL_PROVIDER_UNAVAILABLE
  */
 export async function readGmailAddress(accessToken: string): Promise<string> {
-  const response = await sendRequest(PROFILE_ENDPOINT, {
-    headers: { authorization: `Bearer ${accessToken}` },
-  });
+  const response = await sendGmailRequest(accessToken, '/profile');
   if (!response.ok) {
     const refusal = await readGoogleApiRefusal(response);
     throw mailboxConnectionFailure(

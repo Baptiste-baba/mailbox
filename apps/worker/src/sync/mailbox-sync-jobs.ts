@@ -1,7 +1,9 @@
-import { mailbox, withoutQueryValues } from '@mailbox/db';
+import { mailbox } from '@mailbox/db';
+import { mailboxIdSchema } from '@mailbox/shared';
 import { eq } from 'drizzle-orm';
 import type { Job, PgBoss } from 'pg-boss';
 import * as z from 'zod';
+import { workJobs } from '../job-queue.ts';
 import { copyMailboxPage } from './copy-mailbox-page.ts';
 import { forgetMailboxAccess } from './open-mailbox-access.ts';
 import type { SyncContext } from './sync-context.ts';
@@ -18,7 +20,7 @@ const MAILBOX_CHANGES_QUEUE = 'mailbox-changes';
 const MAILBOX_WATCH_QUEUE = 'mailbox-sync-watch';
 const EVERY_MINUTE = '* * * * *';
 
-const mailboxJobSchema = z.object({ mailboxId: z.uuid() });
+const mailboxJobSchema = z.object({ mailboxId: mailboxIdSchema });
 
 /** Queues work for a mailbox. One with such a job already waiting is not queued twice. */
 async function queueFor(jobQueue: PgBoss, queue: string, mailboxId: string): Promise<void> {
@@ -61,8 +63,7 @@ async function runFor(
       { err: error, queue: job.name, jobId: job.id, mailboxId, retryCount: job.retryCount },
       'Mailbox job failed',
     );
-    // The queue keeps the error of a failed job in its table: without the mail it may carry.
-    throw withoutQueryValues(error);
+    throw error;
   }
 }
 
@@ -95,21 +96,17 @@ export async function registerMailboxSyncJobs(
 ): Promise<void> {
   await createQueues(jobQueue);
   await jobQueue.schedule(MAILBOX_WATCH_QUEUE, EVERY_MINUTE);
-  await jobQueue.work(MAILBOX_COPY_QUEUE, async (jobs) => {
-    for (const job of jobs) {
-      await runFor(context, job, async (mailboxId) => {
-        if ((await copyMailboxPage(context, mailboxId, job.signal)) === 'more') {
-          await queueFor(jobQueue, MAILBOX_COPY_QUEUE, mailboxId);
-        }
-      });
-    }
-  });
-  await jobQueue.work(MAILBOX_CHANGES_QUEUE, async (jobs) => {
-    for (const job of jobs) {
-      await runFor(context, job, (mailboxId) => syncMailboxChanges(context, mailboxId, job.signal));
-    }
-  });
-  await jobQueue.work(MAILBOX_WATCH_QUEUE, () => queueMailboxWork(jobQueue, context));
+  await workJobs(jobQueue, MAILBOX_COPY_QUEUE, (job) =>
+    runFor(context, job, async (mailboxId) => {
+      if ((await copyMailboxPage(context, mailboxId, job.signal)) === 'more') {
+        await queueFor(jobQueue, MAILBOX_COPY_QUEUE, mailboxId);
+      }
+    }),
+  );
+  await workJobs(jobQueue, MAILBOX_CHANGES_QUEUE, (job) =>
+    runFor(context, job, (mailboxId) => syncMailboxChanges(context, mailboxId, job.signal)),
+  );
+  await workJobs(jobQueue, MAILBOX_WATCH_QUEUE, () => queueMailboxWork(jobQueue, context));
   // At start, without waiting for the minute to turn.
   await queueMailboxWork(jobQueue, context);
 }

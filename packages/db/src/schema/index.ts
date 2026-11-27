@@ -1,5 +1,5 @@
 export { account } from './account.ts';
-export { attachment } from './attachment.ts';
+export { attachment, isAttachedFile } from './attachment.ts';
 export { authAttempt, authAttemptKind } from './auth-attempt.ts';
 export { folder } from './folder.ts';
 export { mailbox, mailboxStatus, mailProvider } from './mailbox.ts';

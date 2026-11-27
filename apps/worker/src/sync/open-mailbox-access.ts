@@ -1,17 +1,13 @@
 import { mailbox } from '@mailbox/db';
 import { requireMailProvider } from '@mailbox/providers';
-import { AppError, type MailProvider, type MailProviderName } from '@mailbox/shared';
+import { AppError, type MailProvider } from '@mailbox/shared';
 import { eq } from 'drizzle-orm';
 import type { KeptAccess, SyncContext } from './sync-context.ts';
 
 /** An access is renewed while it still holds this long: a run never ends on an expired one. */
 const RENEWAL_MARGIN_MS = 10 * 60 * 1000;
 
-interface StoredAccess {
-  id: string;
-  provider: MailProviderName;
-  refreshTokenEncrypted: string;
-}
+type StoredAccess = Pick<typeof mailbox.$inferSelect, 'id' | 'provider' | 'refreshTokenEncrypted'>;
 
 export interface MailboxAccess {
   provider: MailProvider;

@@ -1,4 +1,5 @@
-import { PgBoss } from 'pg-boss';
+import { withoutQueryValues } from '@mailbox/db';
+import { type Job, PgBoss } from 'pg-boss';
 import type { Logger } from 'pino';
 
 // A handful of connections covers polling, maintenance and the few jobs running at once.
@@ -25,4 +26,25 @@ export async function isDatabaseReachable(jobQueue: PgBoss, logger: Logger): Pro
     logger.warn({ err: error }, 'Database unreachable');
     return false;
   }
+}
+
+/**
+ * Has `handler` work the jobs of a queue, one at a time. The queue keeps the error of a failed job
+ * in its table: it is handed back without the values of a failed query, which may be the content
+ * of a mail.
+ */
+export async function workJobs(
+  jobQueue: PgBoss,
+  queue: string,
+  handler: (job: Job<unknown>) => Promise<void>,
+): Promise<void> {
+  await jobQueue.work(queue, async (jobs) => {
+    for (const job of jobs) {
+      try {
+        await handler(job);
+      } catch (error) {
+        throw withoutQueryValues(error);
+      }
+    }
+  });
 }

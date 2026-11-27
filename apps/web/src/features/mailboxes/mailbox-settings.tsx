@@ -112,7 +112,7 @@ function MailboxRow({ mailbox, onReconnect, onRemove }: MailboxRowProps) {
             onClick={onReconnect}
             aria-label={fr.mailboxes.reconnectMailbox(mailbox.name)}
           >
-            {fr.mailboxes.reconnect}
+            {fr.common.reconnect}
           </Button>
         </>
       ) : (

@@ -9,7 +9,7 @@ import { ServerUnreachableError } from './server-unreachable-error.ts';
  */
 export function apiErrorMessage(
   error: unknown,
-  expected: Partial<Record<ErrorCode, string>> = {},
+  expected: Partial<Record<ErrorCode, string>>,
 ): string {
   if (error instanceof ServerUnreachableError) {
     return fr.common.serverUnreachable;

@@ -2,18 +2,18 @@ import { useId } from 'react';
 import { joinClassNames } from '../join-class-names.ts';
 import { type SwatchColor, swatchColorClassNames } from './swatch.tsx';
 
-interface SwatchPickerOption<Color extends SwatchColor> {
-  color: Color;
+interface SwatchPickerOption {
+  color: SwatchColor;
   /** Name of the colour: shown when it is the chosen one, and read aloud. */
   label: string;
 }
 
-interface SwatchPickerProps<Color extends SwatchColor> {
+interface SwatchPickerProps {
   /** Shown inside the field, above the name of the chosen colour, and its accessible name. */
   label: string;
-  options: readonly SwatchPickerOption<Color>[];
-  value: Color;
-  onChange: (color: Color) => void;
+  options: readonly SwatchPickerOption[];
+  value: SwatchColor;
+  onChange: (color: SwatchColor) => void;
   className?: string;
 }
 
@@ -22,13 +22,7 @@ interface SwatchPickerProps<Color extends SwatchColor> {
  * chosen colour on the left, one round swatch per colour on the right. Native radio buttons carry
  * it, so that arrow keys and screen readers work as everywhere else.
  */
-export function SwatchPicker<Color extends SwatchColor>({
-  label,
-  options,
-  value,
-  onChange,
-  className,
-}: SwatchPickerProps<Color>) {
+export function SwatchPicker({ label, options, value, onChange, className }: SwatchPickerProps) {
   const name = useId();
   const labelId = useId();
   const chosen = options.find((option) => option.color === value);

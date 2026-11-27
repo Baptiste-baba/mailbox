@@ -1,14 +1,13 @@
 import type { Database, SecretBox } from '@mailbox/db';
 import type { MailProviders } from '@mailbox/providers';
+import type { ProviderAccess } from '@mailbox/shared';
 import type { Logger } from 'pino';
 import type { ReadPace } from './read-pace.ts';
 
 /** An access a provider gave to read a mailbox, kept for as long as it holds. */
-export interface KeptAccess {
+export interface KeptAccess extends ProviderAccess {
   /** The sealed token it was renewed with: signing in again gives another, and a new access. */
   refreshTokenEncrypted: string;
-  accessToken: string;
-  expiresAt: Date;
 }
 
 /** What keeping the mail of the mailboxes in line with their providers works with. */

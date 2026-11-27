@@ -1,5 +1,5 @@
-import { attachment, message, type Transaction, thread } from '@mailbox/db';
-import { and, asc, count, desc, eq, isNull, type SQL, sql } from 'drizzle-orm';
+import { attachment, isAttachedFile, message, type Transaction, thread } from '@mailbox/db';
+import { and, asc, count, desc, eq, type SQL, sql } from 'drizzle-orm';
 
 /** A mail just stored, and what the list shows of its thread when it is the one that opened it. */
 interface StoredMail {
@@ -44,13 +44,12 @@ async function findOldestMessageId(transaction: Transaction, ofThread: SQL) {
   return oldest?.id;
 }
 
-/** A file the body displays is part of the body, not an attachment of the mail. */
 async function hasAttachedFile(transaction: Transaction, ofThread: SQL): Promise<boolean> {
   const [file] = await transaction
     .select({ id: attachment.id })
     .from(attachment)
     .innerJoin(message, eq(attachment.messageId, message.id))
-    .where(and(ofThread, isNull(attachment.contentId)))
+    .where(and(ofThread, isAttachedFile))
     .limit(1);
   return file !== undefined;
 }

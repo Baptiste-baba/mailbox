@@ -12,13 +12,10 @@ export async function storeFolders(
   folders: ProviderFolder[],
 ): Promise<void> {
   await database.transaction(async (transaction) => {
-    const ofMailbox = eq(folder.mailboxId, mailboxId);
     const kept = folders.map(({ providerFolderId }) => providerFolderId);
     await transaction
       .delete(folder)
-      .where(
-        kept.length === 0 ? ofMailbox : and(ofMailbox, notInArray(folder.providerFolderId, kept)),
-      );
+      .where(and(eq(folder.mailboxId, mailboxId), notInArray(folder.providerFolderId, kept)));
     if (folders.length > 0) {
       await transaction
         .insert(folder)
@@ -26,6 +23,8 @@ export async function storeFolders(
         .onConflictDoUpdate({
           target: [folder.mailboxId, folder.providerFolderId],
           set: { name: sql`excluded.name` },
+          // A name that did not change is left as it is, rather than written again.
+          setWhere: sql`${folder.name} is distinct from excluded.name`,
         });
     }
   });

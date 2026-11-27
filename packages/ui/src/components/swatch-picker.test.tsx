@@ -2,18 +2,17 @@ import { useState } from 'react';
 import { describe, expect, test } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
+import type { SwatchColor } from './swatch.tsx';
 import { SwatchPicker } from './swatch-picker.tsx';
 
-type Color = 'navy' | 'azur' | 'ciel';
-
-const colors: { color: Color; label: string }[] = [
+const colors: { color: SwatchColor; label: string }[] = [
   { color: 'navy', label: 'Bleu nuit' },
   { color: 'azur', label: 'Azur' },
   { color: 'ciel', label: 'Ciel' },
 ];
 
 function ColorChoice() {
-  const [color, setColor] = useState<Color>('navy');
+  const [color, setColor] = useState<SwatchColor>('navy');
   return <SwatchPicker label="Couleur" options={colors} value={color} onChange={setColor} />;
 }
 

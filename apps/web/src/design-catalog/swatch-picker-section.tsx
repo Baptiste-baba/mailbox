@@ -1,10 +1,8 @@
-import { SwatchPicker, TextField } from '@mailbox/ui';
-import { type ComponentProps, useState } from 'react';
+import { type SwatchColor, SwatchPicker, TextField } from '@mailbox/ui';
+import { useState } from 'react';
 import { CatalogSection, SampleName } from './catalog-section.tsx';
 
-type Color = ComponentProps<typeof SwatchPicker>['value'];
-
-const colors: { color: Color; label: string }[] = [
+const colors: { color: SwatchColor; label: string }[] = [
   { color: 'navy', label: 'Bleu nuit' },
   { color: 'azur', label: 'Azur' },
   { color: 'ciel', label: 'Ciel' },
@@ -13,7 +11,7 @@ const colors: { color: Color; label: string }[] = [
 ];
 
 export function SwatchPickerSection() {
-  const [color, setColor] = useState<Color>('azur');
+  const [color, setColor] = useState<SwatchColor>('azur');
   return (
     <CatalogSection title="Choix de couleur">
       <div className="flex max-w-90 flex-col gap-5">

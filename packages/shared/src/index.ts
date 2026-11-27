@@ -71,11 +71,8 @@ export {
   mailboxIdSchema,
 } from './mail/mailbox-connection.ts';
 export {
-  type MailboxConnectionFailureDetails,
-  type MailboxConnectionFailureReason,
   mailboxConnectionFailure,
   mailboxConnectionFailureDetailsSchema,
-  mailboxConnectionFailureReasonSchema,
 } from './mail/mailbox-connection-failure.ts';
 export {
   type MailboxList,
