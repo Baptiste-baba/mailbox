@@ -162,3 +162,19 @@ describe('the access to a mailbox, from one run to the next', () => {
     expect(provider.renewals).toBe(2);
   });
 });
+
+describe('reading what changed, after runs that failed', () => {
+  it('tells the mailbox read again, and forgets the failure', async () => {
+    await database.update(mailbox).set({
+      lastSyncedAt: new Date('2026-11-20T09:00:00.000Z'),
+      syncFailingSince: new Date('2026-11-20T09:01:00.000Z'),
+      syncFailureReason: 'provider_unavailable',
+    });
+
+    await syncChanges();
+
+    const stored = await storedMailbox(database, mailboxId);
+    expect(stored).toMatchObject({ syncFailingSince: null, syncFailureReason: null });
+    expect(stored?.lastSyncedAt?.getTime()).toBeGreaterThan(Date.now() - 60_000);
+  });
+});

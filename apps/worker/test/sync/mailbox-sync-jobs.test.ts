@@ -12,6 +12,7 @@ import {
   insertTestMailbox,
   openTestDatabase,
   resetMailTables,
+  storedMailbox,
   testMail,
   testSyncContext,
 } from './test-mail.ts';
@@ -83,6 +84,21 @@ describe('the changes of the mailboxes, in the background', { timeout: 40_000 },
 });
 
 describe('a mailbox job that fails, in the background', { timeout: 40_000 }, () => {
+  it('records that the mailbox could not be read, and why', async () => {
+    const provider = new FakeProvider();
+    provider.mails = [testMail('m1')];
+    provider.unreachableIds.add('m1');
+    const mailboxId = await insertTestMailbox(database);
+
+    await registerMailboxSyncJobs(jobQueue, testSyncContext(database, provider));
+
+    await expect
+      .poll(async () => (await storedMailbox(database, mailboxId))?.syncFailureReason, {
+        timeout: COPY_WAIT_MS,
+      })
+      .toBe('provider_unavailable');
+  });
+
   it('logs and keeps its error without the mail it was storing', async () => {
     const subject = 'Sujet qui doit rester hors des journaux';
     const provider = new FakeProvider();

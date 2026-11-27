@@ -58,6 +58,7 @@ export {
   mailProviderNameSchema,
   type ProviderAccess,
   type ProviderGrant,
+  type ProviderMailboxState,
 } from './mail/mail-provider.ts';
 export {
   MAILBOX_CONNECTION_PATH,

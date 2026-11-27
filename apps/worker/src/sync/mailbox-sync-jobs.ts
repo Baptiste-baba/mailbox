@@ -7,6 +7,7 @@ import { workJobs } from '../job-queue.ts';
 import { copyMailboxPage } from './copy-mailbox-page.ts';
 import { forgetMailboxAccess } from './open-mailbox-access.ts';
 import type { SyncContext } from './sync-context.ts';
+import { recordSyncFailure } from './sync-health.ts';
 import { syncMailboxChanges } from './sync-mailbox-changes.ts';
 
 /** One job copies one page of a mailbox, then queues the next. */
@@ -63,6 +64,7 @@ async function runFor(
       { err: error, queue: job.name, jobId: job.id, mailboxId, retryCount: job.retryCount },
       'Mailbox job failed',
     );
+    await recordSyncFailure(context.database, mailboxId, error);
     throw error;
   }
 }

@@ -50,6 +50,16 @@ describe('copying a mailbox, page after page', () => {
     });
   });
 
+  it('remembers how many mails the provider announced, and when the mailbox was read', async () => {
+    await copyPage();
+
+    const stored = await storedMailbox(database, mailboxId);
+    expect(stored?.initialSyncTotal).toBe(5);
+    expect(stored?.lastSyncedAt).toBeInstanceOf(Date);
+  });
+});
+
+describe('copying a mailbox, down to its oldest mail', () => {
   it('goes on from the page it stopped at, down to the oldest mail', async () => {
     await copyPage();
 

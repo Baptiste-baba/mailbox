@@ -29,8 +29,8 @@ function record(id: string, ...messageIds: string[]) {
   };
 }
 
-describe('asking Gmail where the history of a mailbox stands', () => {
-  it('gives the id of its latest change', async () => {
+describe('asking Gmail where a mailbox stands', () => {
+  it('gives the id of its latest change, and how many mails it holds', async () => {
     fetchMock.mockResolvedValueOnce(
       Response.json({
         emailAddress: 'alex.martin@example.com',
@@ -39,7 +39,10 @@ describe('asking Gmail where the history of a mailbox stands', () => {
       }),
     );
 
-    await expect(provider.currentCursor('the-access-token')).resolves.toBe('8421');
+    await expect(provider.readMailboxState('the-access-token')).resolves.toEqual({
+      cursor: '8421',
+      messageCount: 12,
+    });
     expect(urlAsked()).toBe(`${API}/profile`);
   });
 });

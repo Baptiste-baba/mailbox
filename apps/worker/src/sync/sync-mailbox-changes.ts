@@ -6,6 +6,7 @@ import { refreshMessage } from './refresh-message.ts';
 import { removeMessage } from './remove-message.ts';
 import { storeFolders } from './store-folders.ts';
 import type { SyncContext } from './sync-context.ts';
+import { syncSucceeded } from './sync-health.ts';
 
 /**
  * Starts the copy of the whole mailbox over: the provider no longer tells what changed since the
@@ -86,7 +87,7 @@ export async function syncMailboxChanges(
   await applyChanges(context, access, mailboxId, changes, signal);
   await context.database
     .update(mailbox)
-    .set({ syncCursor: changes.nextCursor })
+    .set({ syncCursor: changes.nextCursor, ...syncSucceeded() })
     .where(eq(mailbox.id, mailboxId));
   const { changedMessageIds: changed, goneMessageIds: gone } = changes;
   if (changed.length + gone.length > 0) {

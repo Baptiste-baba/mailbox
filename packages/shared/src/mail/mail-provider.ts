@@ -37,6 +37,14 @@ export interface AuthorizationCode {
   redirectUri: string;
 }
 
+/** Where a mailbox stands at its provider. */
+export interface ProviderMailboxState {
+  /** What asks for the changes from now on. */
+  cursor: string;
+  /** How many mails the provider says the mailbox holds, spam and deleted mail left out. */
+  messageCount: number;
+}
+
 /** What a provider grants once the user has signed in. */
 export interface ProviderGrant {
   /** The address of the account the user signed in with. */
@@ -94,10 +102,11 @@ export interface MailProvider {
   readMessage(accessToken: string, providerMessageId: string): Promise<ProviderMessage | null>;
 
   /**
-   * What asks, later, for everything that changes in the mailbox from now on.
+   * Where the mailbox stands now: what asks, later, for everything that changes in it from now
+   * on, and how many mails it holds.
    * @throws AppError MAIL_PROVIDER_UNAVAILABLE when the provider cannot be reached or refuses.
    */
-  currentCursor(accessToken: string): Promise<string>;
+  readMailboxState(accessToken: string): Promise<ProviderMailboxState>;
 
   /**
    * Some of what changed in the mailbox since a cursor, and the cursor to ask for the rest with.

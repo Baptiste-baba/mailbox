@@ -6,6 +6,7 @@ import { refreshMessage } from './refresh-message.ts';
 import { removeMessage } from './remove-message.ts';
 import { storeFolders } from './store-folders.ts';
 import type { SyncContext } from './sync-context.ts';
+import { syncSucceeded } from './sync-health.ts';
 
 /** Whether pages of the mailbox remain to copy. */
 export type CopyOutcome = 'more' | 'done';
@@ -40,10 +41,11 @@ async function unseenMessageIds(
 }
 
 /**
- * What tells what changes in the mailbox from before its first page is listed: nothing that
- * happens during the copy is lost. Asked once per copy, however many times its pages are retried.
+ * Where the mailbox stands before its first page is listed: what tells what changes in it from
+ * then on, so that nothing that happens during the copy is lost, and how many mails the copy is
+ * to go through. Asked once per copy, however many times its pages are retried.
  */
-async function rememberStartingCursor(
+async function rememberStartingPoint(
   context: SyncContext,
   access: MailboxAccess,
   copied: CopiedMailbox,
@@ -51,8 +53,11 @@ async function rememberStartingCursor(
   if (copied.syncCursor !== null) {
     return;
   }
-  const syncCursor = await access.provider.currentCursor(access.accessToken);
-  await context.database.update(mailbox).set({ syncCursor }).where(eq(mailbox.id, copied.id));
+  const { cursor, messageCount } = await access.provider.readMailboxState(access.accessToken);
+  await context.database
+    .update(mailbox)
+    .set({ syncCursor: cursor, initialSyncTotal: messageCount })
+    .where(eq(mailbox.id, copied.id));
 }
 
 /** Removes the mails the copy did not find at the provider: gone since they were stored. */
@@ -92,6 +97,7 @@ async function rememberProgress(
     .set({
       initialSyncPageToken: nextPageToken,
       initialSyncCompletedAt: completed ? new Date() : null,
+      ...syncSucceeded(),
     })
     .where(underSameCopy(copied))
     .returning({ id: mailbox.id });
@@ -155,7 +161,7 @@ export async function copyMailboxPage(
   if (copied === undefined || access === undefined) {
     return 'done';
   }
-  await rememberStartingCursor(context, access, copied);
+  await rememberStartingPoint(context, access, copied);
   const folders = await access.provider.listFolders(access.accessToken);
   await storeFolders(context.database, mailboxId, folders);
   const page = await access.provider.listMessages(access.accessToken, copied.initialSyncPageToken);

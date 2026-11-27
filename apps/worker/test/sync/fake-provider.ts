@@ -97,8 +97,11 @@ export class FakeProvider implements MailProvider {
     return this.mails.find((held) => held.providerMessageId === providerMessageId) ?? null;
   }
 
-  currentCursor() {
-    return Promise.resolve(String(this.changes.length));
+  readMailboxState() {
+    return Promise.resolve({
+      cursor: String(this.changes.length),
+      messageCount: this.mails.length,
+    });
   }
 
   listChanges(_accessToken: string, cursor: string) {

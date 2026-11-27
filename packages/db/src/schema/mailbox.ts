@@ -1,9 +1,16 @@
-import { pgEnum, pgTable, text, timestamp, unique, uuid } from 'drizzle-orm/pg-core';
+import { integer, pgEnum, pgTable, text, timestamp, unique, uuid } from 'drizzle-orm/pg-core';
 import { paletteColor } from './palette-color.ts';
 
 export const mailProvider = pgEnum('mail_provider', ['gmail']);
 
 export const mailboxStatus = pgEnum('mailbox_status', ['connected', 'reconnect_required']);
+
+/** Why reading a mailbox at its provider fails. */
+export const syncFailureReason = pgEnum('sync_failure_reason', [
+  'provider_unavailable',
+  'provider_not_configured',
+  'unexpected',
+]);
 
 /** A mail account the user connected. Its mail stays at the provider: the tables below mirror it. */
 export const mailbox = pgTable(
@@ -34,6 +41,14 @@ export const mailbox = pgTable(
     initialSyncPageToken: text(),
     /** When the copy of the whole mailbox ended; null while it is under way. */
     initialSyncCompletedAt: timestamp({ withTimezone: true }),
+    /** How many mails the provider announced when the copy started: what its progress is told against. */
+    initialSyncTotal: integer(),
+    /** When the mailbox was last read at its provider without failing. */
+    lastSyncedAt: timestamp({ withTimezone: true }),
+    /** Since when reading the mailbox fails without a success since; null while it works. */
+    syncFailingSince: timestamp({ withTimezone: true }),
+    /** Why reading the mailbox fails, while it does. */
+    syncFailureReason: syncFailureReason(),
     /**
      * What asks the provider for the changes of the mailbox since they were last read. Null until
      * a copy starts, and when the provider no longer knows the one it gave.
