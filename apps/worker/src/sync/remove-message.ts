@@ -1,4 +1,4 @@
-import { type Database, message, thread } from '@mailbox/db';
+import { type Database, message, notifyMailboxChange, thread } from '@mailbox/db';
 import { and, eq } from 'drizzle-orm';
 import { summariseThread } from './summarise-thread.ts';
 
@@ -31,5 +31,6 @@ export async function removeMessage(
       .for('update');
     await transaction.delete(message).where(stored);
     await summariseThread(transaction, found.threadId);
+    await notifyMailboxChange(transaction, mailboxId);
   });
 }

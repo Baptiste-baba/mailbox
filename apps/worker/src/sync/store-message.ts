@@ -4,6 +4,7 @@ import {
   folder,
   message,
   messageFolder,
+  notifyMailboxChange,
   type Transaction,
   thread,
 } from '@mailbox/db';
@@ -132,5 +133,6 @@ export async function storeMessage(
     await writeAttachments(transaction, messageId, mail.attachments);
     await fileInFolders(transaction, { mailboxId, messageId }, mail.providerFolderIds);
     await summariseThread(transaction, threadId, { messageId, subject: mail.subject });
+    await notifyMailboxChange(transaction, mailboxId);
   });
 }

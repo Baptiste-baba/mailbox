@@ -1,4 +1,9 @@
 export { createDatabase, type Database, pingDatabase, type Transaction } from './database.ts';
+export {
+  listenToMailboxChanges,
+  type MailboxChangesListener,
+  notifyMailboxChange,
+} from './mailbox-changes.ts';
 export { migrateDatabase } from './migrate-database.ts';
 export * from './schema/index.ts';
 export { SecretBox } from './secret-box.ts';

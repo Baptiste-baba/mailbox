@@ -1,4 +1,4 @@
-import { mailbox } from '@mailbox/db';
+import { mailbox, notifyMailboxChange } from '@mailbox/db';
 import type { ProviderChanges } from '@mailbox/shared';
 import { and, eq, isNotNull } from 'drizzle-orm';
 import { type MailboxAccess, openMailboxAccess } from './open-mailbox-access.ts';
@@ -22,6 +22,7 @@ async function startCopyOver(context: SyncContext, mailboxId: string): Promise<v
       initialSyncCompletedAt: null,
     })
     .where(eq(mailbox.id, mailboxId));
+  await notifyMailboxChange(context.database, mailboxId);
   context.logger.warn({ mailboxId }, 'Changes of the mailbox lost: copying it again');
 }
 
@@ -89,6 +90,10 @@ export async function syncMailboxChanges(
     .update(mailbox)
     .set({ syncCursor: changes.nextCursor, ...syncSucceeded() })
     .where(eq(mailbox.id, mailboxId));
+  // The mails told their own changes; the mailbox tells it is read again after failing.
+  if (stored.syncFailingSince !== null) {
+    await notifyMailboxChange(context.database, mailboxId);
+  }
   const { changedMessageIds: changed, goneMessageIds: gone } = changes;
   if (changed.length + gone.length > 0) {
     context.logger.info(

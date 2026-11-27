@@ -1,4 +1,4 @@
-import { mailbox, message } from '@mailbox/db';
+import { mailbox, message, notifyMailboxChange } from '@mailbox/db';
 import type { ProviderMessagePage } from '@mailbox/shared';
 import { and, eq, gte, inArray, isNull, lt } from 'drizzle-orm';
 import { type MailboxAccess, openMailboxAccess } from './open-mailbox-access.ts';
@@ -85,7 +85,11 @@ function underSameCopy(copied: CopiedMailbox) {
   );
 }
 
-/** @returns Whether the progress was written: false when the copy was started over meanwhile. */
+/**
+ * Remembers where the copy stands, and tells when that changes what the app shows: the copy is
+ * over, or the mailbox is read again after failing. The mails stored told their own change.
+ * @returns Whether the progress was written: false when the copy was started over meanwhile.
+ */
 async function rememberProgress(
   context: SyncContext,
   copied: CopiedMailbox,
@@ -101,6 +105,9 @@ async function rememberProgress(
     })
     .where(underSameCopy(copied))
     .returning({ id: mailbox.id });
+  if (written.length > 0 && (completed || copied.syncFailingSince !== null)) {
+    await notifyMailboxChange(context.database, copied.id);
+  }
   return written.length > 0;
 }
 

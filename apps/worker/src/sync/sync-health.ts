@@ -1,4 +1,4 @@
-import { type Database, mailbox } from '@mailbox/db';
+import { type Database, mailbox, notifyMailboxChange } from '@mailbox/db';
 import { AppError } from '@mailbox/shared';
 import { eq, sql } from 'drizzle-orm';
 
@@ -35,4 +35,5 @@ export async function recordSyncFailure(
       syncFailureReason: failureReasonOf(error),
     })
     .where(eq(mailbox.id, mailboxId));
+  await notifyMailboxChange(database, mailboxId);
 }

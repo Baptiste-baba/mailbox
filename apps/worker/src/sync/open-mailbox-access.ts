@@ -1,4 +1,4 @@
-import { mailbox } from '@mailbox/db';
+import { mailbox, notifyMailboxChange } from '@mailbox/db';
 import { requireMailProvider } from '@mailbox/providers';
 import { AppError, type MailProvider } from '@mailbox/shared';
 import { eq } from 'drizzle-orm';
@@ -74,6 +74,7 @@ export async function openMailboxAccess(
       .update(mailbox)
       .set({ status: 'reconnect_required' })
       .where(eq(mailbox.id, stored.id));
+    await notifyMailboxChange(context.database, stored.id);
     context.logger.warn({ mailboxId: stored.id }, 'Mailbox waiting for its user to sign in again');
     return undefined;
   }
