@@ -1,4 +1,5 @@
 import * as z from 'zod';
+import type { ProviderFolder, ProviderMessage, ProviderMessagePage } from './provider-message.ts';
 
 /** The mail services a mailbox can be connected from. */
 export const mailProviderNameSchema = z.enum(['gmail']);
@@ -70,6 +71,25 @@ export interface MailProvider {
    * a reason signing in again would not settle.
    */
   renewAccess(refreshToken: string): Promise<ProviderAccess>;
+
+  /**
+   * A page of the mails of the account, most recent first; spam and deleted mail are left out.
+   * @param pageToken What the previous page gave to ask for this one; null for the first page.
+   * @throws AppError MAIL_PROVIDER_UNAVAILABLE when the provider cannot be reached or refuses.
+   */
+  listMessages(accessToken: string, pageToken: string | null): Promise<ProviderMessagePage>;
+
+  /**
+   * A mail of the account; null when the provider no longer has it, deleted since it was listed.
+   * @throws AppError MAIL_PROVIDER_UNAVAILABLE when the provider cannot be reached or refuses.
+   */
+  readMessage(accessToken: string, providerMessageId: string): Promise<ProviderMessage | null>;
+
+  /**
+   * The folders the user created at the provider.
+   * @throws AppError MAIL_PROVIDER_UNAVAILABLE when the provider cannot be reached or refuses.
+   */
+  listFolders(accessToken: string): Promise<ProviderFolder[]>;
 
   /**
    * Ends the access a refresh token gives. One the provider no longer knows is already ended.

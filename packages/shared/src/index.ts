@@ -88,6 +88,7 @@ export type {
   ProviderAttachment,
   ProviderFolder,
   ProviderMessage,
+  ProviderMessagePage,
 } from './mail/provider-message.ts';
 export {
   type Attachment,

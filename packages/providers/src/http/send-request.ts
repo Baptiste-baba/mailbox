@@ -12,19 +12,29 @@ interface LostAttempt {
 }
 
 /**
+ * Tells, from an answer a provider refused, that it only asks to slow down: some providers say so
+ * under another status than 429. It is given a copy of the answer, to read as it likes.
+ */
+type SlowDownCheck = (refusal: Response) => Promise<boolean>;
+
+/**
  * Sends a request to a mail provider and gives its answer, whatever its status. An attempt lost to
- * the network, left without answer for ten seconds, refused for going too fast (429) or failed on
- * the provider's side (5xx) is made again, after a wait that doubles each time. Any other answer
- * is final: asking again would get the same.
+ * the network, left without answer for ten seconds, refused for going too fast (429, or what
+ * `asksToSlowDown` recognises) or failed on the provider's side (5xx) is made again, after a wait
+ * that doubles each time. Any other answer is final: asking again would get the same.
  * @throws AppError MAIL_PROVIDER_UNAVAILABLE when no attempt got a final answer.
  */
-export async function sendRequest(url: string, init: RequestInit): Promise<Response> {
+export async function sendRequest(
+  url: string,
+  init: RequestInit,
+  asksToSlowDown?: SlowDownCheck,
+): Promise<Response> {
   let lastFailure: unknown;
   for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt += 1) {
     if (attempt > 0) {
       await wait(FIRST_RETRY_DELAY_MS * 2 ** (attempt - 1));
     }
-    const outcome = await attemptRequest(url, init);
+    const outcome = await attemptRequest(url, init, asksToSlowDown);
     if (outcome instanceof Response) {
       return outcome;
     }
@@ -35,7 +45,11 @@ export async function sendRequest(url: string, init: RequestInit): Promise<Respo
   });
 }
 
-async function attemptRequest(url: string, init: RequestInit): Promise<Response | LostAttempt> {
+async function attemptRequest(
+  url: string,
+  init: RequestInit,
+  asksToSlowDown: SlowDownCheck | undefined,
+): Promise<Response | LostAttempt> {
   let response: Response;
   try {
     response = await fetch(url, { ...init, signal: AbortSignal.timeout(ATTEMPT_TIMEOUT_MS) });
@@ -43,7 +57,11 @@ async function attemptRequest(url: string, init: RequestInit): Promise<Response 
     // fetch only fails when no answer came: network down, host not found, or time out.
     return { failure: error };
   }
-  if (response.status === TOO_MANY_REQUESTS || response.status >= FIRST_SERVER_ERROR) {
+  const transient =
+    response.status === TOO_MANY_REQUESTS ||
+    response.status >= FIRST_SERVER_ERROR ||
+    (!response.ok && (await asksToSlowDown?.(response.clone())) === true);
+  if (transient) {
     await response.body?.cancel();
     return { failure: new Error(`The mail provider answered HTTP ${response.status}`) };
   }

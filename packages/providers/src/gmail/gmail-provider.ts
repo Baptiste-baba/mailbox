@@ -1,6 +1,9 @@
 import type { MailProvider } from '@mailbox/shared';
 import type { OauthClient } from '../oauth-client.ts';
 import { googleAuthorizationUrl } from './google-authorization-url.ts';
+import { listGmailFolders } from './list-gmail-folders.ts';
+import { listGmailMessages } from './list-gmail-messages.ts';
+import { readGmailMessage } from './read-gmail-message.ts';
 import { redeemGoogleCode } from './redeem-google-code.ts';
 import { renewGoogleAccess } from './renew-google-access.ts';
 import { revokeGoogleToken } from './revoke-google-token.ts';
@@ -11,6 +14,9 @@ export function createGmailProvider(client: OauthClient): MailProvider {
     authorizationUrl: (request) => googleAuthorizationUrl(client.clientId, request),
     redeem: (code) => redeemGoogleCode(client, code),
     renewAccess: (refreshToken) => renewGoogleAccess(client, refreshToken),
+    listMessages: listGmailMessages,
+    readMessage: readGmailMessage,
+    listFolders: listGmailFolders,
     revoke: revokeGoogleToken,
   };
 }

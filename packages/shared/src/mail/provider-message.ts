@@ -38,6 +38,13 @@ export interface ProviderMessage {
   attachments: ProviderAttachment[];
 }
 
+/** Some of the mails of an account, by their id at the provider, most recent first. */
+export interface ProviderMessagePage {
+  providerMessageIds: string[];
+  /** What asks for the mails that follow; null once there is none left. */
+  nextPageToken: string | null;
+}
+
 /** A folder the user created at the provider, where it may be called a label. */
 export interface ProviderFolder {
   providerFolderId: string;

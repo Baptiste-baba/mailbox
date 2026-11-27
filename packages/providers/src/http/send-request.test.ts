@@ -98,3 +98,25 @@ describe('sendRequest, when the provider stays out of reach', () => {
     await outcome;
   });
 });
+
+describe('sendRequest, with a provider that asks to slow down in its own way', () => {
+  const slowDownUnder403 = (refusal: Response) => Promise.resolve(refusal.status === 403);
+
+  it('asks again what the provider refused only for coming too fast', async () => {
+    fetchMock.mockResolvedValueOnce(answer(403)).mockResolvedValueOnce(answer(200));
+
+    const outcome = await outcomeOf(sendRequest(URL_ASKED, {}, slowDownUnder403));
+
+    expect(outcome).toMatchObject({ status: 200 });
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
+  it('gives any other refusal as it is, without asking twice', async () => {
+    fetchMock.mockResolvedValueOnce(answer(401));
+
+    const outcome = await outcomeOf(sendRequest(URL_ASKED, {}, slowDownUnder403));
+
+    expect(outcome).toMatchObject({ status: 401 });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+});
