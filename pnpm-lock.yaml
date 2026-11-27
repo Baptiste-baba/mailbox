@@ -402,9 +402,18 @@ importers:
       '@mailbox/config':
         specifier: workspace:*
         version: link:../../packages/config
+      '@mailbox/db':
+        specifier: workspace:*
+        version: link:../../packages/db
+      '@mailbox/providers':
+        specifier: workspace:*
+        version: link:../../packages/providers
       '@mailbox/shared':
         specifier: workspace:*
         version: link:../../packages/shared
+      drizzle-orm:
+        specifier: 'catalog:'
+        version: 0.45.4(@opentelemetry/api@1.10.0)(@types/pg@8.23.1)(pg@8.23.1)
       pg-boss:
         specifier: 12.38.0
         version: 12.38.0(@opentelemetry/api@1.10.0)

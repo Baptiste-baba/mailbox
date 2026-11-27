@@ -1,8 +1,9 @@
 import { SecretBox } from '@mailbox/db';
+import { configuredMailProviders } from '@mailbox/providers';
 import { type DynamicModule, Module } from '@nestjs/common';
 import type { ApiConfig } from '../config/api-config.ts';
 import { CONNECTION_REDIRECT_URI, connectionRedirectUri } from './connection-redirect-uri.ts';
-import { configuredMailProviders, MAIL_PROVIDERS } from './mail-providers.ts';
+import { MAIL_PROVIDERS } from './mail-providers.ts';
 import { MailboxConnectionController } from './mailbox-connection.controller.ts';
 import { MailboxConnectionService } from './mailbox-connection.service.ts';
 import { MailboxRemovalService } from './mailbox-removal.service.ts';

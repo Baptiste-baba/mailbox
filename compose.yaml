@@ -95,6 +95,9 @@ services:
     image: ghcr.io/baptiste-baba/mailbox-worker:${MAILBOX_VERSION:-main}
     environment:
       DATABASE_URL: postgres://mailbox:${POSTGRES_PASSWORD}@postgres:5432/mailbox
+      MAILBOX_SECRET_KEY: ${MAILBOX_SECRET_KEY:?Set MAILBOX_SECRET_KEY in .env}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
       BACKUP_DIRECTORY: /backups
       LOG_LEVEL: ${LOG_LEVEL:-info}
       TZ: ${TZ:-UTC}

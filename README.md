@@ -126,13 +126,13 @@ sets them from `.env`; the table below matters to run a service on its own.
 | Variable               | Used by     | Required | Default     | Purpose                                                        |
 | ---------------------- | ----------- | -------- | ----------- | -------------------------------------------------------------- |
 | `DATABASE_URL`         | api, worker | yes      |             | PostgreSQL connection string (`postgres://…`)                  |
-| `MAILBOX_SECRET_KEY`   | api         | yes      |             | 32 bytes in base64 encrypting the secrets kept in the database |
+| `MAILBOX_SECRET_KEY`   | api, worker | yes      |             | 32 bytes in base64 encrypting the secrets kept in the database |
 | `MAILBOX_URL`          | api         | yes      |             | HTTPS address the app is opened at (`http` for `localhost`)    |
 | `API_HOST`             | api         | no       | `127.0.0.1` | Address the api listens on (`0.0.0.0` inside a container)      |
 | `API_PORT`             | api         | no       | `3000`      | Port the api listens on                                        |
 | `WEB_DIRECTORY`        | api         | no       |             | Built web app (`apps/web/dist`) to serve; unset, API only      |
-| `GOOGLE_CLIENT_ID`     | api         | no       |             | OAuth client of this installation at Google, to connect Gmail  |
-| `GOOGLE_CLIENT_SECRET` | api         | no       |             | Secret of that client; set both, or neither                    |
+| `GOOGLE_CLIENT_ID`     | api, worker | no       |             | OAuth client of this installation at Google, to connect Gmail  |
+| `GOOGLE_CLIENT_SECRET` | api, worker | no       |             | Secret of that client; set both, or neither                    |
 | `BACKUP_DIRECTORY`     | worker      | yes      |             | Folder receiving the nightly database backups                  |
 | `WORKER_HEALTH_PORT`   | worker      | no       | `3001`      | Port of the worker health check, bound to loopback only        |
 | `TRUSTED_PROXIES`      | api         | no       |             | Proxies whose `X-Forwarded-For` names the device (see below)   |
@@ -217,7 +217,7 @@ live in `.env.development` and `.env.test`; they only hold local values.
 To connect Gmail in development, follow "Connecting Gmail" with
 `http://localhost:5173/mailbox-connection` as the redirect address, and write `GOOGLE_CLIENT_ID` and
 `GOOGLE_CLIENT_SECRET` to `.env.development.local` at the root of the repository: Git ignores that
-file, and the api reads it on top of `.env.development`.
+file, and the api and the worker read it on top of `.env.development`.
 
 `http://localhost:5173/design.html` shows every design token and interface component in both
 themes. It exists in development only.

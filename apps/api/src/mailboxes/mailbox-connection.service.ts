@@ -1,4 +1,5 @@
 import { type Database, mailbox, SecretBox } from '@mailbox/db';
+import { type MailProviders, requireMailProvider } from '@mailbox/providers';
 import {
   AppError,
   type MailboxAuthorization,
@@ -14,7 +15,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { eq } from 'drizzle-orm';
 import { DATABASE } from '../database/database.module.ts';
 import { CONNECTION_REDIRECT_URI } from './connection-redirect-uri.ts';
-import { MAIL_PROVIDERS, type MailProviders, requireMailProvider } from './mail-providers.ts';
+import { MAIL_PROVIDERS } from './mail-providers.ts';
 import { mailboxNotFound } from './mailbox-not-found.ts';
 import { MailboxesService } from './mailboxes.service.ts';
 import { type ConnectionTarget, PendingConnections } from './pending-connections.ts';

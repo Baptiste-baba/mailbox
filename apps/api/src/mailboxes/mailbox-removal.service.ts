@@ -1,9 +1,10 @@
 import { type Database, mailbox, SecretBox } from '@mailbox/db';
+import { type MailProviders, requireMailProvider } from '@mailbox/providers';
 import { Inject, Injectable } from '@nestjs/common';
 import { eq } from 'drizzle-orm';
 import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
 import { DATABASE } from '../database/database.module.ts';
-import { MAIL_PROVIDERS, type MailProviders, requireMailProvider } from './mail-providers.ts';
+import { MAIL_PROVIDERS } from './mail-providers.ts';
 
 @Injectable()
 export class MailboxRemovalService {
