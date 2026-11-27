@@ -92,6 +92,11 @@ most recent first, leaving out spam, the bin and drafts. Google lets a mailbox b
 mails a minute: count two hours for 10,000 mails. The copy picks up where it stopped after a
 restart, and the mails already copied can be read meanwhile.
 
+From then on, the worker asks Google every minute what changed in the mailbox: new mail, mail
+read, archived, filed or deleted there shows in MailBox within a minute or two. Google keeps about
+a week of these changes: after a longer stop of the server, the mailbox is copied again from the
+start, which takes as long as the first time.
+
 As such a client serves one Google account, an installation connects the mailbox of one Google
 account for now. With a Google Workspace account, the administrator of the domain may have to allow
 the app first.
