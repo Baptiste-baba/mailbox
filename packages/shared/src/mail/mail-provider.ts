@@ -100,9 +100,9 @@ export interface MailProvider {
   currentCursor(accessToken: string): Promise<string>;
 
   /**
-   * Some of what changed in the mailbox since a cursor, oldest changes first, and the cursor to
-   * ask for the rest with. Null when the provider no longer keeps what happened since that
-   * cursor: only copying the mailbox again tells what it holds.
+   * Some of what changed in the mailbox since a cursor, and the cursor to ask for the rest with.
+   * Null when the provider no longer keeps what happened since that cursor: only copying the
+   * mailbox again tells what it holds.
    * @throws AppError MAIL_PROVIDER_UNAVAILABLE when the provider cannot be reached or refuses.
    */
   listChanges(accessToken: string, cursor: string): Promise<ProviderChanges | null>;

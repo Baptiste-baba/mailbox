@@ -55,7 +55,11 @@ describe('listing what changed in a Gmail mailbox', () => {
 
     const changes = await provider.listChanges('the-access-token', '8421');
 
-    expect(changes).toEqual({ providerMessageIds: ['message-1', 'message-2'], nextCursor: '8430' });
+    expect(changes).toEqual({
+      changedMessageIds: ['message-1', 'message-2'],
+      goneMessageIds: [],
+      nextCursor: '8430',
+    });
     expect(urlAsked()).toBe(`${API}/history?startHistoryId=8421&maxResults=100`);
   });
 
@@ -63,7 +67,8 @@ describe('listing what changed in a Gmail mailbox', () => {
     fetchMock.mockResolvedValueOnce(Response.json({ historyId: '8430' }));
 
     await expect(provider.listChanges('the-access-token', '8421')).resolves.toEqual({
-      providerMessageIds: [],
+      changedMessageIds: [],
+      goneMessageIds: [],
       nextCursor: '8430',
     });
   });
@@ -81,7 +86,9 @@ describe('listing what changed in a Gmail mailbox', () => {
 
     expect(changes?.nextCursor).toBe('8425');
   });
+});
 
+describe('listing what changed in a Gmail mailbox, when Gmail lost it', () => {
   it('gives nothing when Gmail no longer keeps the history since the cursor', async () => {
     fetchMock.mockResolvedValueOnce(
       Response.json({ error: { code: 404, status: 'NOT_FOUND' } }, { status: 404 }),

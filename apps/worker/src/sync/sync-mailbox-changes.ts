@@ -1,7 +1,9 @@
 import { mailbox } from '@mailbox/db';
+import type { ProviderChanges } from '@mailbox/shared';
 import { and, eq, isNotNull } from 'drizzle-orm';
-import { openMailboxAccess } from './open-mailbox-access.ts';
+import { type MailboxAccess, openMailboxAccess } from './open-mailbox-access.ts';
 import { refreshMessage } from './refresh-message.ts';
+import { removeMessage } from './remove-message.ts';
 import { storeFolders } from './store-folders.ts';
 import type { SyncContext } from './sync-context.ts';
 
@@ -20,6 +22,30 @@ async function startCopyOver(context: SyncContext, mailboxId: string): Promise<v
     })
     .where(eq(mailbox.id, mailboxId));
   context.logger.warn({ mailboxId }, 'Changes of the mailbox lost: copying it again');
+}
+
+/**
+ * Removes the mails the mirror no longer holds, without asking the provider, then reads again
+ * those that changed, at the pace the provider allows.
+ */
+async function applyChanges(
+  context: SyncContext,
+  access: MailboxAccess,
+  mailboxId: string,
+  changes: ProviderChanges,
+  signal: AbortSignal,
+): Promise<void> {
+  for (const providerMessageId of changes.goneMessageIds) {
+    await removeMessage(context.database, mailboxId, providerMessageId);
+  }
+  if (changes.changedMessageIds.length === 0) {
+    return;
+  }
+  const folders = await access.provider.listFolders(access.accessToken);
+  await storeFolders(context.database, mailboxId, folders);
+  for (const providerMessageId of changes.changedMessageIds) {
+    await refreshMessage(context, access, { mailboxId, providerMessageId }, signal);
+  }
 }
 
 /**
@@ -57,20 +83,15 @@ export async function syncMailboxChanges(
     await startCopyOver(context, mailboxId);
     return;
   }
-  if (changes.providerMessageIds.length > 0) {
-    const folders = await access.provider.listFolders(access.accessToken);
-    await storeFolders(context.database, mailboxId, folders);
-  }
-  for (const providerMessageId of changes.providerMessageIds) {
-    await refreshMessage(context, access, { mailboxId, providerMessageId }, signal);
-  }
+  await applyChanges(context, access, mailboxId, changes, signal);
   await context.database
     .update(mailbox)
     .set({ syncCursor: changes.nextCursor })
     .where(eq(mailbox.id, mailboxId));
-  if (changes.providerMessageIds.length > 0) {
+  const { changedMessageIds: changed, goneMessageIds: gone } = changes;
+  if (changed.length + gone.length > 0) {
     context.logger.info(
-      { mailboxId, changed: changes.providerMessageIds.length, durationMs: Date.now() - startedAt },
+      { mailboxId, changed: changed.length, gone: gone.length, durationMs: Date.now() - startedAt },
       'Mailbox changes stored',
     );
   }

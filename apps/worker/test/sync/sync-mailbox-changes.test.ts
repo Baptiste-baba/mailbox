@@ -66,13 +66,14 @@ describe('reading what changed in a mailbox', () => {
     expect(summary).toMatchObject({ unread: false, inInbox: false });
   });
 
-  it('removes a mail deleted or marked as spam at the provider', async () => {
+  it('removes a mail deleted or marked as spam at the provider, without reading it', async () => {
     provider.discard('m1');
 
     await syncChanges();
 
     expect(await storedMail('m1')).toBeUndefined();
     expect(await database.select().from(thread)).toHaveLength(1);
+    expect(provider.readIds).toEqual([]);
   });
 
   it('reads nothing when nothing changed, and only what changed since the last time', async () => {

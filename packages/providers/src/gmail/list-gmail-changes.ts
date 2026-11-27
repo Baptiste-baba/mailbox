@@ -1,33 +1,26 @@
 import type { ProviderChanges } from '@mailbox/shared';
 import * as z from 'zod';
 import { askGmailIfThere } from './ask-gmail.ts';
+import { gmailHistoryRecordSchema, sortGmailChanges } from './sort-gmail-changes.ts';
 
 /**
- * As many changes as a mailbox can be read mails in about a minute: every changed mail is read
- * again, at the pace Gmail allows.
+ * As many changes as a mailbox can be read mails in about a minute: a changed mail is read again,
+ * at the pace Gmail allows.
  */
 const PAGE_SIZE = 100;
 
 const gmailHistorySchema = z.object({
   /** Absent when nothing changed. Records come oldest first. */
-  history: z
-    .array(
-      z.object({
-        id: z.string().regex(/^\d{1,20}$/),
-        /** Every message the record is about, whatever happened to it. */
-        messages: z.array(z.object({ id: z.string().min(1) })).optional(),
-      }),
-    )
-    .optional(),
+  history: z.array(gmailHistoryRecordSchema).optional(),
   nextPageToken: z.string().optional(),
   /** Where the history of the mailbox stands now. */
   historyId: z.string().regex(/^\d{1,20}$/),
 });
 
 /**
- * The messages of a Gmail mailbox that arrived, left or changed labels since a point of its
- * history, a page of records at a time. Null when Gmail no longer keeps the history since that
- * point (HTTP 404, measured: it keeps about a week of it).
+ * What changed in a Gmail mailbox since a point of its history, a page of records at a time: the
+ * messages to read again, and those the mirror no longer holds. Null when Gmail no longer keeps
+ * the history since that point (HTTP 404, measured: it keeps about a week of it).
  * @throws AppError MAIL_PROVIDER_UNAVAILABLE
  */
 export async function listGmailChanges(
@@ -40,12 +33,8 @@ export async function listGmailChanges(
     return null;
   }
   const records = page.history ?? [];
-  const changed = records.flatMap((record) => (record.messages ?? []).map((message) => message.id));
   // More records follow: they are asked for from the last one read, not with the page token, so
   // that a cursor alone always tells where the reading stands.
   const lastRead = page.nextPageToken === undefined ? undefined : records.at(-1)?.id;
-  return {
-    providerMessageIds: [...new Set(changed)],
-    nextCursor: lastRead ?? page.historyId,
-  };
+  return { ...sortGmailChanges(records), nextCursor: lastRead ?? page.historyId };
 }

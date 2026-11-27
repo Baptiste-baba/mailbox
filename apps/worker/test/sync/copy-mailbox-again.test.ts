@@ -66,7 +66,10 @@ describe('copying a mailbox again, the provider having lost what changed', () =>
     await copyWholeMailbox();
     // While the server was off for long: a mail changed, one was deleted, one arrived.
     provider.mails = [testMail('m4'), testMail('m3', { unread: true }), testMail('m1')];
-    provider.changedIds = ['m3', 'm2', 'm4', 'm4', 'm4', 'm4'];
+    provider.changes = ['m3', 'm2', 'm4', 'm4', 'm4', 'm4'].map((providerMessageId) => ({
+      providerMessageId,
+      gone: providerMessageId === 'm2',
+    }));
     provider.oldestCursorKept = 5;
     provider.readIds = [];
     await syncMailboxChanges(context, mailboxId, neverStopped);

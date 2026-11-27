@@ -1,12 +1,8 @@
 import type { MailAddress, ProviderAttachment, ProviderMessage } from '@mailbox/shared';
+import { INBOX_LABEL, isUserLabel, UNREAD_LABEL } from './gmail-labels.ts';
 import type { GmailMessage, GmailPart } from './gmail-message-schema.ts';
 import { parseMailAddresses } from './parse-mail-addresses.ts';
 import { unescapeGmailSnippet } from './unescape-gmail-snippet.ts';
-
-const UNREAD_LABEL = 'UNREAD';
-const INBOX_LABEL = 'INBOX';
-/** Gmail names the labels of the user "Label_" and a number; its own are words in capitals. */
-const USER_LABEL_PREFIX = 'Label_';
 
 function header(part: GmailPart, name: string): string | undefined {
   return part.headers?.find((candidate) => candidate.name.toLowerCase() === name)?.value;
@@ -75,7 +71,7 @@ export function toProviderMessage(message: GmailMessage): ProviderMessage {
     bodyHtml,
     unread: labelIds.includes(UNREAD_LABEL),
     inInbox: labelIds.includes(INBOX_LABEL),
-    providerFolderIds: labelIds.filter((labelId) => labelId.startsWith(USER_LABEL_PREFIX)),
+    providerFolderIds: labelIds.filter(isUserLabel),
     attachments: parts.filter(isFile).map((part) => toAttachment(part, bodyHtml)),
   };
 }

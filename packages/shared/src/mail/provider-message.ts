@@ -48,10 +48,15 @@ export interface ProviderMessagePage {
 /** What changed in the mailbox of an account since a cursor was given. */
 export interface ProviderChanges {
   /**
-   * The mails that arrived, left, or changed state or folder, by their id at the provider. A
-   * provider tells little more: each is read again to know what it became.
+   * The mails that arrived, or changed in a way the mirror shows (read or not, archived, filed),
+   * by their id at the provider: each is read again to know what it became.
    */
-  providerMessageIds: string[];
+  changedMessageIds: string[];
+  /**
+   * The mails the mirror no longer holds: deleted at the provider, or now spam, deleted mail or a
+   * draft. They are removed without being read.
+   */
+  goneMessageIds: string[];
   /** What asks for the changes that follow these. */
   nextCursor: string;
 }

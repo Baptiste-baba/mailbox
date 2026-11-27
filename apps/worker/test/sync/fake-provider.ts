@@ -21,8 +21,11 @@ const unused = (): never => {
 export class FakeProvider implements MailProvider {
   mails: ProviderMessage[] = [];
   folders: ProviderFolder[] = [];
-  /** Ids of the mails that changed, in order: the cursor is how many were told so far. */
-  changedIds: string[] = [];
+  /**
+   * What happened to mails, in order: changed, or gone from the mirror. The cursor is how many
+   * changes were told so far.
+   */
+  changes: { providerMessageId: string; gone: boolean }[] = [];
   /** Ids of the mails read, in order. */
   readIds: string[] = [];
   /** Page tokens asked for, in order. */
@@ -52,13 +55,13 @@ export class FakeProvider implements MailProvider {
       mail,
       ...this.mails.filter((held) => held.providerMessageId !== mail.providerMessageId),
     ];
-    this.changedIds.push(mail.providerMessageId);
+    this.changes.push({ providerMessageId: mail.providerMessageId, gone: false });
   }
 
   /** A mail is deleted, or marked as spam: the provider no longer gives it, and tells. */
   discard(providerMessageId: string): void {
     this.mails = this.mails.filter((held) => held.providerMessageId !== providerMessageId);
-    this.changedIds.push(providerMessageId);
+    this.changes.push({ providerMessageId, gone: true });
   }
 
   renewAccess(): Promise<ProviderAccess> {
@@ -95,16 +98,23 @@ export class FakeProvider implements MailProvider {
   }
 
   currentCursor() {
-    return Promise.resolve(String(this.changedIds.length));
+    return Promise.resolve(String(this.changes.length));
   }
 
   listChanges(_accessToken: string, cursor: string) {
     if (Number(cursor) < this.oldestCursorKept) {
       return Promise.resolve(null);
     }
+    // The latest change of a mail says what it became.
+    const latest = new Map(
+      this.changes.slice(Number(cursor)).map((change) => [change.providerMessageId, change.gone]),
+    );
+    const told = (gone: boolean) =>
+      [...latest].filter(([, isGone]) => isGone === gone).map(([id]) => id);
     return Promise.resolve({
-      providerMessageIds: [...new Set(this.changedIds.slice(Number(cursor)))],
-      nextCursor: String(this.changedIds.length),
+      changedMessageIds: told(false),
+      goneMessageIds: told(true),
+      nextCursor: String(this.changes.length),
     });
   }
 
