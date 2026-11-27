@@ -1,4 +1,13 @@
-import { Chip, Kbd, NavGroup, NavGroupAction, NavItem, Skeleton, Swatch } from '@mailbox/ui';
+import {
+  Chip,
+  Kbd,
+  NavGroup,
+  NavGroupAction,
+  NavItem,
+  Skeleton,
+  Swatch,
+  WarningDot,
+} from '@mailbox/ui';
 import { InboxIcon, SearchIcon, SunIcon } from 'lucide-react';
 import type { ComponentProps } from 'react';
 import { CatalogSection, SampleName } from './catalog-section.tsx';
@@ -81,6 +90,15 @@ function SampleNavigation() {
               <Chip tone="warn">Reconnecter</Chip>
             </a>
           }
+          marker="warn"
+        />
+        <NavItem
+          icon={<Swatch color="glacier" shape="circle" />}
+          label="Travail"
+          description="alex@studio.example"
+          href="#"
+          title="Synchronisation interrompue"
+          trailing={<WarningDot />}
           marker="warn"
         />
       </NavGroup>

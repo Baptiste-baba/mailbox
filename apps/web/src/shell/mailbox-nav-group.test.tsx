@@ -5,6 +5,7 @@ import { renderApp } from '../testing/render-app.tsx';
 import { workMailbox } from '../testing/test-mailboxes.ts';
 
 const work: MailboxSummary = { ...workMailbox, status: 'reconnectRequired' };
+
 afterEach(() => {
   vi.unstubAllGlobals();
 });
@@ -34,5 +35,27 @@ describe('sidebar, mailboxes', () => {
       .element(screen.getByRole('button', { name: 'Reconnecter la boîte « Travail »' }))
       .toBeVisible();
     expect(router.state.location.pathname).toBe('/settings');
+  });
+});
+
+describe('sidebar, a mailbox not read for a while', () => {
+  test('says so on hover, in place of its unread count', async () => {
+    const interrupted: MailboxSummary = {
+      ...workMailbox,
+      unreadCount: 4,
+      sync: {
+        state: 'interrupted',
+        since: '2026-11-27T09:00:00.000Z',
+        reason: 'providerUnavailable',
+      },
+    };
+    fakeApi({ mailboxes: () => ({ mailboxes: [interrupted] }) });
+    const { screen } = await renderApp('/inbox');
+    const link = screen.getByRole('navigation').getByRole('link', { name: /alex@studio.example/ });
+
+    await expect
+      .element(link)
+      .toHaveAttribute('title', expect.stringContaining('Synchronisation interrompue'));
+    expect(link.getByText('4').query()).toBeNull();
   });
 });

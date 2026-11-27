@@ -40,4 +40,5 @@ export { Swatch, type SwatchColor } from './components/swatch.tsx';
 export { SwatchPicker } from './components/swatch-picker.tsx';
 export { TextField } from './components/text-field.tsx';
 export { Toolbar, ToolbarGroup, ToolbarSeparator } from './components/toolbar.tsx';
+export { WarningDot } from './components/warning-dot.tsx';
 export { deviceStorage } from './device-storage.ts';

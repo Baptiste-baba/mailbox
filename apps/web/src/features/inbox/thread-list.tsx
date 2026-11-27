@@ -36,7 +36,7 @@ export function ThreadList({ filters }: { filters: ThreadFilters }) {
   }
   const threads = pages.data.pages.flatMap((page) => page.threads);
   if (threads.length === 0) {
-    return <EmptyThreadList unreadOnly={filters.unreadOnly} />;
+    return <EmptyThreadList filters={filters} />;
   }
   return (
     <VirtualThreadList

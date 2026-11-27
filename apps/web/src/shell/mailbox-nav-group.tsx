@@ -1,5 +1,5 @@
 import type { MailboxSummary } from '@mailbox/shared';
-import { Chip, NavGroup, NavGroupAction, Swatch } from '@mailbox/ui';
+import { Chip, NavGroup, NavGroupAction, Swatch, WarningDot } from '@mailbox/ui';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useNavigate } from '@tanstack/react-router';
 import { LayoutGridIcon } from 'lucide-react';
@@ -55,8 +55,45 @@ function MailboxLinks() {
   ));
 }
 
+/** What a mailbox of the sidebar asks attention for, if anything. */
+function noticeOf(mailbox: MailboxSummary): 'reconnect' | 'interrupted' | undefined {
+  if (mailbox.status === 'reconnectRequired') {
+    return 'reconnect';
+  }
+  return mailbox.sync.state === 'interrupted' ? 'interrupted' : undefined;
+}
+
+type Notice = ReturnType<typeof noticeOf>;
+
+/** At the end of a mailbox: its unread count, or a dot when it has not been read for a while. */
+function trailingOf(mailbox: MailboxSummary, notice: Notice) {
+  if (notice === 'interrupted') {
+    return <WarningDot />;
+  }
+  return notice === undefined ? mailbox.unreadCount || undefined : undefined;
+}
+
+/** What the hint of a mailbox says after its name and address. */
+function noticeHint(mailbox: MailboxSummary, notice: Notice) {
+  if (notice === 'reconnect') {
+    return fr.common.reconnect;
+  }
+  if (notice === 'interrupted') {
+    return fr.common.syncInterrupted;
+  }
+  return mailbox.unreadCount > 0 && fr.common.unreadCount(mailbox.unreadCount);
+}
+
+/** The dot on the icon of a mailbox once the sidebar is reduced to icons. */
+function markerOf(mailbox: MailboxSummary, notice: Notice) {
+  if (notice !== undefined) {
+    return 'warn';
+  }
+  return mailbox.unreadCount > 0 ? 'accent' : undefined;
+}
+
 function MailboxLink({ mailbox }: { mailbox: MailboxSummary }) {
-  const reconnect = mailbox.status === 'reconnectRequired';
+  const notice = noticeOf(mailbox);
   return (
     <SidebarNavLink
       to="/$view"
@@ -65,17 +102,11 @@ function MailboxLink({ mailbox }: { mailbox: MailboxSummary }) {
       icon={<Swatch color={mailbox.color} shape="circle" />}
       label={mailbox.name}
       description={mailbox.address}
-      title={hint(
-        mailbox.name,
-        mailbox.address,
-        reconnect
-          ? fr.common.reconnect
-          : mailbox.unreadCount > 0 && fr.common.unreadCount(mailbox.unreadCount),
-      )}
-      trailing={reconnect ? undefined : mailbox.unreadCount || undefined}
+      title={hint(mailbox.name, mailbox.address, noticeHint(mailbox, notice))}
+      trailing={trailingOf(mailbox, notice)}
       // Reconnecting is done in the settings, where the row itself still opens the mailbox.
       action={
-        reconnect ? (
+        notice === 'reconnect' ? (
           <Link
             to="/settings"
             aria-label={fr.mailboxes.reconnectMailbox(mailbox.name)}
@@ -85,7 +116,7 @@ function MailboxLink({ mailbox }: { mailbox: MailboxSummary }) {
           </Link>
         ) : undefined
       }
-      marker={reconnect ? 'warn' : mailbox.unreadCount > 0 ? 'accent' : undefined}
+      marker={markerOf(mailbox, notice)}
     />
   );
 }
