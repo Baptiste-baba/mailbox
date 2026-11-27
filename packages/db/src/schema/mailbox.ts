@@ -20,6 +20,13 @@ export const mailbox = pgTable(
     /** What renews the access to the provider, encrypted with the key of the configuration. */
     refreshTokenEncrypted: text().notNull(),
     createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+    /**
+     * Where the first copy of the mailbox resumes: what asks the provider for the next page of its
+     * mails. Null before the first page, and once the last one was read.
+     */
+    initialSyncPageToken: text(),
+    /** When every mail the mailbox held was copied once; null until then. */
+    initialSyncCompletedAt: timestamp({ withTimezone: true }),
   },
   (table) => [unique('mailbox_provider_address_unique').on(table.provider, table.address)],
 );

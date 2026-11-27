@@ -36,6 +36,13 @@
       "when": 1794419454545,
       "tag": "0004_add_mail_tables",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1795790578130,
+      "tag": "0005_add_mailbox_initial_sync",
+      "breakpoints": true
     }
   ]
 }
