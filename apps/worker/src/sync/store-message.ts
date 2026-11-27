@@ -64,6 +64,7 @@ async function writeMessage(
     bodyHtml: mail.bodyHtml,
     unread: mail.unread,
     inInbox: mail.inInbox,
+    syncedAt: new Date(),
   };
   const [stored] = await transaction
     .insert(message)

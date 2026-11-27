@@ -56,28 +56,33 @@ async function hasAttachedFile(transaction: Transaction, ofThread: SQL): Promise
 }
 
 /**
- * Works out again what a mail list shows of a thread, from the messages stored so far: lists read
- * the thread alone. The subject is the one of its oldest message, as the conversation was named.
+ * Works out again what a mail list shows of a thread, from the messages it has left: lists read
+ * the thread alone. A thread left without a message goes. The subject is the one of the oldest
+ * message stored, as the conversation was named; it stays when that message goes.
+ * @param justStored The mail whose storing calls for this, when a mail was stored.
  */
 export async function summariseThread(
   transaction: Transaction,
   threadId: string,
-  stored: StoredMail,
+  justStored?: StoredMail,
 ): Promise<void> {
   const ofThread = eq(message.threadId, threadId);
   const facts = await countMessages(transaction, ofThread);
   const latest = await readLatestMessage(transaction, ofThread);
   if (facts === undefined || latest === undefined) {
-    throw new Error('A thread just written to has no message');
+    await transaction.delete(thread).where(eq(thread.id, threadId));
+    return;
   }
-  const opensThread = (await findOldestMessageId(transaction, ofThread)) === stored.messageId;
+  const opensThread =
+    justStored !== undefined &&
+    (await findOldestMessageId(transaction, ofThread)) === justStored.messageId;
   await transaction
     .update(thread)
     .set({
       ...facts,
       ...latest,
       hasAttachments: await hasAttachedFile(transaction, ofThread),
-      ...(opensThread ? { subject: stored.subject } : {}),
+      ...(opensThread ? { subject: justStored.subject } : {}),
     })
     .where(eq(thread.id, threadId));
 }

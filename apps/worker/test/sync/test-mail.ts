@@ -1,6 +1,9 @@
 import { createDatabase, type Database, mailbox, SecretBox } from '@mailbox/db';
-import type { ProviderMessage } from '@mailbox/shared';
+import type { MailProvider, ProviderMessage } from '@mailbox/shared';
 import { sql } from 'drizzle-orm';
+import { pino } from 'pino';
+import { ReadPace } from '../../src/sync/read-pace.ts';
+import type { SyncContext } from '../../src/sync/sync-context.ts';
 
 /** The refresh token the test mailboxes were connected with. */
 export const TEST_REFRESH_TOKEN = 'the-refresh-token';
@@ -14,6 +17,18 @@ export function openTestDatabase(): Database {
   return createDatabase(process.env.DATABASE_URL ?? '', (error) => {
     throw error;
   });
+}
+
+/** What a run works with in tests: a provider for Gmail mailboxes, read without waiting. */
+export function testSyncContext(database: Database, provider: MailProvider): SyncContext {
+  return {
+    database,
+    providers: new Map([['gmail', provider]]),
+    secretBox: testSecretBox(),
+    logger: pino({ level: 'silent' }),
+    pace: new ReadPace(0),
+    accesses: new Map(),
+  };
 }
 
 /** No mailbox, and so no mail: everything a mailbox owns goes with it. */

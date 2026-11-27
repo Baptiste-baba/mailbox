@@ -1,6 +1,5 @@
 import { type Database, folder, mailbox, message } from '@mailbox/db';
 import { eq } from 'drizzle-orm';
-import { pino } from 'pino';
 import { afterAll, beforeEach, describe, expect, it } from 'vitest';
 import { copyMailboxPage } from '../../src/sync/copy-mailbox-page.ts';
 import type { SyncContext } from '../../src/sync/sync-context.ts';
@@ -10,7 +9,7 @@ import {
   openTestDatabase,
   resetMailTables,
   testMail,
-  testSecretBox,
+  testSyncContext,
 } from './test-mail.ts';
 
 const neverStopped = new AbortController().signal;
@@ -26,13 +25,7 @@ beforeEach(async () => {
   mailboxId = await insertTestMailbox(database);
   provider = new FakeProvider();
   provider.mails = ['m5', 'm4', 'm3', 'm2', 'm1'].map((id) => testMail(id));
-  context = {
-    database,
-    providers: new Map([['gmail', provider]]),
-    secretBox: testSecretBox(),
-    logger: pino({ level: 'silent' }),
-    readIntervalMs: 0,
-  };
+  context = testSyncContext(database, provider);
 });
 
 afterAll(async () => {
@@ -114,8 +107,8 @@ describe('copying a mailbox, when a page does not go through', () => {
     expect(await storedIds()).toEqual(['m4', 'm5']);
   });
 
-  it('skips a mail deleted since it was listed', async () => {
-    provider.deletedIds.add('m5');
+  it('skips a mail the provider no longer gives once listed', async () => {
+    provider.goneOnceListed.add('m5');
 
     expect(await copyPage()).toBe('more');
 

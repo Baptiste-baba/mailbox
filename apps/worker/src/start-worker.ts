@@ -5,7 +5,8 @@ import { registerBackupJob } from './backup/backup-job.ts';
 import type { WorkerConfig } from './config/worker-config.ts';
 import { startHealthServer } from './health/health-server.ts';
 import { createJobQueue, isDatabaseReachable } from './job-queue.ts';
-import { registerMailboxCopyJobs } from './sync/mailbox-copy-jobs.ts';
+import { registerMailboxSyncJobs } from './sync/mailbox-sync-jobs.ts';
+import { ReadPace } from './sync/read-pace.ts';
 import type { SyncContext } from './sync/sync-context.ts';
 
 // Lets a running backup finish; Docker's stop grace period must stay above it.
@@ -28,7 +29,7 @@ export async function startWorker(config: WorkerConfig, logger: Logger): Promise
   try {
     const backupTarget = { databaseUrl: config.databaseUrl, directory: config.backupDirectory };
     await registerBackupJob(jobQueue, backupTarget, logger);
-    await registerMailboxCopyJobs(jobQueue, sync);
+    await registerMailboxSyncJobs(jobQueue, sync);
     const healthServer = await startHealthServer(config.healthPort, () =>
       isDatabaseReachable(jobQueue, logger),
     );
@@ -56,6 +57,7 @@ function syncContext(config: WorkerConfig, logger: Logger): SyncContext {
     providers: configuredMailProviders(config.google),
     secretBox: new SecretBox(config.secretKey),
     logger,
-    readIntervalMs: READ_INTERVAL_MS,
+    pace: new ReadPace(READ_INTERVAL_MS),
+    accesses: new Map(),
   };
 }
