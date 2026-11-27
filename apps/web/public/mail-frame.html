@@ -16,13 +16,14 @@
     <title>Mail</title>
     <style>
       /* The sheet a mail is shown on: white, as its sender designed it, whatever the theme of the app. */
-      /* The frame takes the height of the mail: it never scrolls up and down, only sideways for a
-         mail wider than the pane. */
+      /* The frame takes the height of the mail, and a mail wider than the pane is shrunk to it from
+         its top left corner: nothing to scroll. */
       html {
         background: #fff;
         color: #000;
         color-scheme: light;
-        overflow-y: hidden;
+        overflow: hidden;
+        transform-origin: 0 0;
       }
       body {
         margin: 0;

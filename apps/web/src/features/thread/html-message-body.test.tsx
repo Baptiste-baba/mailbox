@@ -116,6 +116,69 @@ describe('the frame of a mail', () => {
     await expect.poll(() => frame.clientHeight).toBeGreaterThanOrEqual(1200);
     expect(fits()).toBe(true);
   });
+
+  // Regression: the frame could grow, but never shrink back.
+  test('shrinks back when the mail gets shorter', async () => {
+    const { screen } = await openMailWith('<p>Bonjour</p><div id="longer" style="height: 1200px">');
+    const page = await mailPage(screen);
+    const frame = screen.getByTitle('Contenu du mail').element();
+    await expect.poll(() => frame.clientHeight).toBeGreaterThanOrEqual(1200);
+
+    page.getElementById('longer')?.remove();
+
+    await expect.poll(() => frame.clientHeight).toBeLessThan(200);
+  });
+
+  test('shows whole a mail that gives its page the height of the window', async () => {
+    const { screen } = await openMailWith(
+      '<html><head><style>html, body { height: 100% !important; }</style></head><body><div style="height: 1500px">Bonjour</div></body></html>',
+    );
+    await mailPage(screen);
+    const frame = screen.getByTitle('Contenu du mail').element();
+
+    await expect.poll(() => frame.clientHeight).toBeGreaterThanOrEqual(1500);
+  });
+});
+
+/** The right edge of an element of the mail, within the frame, once shrunk. */
+const rightEdge = (page: Document, id: string) =>
+  page.getElementById(id)?.getBoundingClientRect().right ?? Number.NaN;
+
+describe('a mail wider than the pane', () => {
+  test('shows whole, shrunk to the width of the pane, its full-width parts along', async () => {
+    const { screen } = await openMailWith(
+      '<div id="band">La Lettre</div><table id="wide" style="width: 3000px"><tr><td>Bonjour</td></tr></table>',
+    );
+    const page = await mailPage(screen);
+    const frameWidth = page.documentElement.clientWidth;
+
+    await expect.poll(() => rightEdge(page, 'wide')).toBeLessThanOrEqual(frameWidth + 1);
+    expect(rightEdge(page, 'wide')).toBeGreaterThan(frameWidth - 1);
+    expect(rightEdge(page, 'band')).toBeCloseTo(rightEdge(page, 'wide'), 0);
+  });
+
+  test('follows the width of the pane, back to its own size once the pane is wide enough', async () => {
+    const { screen } = await openMailWith(
+      '<table id="table" style="width: 500px"><tr><td>Bonjour</td></tr></table>',
+    );
+    const page = await mailPage(screen);
+    const frame = screen.getByTitle('Contenu du mail').element();
+
+    frame.style.width = '250px';
+    await expect.poll(() => rightEdge(page, 'table')).toBeLessThanOrEqual(251);
+
+    frame.style.width = '800px';
+    await expect.poll(() => rightEdge(page, 'table')).toBeCloseTo(500, 0);
+  });
+});
+
+describe('a mail narrower than the pane', () => {
+  test('keeps its own size', async () => {
+    const { screen } = await openMailWith('<div id="card" style="width: 300px">Bonjour</div>');
+    const page = await mailPage(screen);
+
+    await expect.poll(() => rightEdge(page, 'card')).toBe(300);
+  });
 });
 
 describe('the HTML of a mail, and what it loads', () => {
