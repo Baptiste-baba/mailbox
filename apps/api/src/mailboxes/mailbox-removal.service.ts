@@ -1,4 +1,4 @@
-import { type Database, mailbox, SecretBox } from '@mailbox/db';
+import { type Database, mailbox, notifyMailboxChange, SecretBox } from '@mailbox/db';
 import { type MailProviders, requireMailProvider } from '@mailbox/providers';
 import { Inject, Injectable } from '@nestjs/common';
 import { eq } from 'drizzle-orm';
@@ -34,6 +34,7 @@ export class MailboxRemovalService {
       await requireMailProvider(this.mailProviders, stored.provider).revoke(refreshToken);
     }
     await this.database.delete(mailbox).where(eq(mailbox.id, mailboxId));
+    await notifyMailboxChange(this.database, mailboxId);
   }
 
   // A token sealed with a key the configuration no longer holds can be read by no one: there is

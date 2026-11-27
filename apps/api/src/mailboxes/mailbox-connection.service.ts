@@ -1,4 +1,4 @@
-import { type Database, mailbox, SecretBox } from '@mailbox/db';
+import { type Database, mailbox, notifyMailboxChange, SecretBox } from '@mailbox/db';
 import { type MailProviders, requireMailProvider } from '@mailbox/providers';
 import {
   AppError,
@@ -102,6 +102,8 @@ export class MailboxConnectionService {
       target.kind === 'newMailbox'
         ? await this.connect(provider, target, grant)
         : await this.reconnect(target.mailboxId, grant);
+    // The other devices of the user show the mailbox, or its access back, without reloading.
+    await notifyMailboxChange(this.database, mailboxId);
     return this.mailboxes.get(mailboxId);
   }
 

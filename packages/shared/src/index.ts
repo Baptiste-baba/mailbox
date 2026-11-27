@@ -47,6 +47,11 @@ export {
   type TooManyAttemptsDetails,
   tooManyAttemptsDetailsSchema,
 } from './errors/too-many-attempts-details.ts';
+export {
+  SERVER_EVENTS_PATH,
+  type ServerEvent,
+  serverEventSchema,
+} from './events/server-event.ts';
 export { type MailAddress, mailAddressSchema } from './mail/mail-address.ts';
 export {
   type AuthorizationCode,

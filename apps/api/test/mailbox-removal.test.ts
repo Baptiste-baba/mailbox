@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { type Database, thread } from '@mailbox/db';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { errorCode } from './auth-requests.ts';
+import { openEventStream } from './event-stream.ts';
 import { type FakeGoogle, installFakeGoogle } from './fake-google.ts';
 import { type ApiCaller, callApi, TEST_GOOGLE_CLIENT } from './mailbox-requests.ts';
 import { type RunningApi, startApi } from './start-api.ts';
@@ -20,6 +21,7 @@ const MAILBOX = { name: 'Perso', address: 'alex.martin@example.com' };
 let api: RunningApi;
 let database: Database;
 let user: ApiCaller;
+let cookie: string;
 let google: FakeGoogle;
 
 beforeAll(async () => {
@@ -36,7 +38,8 @@ afterAll(async () => {
 beforeEach(async () => {
   google = installFakeGoogle();
   await resetMailTables(database);
-  user = { api, cookie: await signInOnFreshInstance(api, database) };
+  cookie = await signInOnFreshInstance(api, database);
+  user = { api, cookie };
 });
 
 afterEach(() => {
@@ -61,6 +64,16 @@ describe('removing a mailbox', () => {
     expect(google.revokedTokens).toEqual(['token-of-the-mailbox']);
     expect(await storedMailbox(database, mailboxId)).toBeUndefined();
     expect(await database.$count(thread)).toBe(0);
+  });
+
+  it('tells the other devices of the user', async () => {
+    const mailboxId = await insertConnectedMailbox();
+    const stream = await openEventStream(`${api.url}/api/events`, cookie);
+
+    await callApi(user, 'DELETE', `/mailboxes/${mailboxId}`);
+
+    expect(await stream.next()).toEqual({ type: 'mailboxChanged', mailboxId });
+    stream.close();
   });
 
   it('keeps the mailbox when Google does not end the access', async () => {
