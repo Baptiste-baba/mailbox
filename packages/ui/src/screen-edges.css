@@ -1,0 +1,34 @@
+/* The edges of the screen that a screen's own controls keep clear of: the camera and the home bar
+   of a phone, which the page runs under. Zero in a browser tab and on a computer. */
+:root {
+  --screen-top: env(safe-area-inset-top, 0px);
+  --screen-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* While the keyboard is open (`data-keyboard`, set by the app), it covers the home bar: the foot of
+   the screen sits on the keyboard. */
+:root[data-keyboard] {
+  --screen-bottom: 0px;
+}
+
+/* Installed on an iPhone or an iPad held upright, iOS blurs the top of the app below its status
+   bar, and nothing turns the blur off: the controls start below it. Safari on iOS alone knows
+   `-webkit-touch-callout`. */
+@media (display-mode: standalone) and (orientation: portrait) {
+  @supports (-webkit-touch-callout: none) {
+    :root {
+      --screen-top: calc(env(safe-area-inset-top, 0px) + 36px);
+    }
+  }
+}
+
+/* The padding at the top of a screen's first row: its own, or the room the status bar and its
+   blur take, whichever is larger. `pt-screen-3` pads 12 px in a browser. */
+@utility pt-screen-* {
+  padding-top: max(calc(var(--spacing) * --value(number)), var(--screen-top));
+}
+
+/* The padding at the foot of a screen's last row: its own, or the room the home bar takes. */
+@utility pb-screen-* {
+  padding-bottom: max(calc(var(--spacing) * --value(number)), var(--screen-bottom));
+}

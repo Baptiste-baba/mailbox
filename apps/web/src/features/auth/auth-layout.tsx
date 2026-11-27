@@ -16,7 +16,7 @@ interface AuthLayoutProps {
 export function AuthLayout({ title, intro, progress, wide = false, children }: AuthLayoutProps) {
   return (
     <div className="flex min-h-dvh flex-col bg-chrome">
-      <header className="flex h-18 flex-none items-center px-7">
+      <header className="box-content flex h-18 flex-none items-center px-7 pt-screen-0">
         <Brand />
       </header>
       <main className="flex flex-1 flex-col items-center gap-12 px-6 pt-[10vh] pb-16">

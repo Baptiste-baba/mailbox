@@ -28,8 +28,13 @@ export function MessageItem({ message, ownAddress, open, onToggle, now }: Messag
   );
   return (
     // Open, two columns: the avatar, then everything else, so that the text lines up with the name.
-    // Both states keep the same button, which would otherwise take the keyboard focus away with it.
-    <div className={open ? 'grid grid-cols-[auto_1fr] gap-x-3.5 px-4.5 pt-5 pb-5.5' : undefined}>
+    // On a phone the text takes the whole width, under both. Both states keep the same button,
+    // which would otherwise take the keyboard focus away with it.
+    <div
+      className={
+        open ? 'grid grid-cols-[auto_1fr] gap-x-3.5 px-4.5 pt-5 pb-5.5 compact:px-4' : undefined
+      }
+    >
       <button
         type="button"
         aria-expanded={open}
@@ -37,7 +42,7 @@ export function MessageItem({ message, ownAddress, open, onToggle, now }: Messag
         className={
           open
             ? 'col-span-2 grid grid-cols-subgrid items-center text-left'
-            : 'flex w-full items-center gap-3.5 px-4.5 py-3.5 text-left'
+            : 'flex w-full items-center gap-3.5 px-4.5 py-3.5 text-left compact:px-4'
         }
       >
         {/* The owner reads "Toi", but keeps the initials of their own name. */}

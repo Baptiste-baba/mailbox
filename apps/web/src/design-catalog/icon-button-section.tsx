@@ -1,6 +1,7 @@
 import { ChoiceMenu, IconButton, NumberStepper, Toolbar, ToolbarSeparator } from '@mailbox/ui';
 import {
   ArchiveIcon,
+  ArrowLeftIcon,
   BoldIcon,
   CalendarIcon,
   ChevronLeftIcon,
@@ -56,6 +57,14 @@ export function IconButtonSection() {
           </IconButton>
         </div>
         <SampleName name="pressed={false}, pressed, puis désactivé" />
+      </div>
+      <div className="flex flex-col gap-2">
+        <div className="flex flex-wrap items-center gap-1">
+          <IconButton label="Retour" raised>
+            <ArrowLeftIcon />
+          </IconButton>
+        </div>
+        <SampleName name="raised · rond et surélevé, seul en haut d’un écran de téléphone" />
       </div>
       <div className="flex flex-col gap-2">
         <Toolbar label="Mise en forme">

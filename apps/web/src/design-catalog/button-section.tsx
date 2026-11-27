@@ -1,5 +1,5 @@
-import { Button } from '@mailbox/ui';
-import { FolderIcon, PencilLineIcon, ReplyIcon } from 'lucide-react';
+import { Button, FloatingButton } from '@mailbox/ui';
+import { FolderIcon, PencilLineIcon, ReplyIcon, SendHorizontalIcon } from 'lucide-react';
 import type { ComponentProps } from 'react';
 import { CatalogSection, SampleName } from './catalog-section.tsx';
 
@@ -61,6 +61,23 @@ export function ButtonSection() {
           </Button>
         </div>
         <SampleName name='Icône en tête, shortcut="C" · en pleine largeur, le raccourci se cale à droite' />
+      </div>
+      <div className="flex flex-col gap-2">
+        <div className="relative h-32 w-90 rounded-xl border border-line bg-chrome">
+          <FloatingButton label="Nouveau mail">
+            <PencilLineIcon />
+          </FloatingButton>
+        </div>
+        <SampleName name="<FloatingButton> · rond, l’action principale d’un écran de téléphone, en bas à droite de son parent" />
+      </div>
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center gap-2 rounded-xl bg-page p-4">
+          <Button variant="primary" size="field" floating className="ml-auto">
+            Envoyer
+            <SendHorizontalIcon />
+          </Button>
+        </div>
+        <SampleName name="<Button floating> · rond et soulevé, en haut d’un écran de téléphone" />
       </div>
     </CatalogSection>
   );

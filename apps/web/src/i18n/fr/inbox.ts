@@ -2,6 +2,7 @@
 export const inbox = {
   listLabel: 'Liste des mails',
   filterLabel: 'Afficher',
+  backToTop: 'Revenir en haut de la liste',
   filterAll: 'Tous',
   filterUnread: 'Non lus',
   searchIn: (place: string) => `Rechercher dans ${place}`,

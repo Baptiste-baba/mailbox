@@ -39,7 +39,8 @@ export function NavItem({
   return (
     <a
       className={joinClassNames(
-        'group flex min-h-10 gap-3 rounded-md px-3 text-base text-ink touch:min-h-11',
+        // In the menu of a phone, under the finger, items are taller and their text larger.
+        'group flex min-h-10 gap-3 rounded-md px-3 text-base text-ink touch:min-h-11 compact:min-h-13 compact:gap-3.5 compact:text-large',
         twoLines ? 'items-start py-2' : 'items-center',
         '@max-rail:items-center @max-rail:justify-center @max-rail:px-0 @max-rail:py-0',
         'available:not-aria-[current=page]:hover:bg-page',
@@ -50,7 +51,7 @@ export function NavItem({
     >
       <span
         className={joinClassNames(
-          'relative grid w-4.5 flex-none place-items-center text-ink-2 group-aria-[current=page]:text-ink [&>svg]:icon-18',
+          'relative grid w-4.5 flex-none place-items-center text-ink-2 group-aria-[current=page]:text-ink compact:w-5.5 [&>svg]:icon-18 compact:[&>svg]:icon-22',
           firstLineHeight,
         )}
       >
@@ -63,15 +64,19 @@ export function NavItem({
         )}
       </span>
       <span className="flex min-w-0 flex-1 flex-col @max-rail:sr-only">
-        <span className={twoLines ? 'truncate leading-5' : 'truncate'}>{label}</span>
+        <span className={twoLines ? 'truncate leading-5 compact:leading-6' : 'truncate'}>
+          {label}
+        </span>
         {twoLines && (
-          <span className="truncate text-caption font-normal text-ink-2">{description}</span>
+          <span className="truncate text-caption font-normal text-ink-2 compact:text-small">
+            {description}
+          </span>
         )}
       </span>
       {trailing !== undefined && (
         <span
           className={joinClassNames(
-            'flex flex-none items-center text-caption text-ink-2 group-aria-[current=page]:font-semibold group-aria-[current=page]:text-link @max-rail:hidden',
+            'flex flex-none items-center text-caption text-ink-2 group-aria-[current=page]:font-semibold group-aria-[current=page]:text-link compact:text-small @max-rail:hidden',
             firstLineHeight,
           )}
         >

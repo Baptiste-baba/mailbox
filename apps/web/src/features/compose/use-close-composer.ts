@@ -1,4 +1,5 @@
-import { getRouteApi, useCanGoBack, useRouter } from '@tanstack/react-router';
+import { getRouteApi } from '@tanstack/react-router';
+import { useGoBack } from '../../use-go-back.ts';
 
 const composeRoute = getRouteApi('/_shell/$view/new');
 
@@ -7,14 +8,6 @@ const composeRoute = getRouteApi('/_shell/$view/new');
  * reading. Opened from its address alone, it closes on the list.
  */
 export function useCloseComposer(): () => void {
-  const router = useRouter();
-  const canGoBack = useCanGoBack();
   const navigate = composeRoute.useNavigate();
-  return () => {
-    if (canGoBack) {
-      router.history.back();
-    } else {
-      navigate({ to: '/$view', params: true, search: true });
-    }
-  };
+  return useGoBack(() => navigate({ to: '/$view', params: true, search: true }));
 }

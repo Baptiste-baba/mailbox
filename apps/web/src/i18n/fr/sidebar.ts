@@ -1,6 +1,9 @@
 /** The texts of the sidebar: views, mailboxes and folders. */
 export const sidebar = {
   label: 'Navigation',
+  menu: 'Menu',
+  openMenu: 'Ouvrir le menu',
+  closeMenu: 'Fermer le menu',
   newMail: 'Nouveau mail',
   briefing: 'Briefing',
   inbox: 'Réception',

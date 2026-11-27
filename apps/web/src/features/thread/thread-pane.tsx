@@ -48,7 +48,7 @@ function OpenThread({ thread }: { thread: Thread }) {
     <PaneCard>
       <ThreadToolbar />
       <div className="min-h-0 flex-1 overflow-y-auto overscroll-none">
-        <article className="flex flex-col gap-6 px-9 py-7">
+        <article className="flex flex-col gap-6 px-9 py-7 compact:gap-5 compact:px-4 compact:py-5">
           <ThreadHeader thread={thread} mailbox={mailbox} />
           <ThreadMessages thread={thread} ownAddress={mailbox?.address} />
         </article>

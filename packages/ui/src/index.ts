@@ -13,6 +13,7 @@ export { Dialog, DialogActions, DialogConfirmation } from './components/dialog.t
 export { Divider } from './components/divider.tsx';
 export { FieldLine } from './components/field-line.tsx';
 export { FileChip } from './components/file-chip.tsx';
+export { FloatingButton } from './components/floating-button.tsx';
 export { IconButton } from './components/icon-button.tsx';
 export { Kbd } from './components/kbd.tsx';
 export { Meter } from './components/meter.tsx';
@@ -33,6 +34,7 @@ export { RowLink } from './components/row-link.tsx';
 export { SearchField } from './components/search-field.tsx';
 export { SegmentedControl } from './components/segmented-control.tsx';
 export { Select } from './components/select.tsx';
+export { SidePanel } from './components/side-panel.tsx';
 export { Skeleton } from './components/skeleton.tsx';
 export { StateMessage } from './components/state-message.tsx';
 export { Stepper } from './components/stepper.tsx';

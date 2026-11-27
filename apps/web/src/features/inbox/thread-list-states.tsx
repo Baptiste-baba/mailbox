@@ -7,7 +7,7 @@ const SKELETON_ROW_IDS = Array.from({ length: 8 }, (_, index) => `skeleton-row-$
 /** Cards in the shape of threads while the first page loads. */
 export function ThreadListSkeleton() {
   return (
-    <div aria-hidden="true" className="flex flex-col gap-2 px-4 pt-1">
+    <div aria-hidden="true" className="flex flex-col gap-2 px-4 pt-1 compact:px-2">
       {SKELETON_ROW_IDS.map((rowId) => (
         <div key={rowId} className="flex gap-3 rounded-xl border border-line px-3.5 py-3">
           <Skeleton className="size-10 self-center rounded-full" />

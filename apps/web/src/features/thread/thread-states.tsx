@@ -1,21 +1,23 @@
 import { PaneCard, PaneMessage, Skeleton } from '@mailbox/ui';
 import type { ErrorComponentProps } from '@tanstack/react-router';
 import { fr } from '../../i18n/fr.ts';
+import { ThreadBackButton } from './thread-back-button.tsx';
 import { ThreadToolbar } from './thread-toolbar.tsx';
 
-/** Why the thread pane shows no thread, with what to do about it. */
+/** Why the chosen thread cannot be shown, with what to do about it. */
 export function ThreadMessage({ message, onRetry }: { message: string; onRetry?: () => void }) {
   return (
     <PaneMessage
       message={message}
       action={onRetry === undefined ? undefined : { label: fr.common.retry, onClick: onRetry }}
+      top={<ThreadBackButton />}
     />
   );
 }
 
 /** The pane before a thread is chosen. */
 export function ThreadPlaceholder() {
-  return <ThreadMessage message={fr.thread.placeholder} />;
+  return <PaneMessage message={fr.thread.placeholder} />;
 }
 
 /** Stands in for the thread when it fails to render, so that the list stays usable. */
@@ -28,7 +30,7 @@ export function ThreadSkeleton() {
   return (
     <PaneCard>
       <ThreadToolbar />
-      <div aria-hidden="true" className="flex flex-col gap-6 px-9 py-7">
+      <div aria-hidden="true" className="flex flex-col gap-6 px-9 py-7 compact:px-4 compact:py-5">
         <div className="flex flex-col gap-3">
           <Skeleton className="h-6 w-3/5" />
           <Skeleton className="h-3.5 w-2/5" />

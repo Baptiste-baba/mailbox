@@ -99,7 +99,7 @@ export function ToolbarGroup({ children }: { children: ReactNode }) {
   return <span className="flex items-center gap-0.5">{children}</span>;
 }
 
-/** A thin line between groups of controls in a toolbar. */
+/** A thin line between groups of controls in a toolbar; on a phone, the room goes to the controls. */
 export function ToolbarSeparator() {
-  return <hr aria-orientation="vertical" className="mx-1 h-5 w-px border-0 bg-line" />;
+  return <hr aria-orientation="vertical" className="mx-1 h-5 w-px border-0 bg-line phone:hidden" />;
 }
