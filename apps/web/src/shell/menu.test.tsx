@@ -33,6 +33,17 @@ describe('menu on a phone', () => {
     expect(menu.getByRole('button', { name: 'Nouveau mail' }).query()).toBeNull();
   });
 
+  test('gives each place a line sized for the finger, in a wide panel', async () => {
+    const { screen } = await showInbox(390, 844);
+    const menu = await openMenu(screen);
+
+    const inbox = menu.getByRole('link', { name: /Réception/ }).element();
+    expect(inbox.getBoundingClientRect().height).toBeGreaterThanOrEqual(52);
+    expect(getComputedStyle(inbox).fontSize).toBe('17px');
+    const panel = menu.getByRole('navigation').element().parentElement?.parentElement;
+    expect(panel?.getBoundingClientRect().width).toBe(340);
+  });
+
   test('closes once a place is chosen, and shows that place', async () => {
     const { screen, router } = await showInbox(390, 844);
     const menu = await openMenu(screen);

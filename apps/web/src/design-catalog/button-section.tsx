@@ -64,11 +64,11 @@ export function ButtonSection() {
       </div>
       <div className="flex flex-col gap-2">
         <div className="relative h-32 w-90 rounded-xl border border-line bg-chrome">
-          <FloatingButton icon={<PencilLineIcon />} aria-label="Nouveau mail">
-            Nouveau
+          <FloatingButton label="Nouveau mail">
+            <PencilLineIcon />
           </FloatingButton>
         </div>
-        <SampleName name="<FloatingButton> · l’action principale d’un écran de téléphone, en bas à droite de son parent" />
+        <SampleName name="<FloatingButton> · rond, l’action principale d’un écran de téléphone, en bas à droite de son parent" />
       </div>
     </CatalogSection>
   );

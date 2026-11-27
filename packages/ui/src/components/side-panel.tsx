@@ -41,7 +41,7 @@ export function SidePanel({ open, onClose, label, closeLabel, children }: SidePa
     >
       {open && (
         <div className="flex h-full">
-          <div className="h-full w-77 max-w-[85vw] flex-none rounded-r-xl bg-chrome text-ink shadow-card motion-safe:transition-transform motion-safe:duration-200 motion-safe:ease-out motion-safe:starting:-translate-x-full">
+          <div className="h-full w-85 max-w-[88vw] flex-none rounded-r-xl bg-chrome text-ink shadow-card motion-safe:transition-transform motion-safe:duration-200 motion-safe:ease-out motion-safe:starting:-translate-x-full">
             {children}
           </div>
           {/* The dimmed page: a button of its own, so that it closes the panel from any input. */}

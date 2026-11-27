@@ -23,16 +23,12 @@ export function NewMailButton() {
   );
 }
 
-/** "Nouveau", floating at the bottom right of the list on a phone, where the sidebar is in a menu. */
+/** "Nouveau mail" as its pencil alone, floating at the bottom right of the list on a phone. */
 export function NewMailFloatingButton() {
   const openComposer = useOpenComposer();
   return (
-    <FloatingButton
-      icon={<PencilLineIcon />}
-      aria-label={fr.sidebar.newMail}
-      onClick={openComposer}
-    >
-      {fr.sidebar.newMailShort}
+    <FloatingButton label={fr.sidebar.newMail} onClick={openComposer}>
+      <PencilLineIcon />
     </FloatingButton>
   );
 }

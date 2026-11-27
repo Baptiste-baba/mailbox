@@ -8,7 +8,7 @@ export function Brand({ className = '' }: { className?: string }) {
   return (
     <div className={`flex flex-none items-center gap-2.5 ${className}`}>
       {/* Decorative: the product name follows it. */}
-      <img src="/favicon.svg" alt="" className="size-7.5 flex-none" />
+      <img src="/favicon.svg" alt="" className="size-7.5 flex-none compact:size-9" />
       <span className="text-brand font-semibold text-heading @max-rail:sr-only">
         {fr.common.productName}
       </span>

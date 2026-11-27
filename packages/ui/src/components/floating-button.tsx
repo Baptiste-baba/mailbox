@@ -1,34 +1,33 @@
-import type { ComponentProps, ReactNode } from 'react';
+import type { ComponentProps } from 'react';
 import { joinClassNames } from '../join-class-names.ts';
 import { pressableClassNames } from '../pressable-class-names.ts';
 
-interface FloatingButtonProps extends ComponentProps<'button'> {
-  icon: ReactNode;
+interface FloatingButtonProps extends Omit<ComponentProps<'button'>, 'aria-label'> {
+  /** What the button does: its accessible name, its icon, given as its child, standing alone. */
+  label: string;
 }
 
 /**
- * The main action of a phone screen, floating at its bottom right over what scrolls beneath, clear
- * of the home bar. Its parent must be positioned. Its type defaults to `button`.
+ * The main action of a phone screen: a round button with its icon, floating at the bottom right
+ * over what scrolls beneath, clear of the home bar. Its parent must be positioned. Its type
+ * defaults to `button`.
  */
 export function FloatingButton({
-  icon,
+  label,
   type = 'button',
   className,
-  children,
   ...props
 }: FloatingButtonProps) {
   return (
     <button
       type={type}
+      aria-label={label}
       className={joinClassNames(
-        'absolute right-4 bottom-[calc(--spacing(4)+env(safe-area-inset-bottom))] z-10 inline-flex h-14 items-center gap-2.5 rounded-xl bg-primary pr-5.5 pl-4.5 font-medium text-body text-on-primary shadow-float available:hover:bg-primary-hover [&>svg]:icon-20',
+        'absolute right-4 bottom-[calc(--spacing(4)+env(safe-area-inset-bottom))] z-10 grid size-15 place-items-center rounded-full bg-primary text-on-primary shadow-float available:hover:bg-primary-hover [&>svg]:icon-24',
         pressableClassNames,
         className,
       )}
       {...props}
-    >
-      {icon}
-      {children}
-    </button>
+    />
   );
 }

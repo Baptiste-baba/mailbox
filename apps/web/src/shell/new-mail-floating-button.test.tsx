@@ -24,6 +24,18 @@ describe('"Nouveau" floating over the list', () => {
     await expect.element(screen.getByRole('textbox', { name: 'Objet' })).toBeVisible();
   });
 
+  test('is a round button showing its pencil alone', async () => {
+    fakeThreads(3);
+    await page.viewport(390, 844);
+    const { screen } = await renderApp('/inbox');
+    const button = floatingButton(screen);
+    await expect.element(button).toBeVisible();
+
+    const { width, height } = button.element().getBoundingClientRect();
+    expect([width, height]).toEqual([60, 60]);
+    expect(button.element().textContent).toBe('');
+  });
+
   test.each([
     ['an open mail', '/inbox/thread-1', 'Corps de thread-1'],
     ['the new mail', '/inbox/new', 'Nouveau mail'],
