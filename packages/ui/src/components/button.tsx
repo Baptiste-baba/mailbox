@@ -40,6 +40,8 @@ interface ButtonProps extends ComponentProps<'button'> {
   size?: ButtonSize;
   /** Keyboard shortcut shown at the end of the button, such as ⌘↵. */
   shortcut?: string | undefined;
+  /** Round and lifted, floating over what scrolls beneath, such as "Envoyer" on a phone. */
+  floating?: boolean;
 }
 
 /**
@@ -50,6 +52,7 @@ export function Button({
   variant,
   size = 'md',
   shortcut,
+  floating = false,
   type = 'button',
   className,
   children,
@@ -59,7 +62,8 @@ export function Button({
     <button
       type={type}
       className={joinClassNames(
-        'inline-flex flex-none items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium touch:min-h-11',
+        'inline-flex flex-none items-center justify-center gap-2 whitespace-nowrap font-medium touch:min-h-11',
+        floating ? 'rounded-full shadow-float' : 'rounded-md',
         pressableClassNames,
         variantClassNames[variant],
         sizeClassNames[size],

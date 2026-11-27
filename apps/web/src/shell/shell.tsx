@@ -10,6 +10,7 @@ import {
   SIDEBAR_DEFAULT_SIZE,
   useCollapseOnNarrowWindow,
 } from './use-collapse-on-narrow-window.ts';
+import { useVisibleHeight } from './use-visible-height.ts';
 
 /**
  * Frame of the app around every screen: the sidebar beside the screen on a computer, the screen
@@ -27,13 +28,23 @@ export function Shell() {
         <DesktopFrame />
       ) : (
         <MenuProvider>
-          {/* A phone turned sideways keeps the screen clear of its camera, on either side. */}
-          <div className="h-dvh bg-chrome pr-[env(safe-area-inset-right)] pl-[env(safe-area-inset-left)]">
-            <Outlet />
-          </div>
+          <CompactFrame />
         </MenuProvider>
       )}
     </ComposeDraftProvider>
+  );
+}
+
+/**
+ * The screen alone, held on what the keyboard leaves on screen while it is open, wherever iOS
+ * slides the page. A phone turned sideways keeps the screen clear of its camera, on either side.
+ */
+function CompactFrame() {
+  useVisibleHeight();
+  return (
+    <div className="fixed inset-x-0 top-0 h-[var(--visible-height,100dvh)] translate-y-(--visible-top) bg-chrome pr-[env(safe-area-inset-right)] pl-[env(safe-area-inset-left)]">
+      <Outlet />
+    </div>
   );
 }
 

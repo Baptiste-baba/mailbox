@@ -80,6 +80,15 @@ describe('pages of an app installed on an iPhone', () => {
     expect(topOf(screen, 'heading', 'Réglages')).toBeGreaterThanOrEqual(SCREEN_TOP);
   });
 
+  test('keeps the new mail clear of the blur, its formatting above the home bar', async () => {
+    const screen = await openOnIphone('/inbox/new');
+    const bar = screen.getByRole('toolbar', { name: 'Mise en forme' });
+    await expect.element(bar).toBeVisible();
+
+    expect(topOf(screen, 'button', 'Fermer')).toBeGreaterThanOrEqual(SCREEN_TOP);
+    expect(bar.element().getBoundingClientRect().bottom).toBeLessThanOrEqual(844 - SCREEN_BOTTOM);
+  });
+
   test('keeps the logo of the sign-in clear of the blur below the status bar', async () => {
     installOnIphone();
     fakeApi({ authStatus: () => ({ state: 'signedOut' }) });

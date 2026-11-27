@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { type ReactNode, useState } from 'react';
 import type { ComposeDraft } from './compose-draft.ts';
 import { ComposeEnvelope } from './compose-envelope.tsx';
 import { FormatBar } from './format-bar.tsx';
@@ -9,13 +9,15 @@ import { SelectionBubble } from './selection-bubble.tsx';
 interface ComposeMessageProps {
   draft: ComposeDraft;
   onChange: (changes: Partial<ComposeDraft>) => void;
+  /** Actions at the end of the formatting bar, such as attaching on a phone. */
+  barEnd?: ReactNode;
 }
 
 /**
  * The mail being written: its fields and its message, which scroll together, with a bubble over
  * the text being chosen; then the formatting bar, or the link being written in its place.
  */
-export function ComposeMessage({ draft, onChange }: ComposeMessageProps) {
+export function ComposeMessage({ draft, onChange, barEnd }: ComposeMessageProps) {
   const [writingLink, setWritingLink] = useState(false);
   const writeLink = () => setWritingLink(true);
   const editor = useMessageEditor(draft.body, (body) => onChange({ body }), writeLink);
@@ -26,11 +28,14 @@ export function ComposeMessage({ draft, onChange }: ComposeMessageProps) {
         <MessageEditor editor={editor} />
         <SelectionBubble editor={editor} onWriteLink={writeLink} />
       </div>
-      {writingLink ? (
-        <LinkPanel editor={editor} onDone={() => setWritingLink(false)} />
-      ) : (
-        <FormatBar editor={editor} onWriteLink={writeLink} />
-      )}
+      {/* On a phone, the bar at the foot of the screen keeps clear of the home bar. */}
+      <div className="flex-none phone:pb-screen-0">
+        {writingLink ? (
+          <LinkPanel editor={editor} onDone={() => setWritingLink(false)} />
+        ) : (
+          <FormatBar editor={editor} onWriteLink={writeLink} end={barEnd} />
+        )}
+      </div>
     </>
   );
 }

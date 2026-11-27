@@ -5,6 +5,12 @@
   --screen-bottom: env(safe-area-inset-bottom, 0px);
 }
 
+/* While the keyboard is open (`data-keyboard`, set by the app), it covers the home bar: the foot of
+   the screen sits on the keyboard. */
+:root[data-keyboard] {
+  --screen-bottom: 0px;
+}
+
 /* Installed on an iPhone or an iPad held upright, iOS blurs the top of the app below its status
    bar, and nothing turns the blur off: the controls start below it. Safari on iOS alone knows
    `-webkit-touch-callout`. */
