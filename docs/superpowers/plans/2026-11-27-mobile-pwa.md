@@ -4,7 +4,7 @@
 
 **But :** l'app passe d'elle-même en disposition téléphone ou paysage selon la taille de la fenêtre, avec les mêmes fonctions qu'au bureau.
 
-**Architecture :** une seule app. Deux requêtes média définissent trois dispositions (`phone`, `landscape`, `desktop`). Le JavaScript choisit la *structure* (colonnes redimensionnables, pile ou deux colonnes fixes, menu en panneau) via `useLayout()`, le CSS ajuste les *tailles* via deux variantes Tailwind (`phone:`, `compact:`). La navigation en pile s'appuie sur les routes existantes (`/$view`, `/$view/$id`, `/$view/new`, `/settings`).
+**Architecture :** une seule app. Deux requêtes média définissent trois dispositions (`phone`, `landscape`, `desktop`). Le JavaScript choisit la _structure_ (colonnes redimensionnables, pile ou deux colonnes fixes, menu en panneau) via `useLayout()`, le CSS ajuste les _tailles_ via deux variantes Tailwind (`phone:`, `compact:`). La navigation en pile s'appuie sur les routes existantes (`/$view`, `/$view/$id`, `/$view/new`, `/settings`).
 
 **Stack :** React 19, TanStack Router, Tailwind v4 (`@custom-variant`), `<dialog>` natif, Vitest navigateur (Chromium réel, `page.viewport()`), Lucide.
 
@@ -74,7 +74,6 @@ La conception dit « le code du cadre téléphone n'est chargé que s'il sert »
 - Tests : `apps/web/src/shell/new-mail-floating-button.test.tsx`
 
 **Interfaces :** `<FloatingButton icon label onClick />` : pastille primaire 56 px de haut, rayon `xl`, ombre flottante (nouveau token `shadow-float` dans `packages/ui/tokens`), placée en bas à droite au-dessus de la zone de sécurité (`env(safe-area-inset-bottom)`).
-
 - [ ] Tests (rouges) : à 390 × 844 sur la liste, « Nouveau » ouvre la rédaction en plein écran ; absent sur le mail, la rédaction et les réglages ; en paysage, en bas à droite de la colonne de liste ; la dernière carte de la liste reste atteignable (marge basse de la liste ≥ hauteur du bouton).
 - [ ] Vérification + captures.
 

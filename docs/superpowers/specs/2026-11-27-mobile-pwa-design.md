@@ -88,9 +88,9 @@ téléphone et très rapide, pas un bureau rétréci.
 - **Seuil de largeur : 768 px.** Conséquences : téléphones en portrait et iPad mini en portrait (744 px)
   en mode téléphone ; iPad standard en portrait (810–834 px) et toutes les tablettes en paysage en
   mode bureau, barre latérale réduite à ses icônes.
-- **Les trois cadres** : *téléphone* (pile, un écran à la fois) sous 768 px de large ; *paysage*
+- **Les trois cadres** : _téléphone_ (pile, un écran à la fois) sous 768 px de large ; _paysage_
   (liste + aperçu, sans colonne de gauche) à partir de 768 px de large quand la hauteur est sous
-  500 px ; *bureau* (l'actuel) sinon. En paysage, le menu s'ouvre avec le même bouton ☰ rond en
+  500 px ; _bureau_ (l'actuel) sinon. En paysage, le menu s'ouvre avec le même bouton ☰ rond en
   haut à gauche de la liste, et le bouton « Nouveau » flottant reste en bas à droite de la liste.
 - **Largeur minimale de l'app Mac : 360 px**, la plus petite largeur que CLAUDE.md impose de
   supporter.
