@@ -1,5 +1,6 @@
 import { ColumnResizeHandle, ResizableColumn, ResizableColumns, useColumnRef } from '@mailbox/ui';
 import { CatchBoundary, Outlet } from '@tanstack/react-router';
+import { useServerEvents } from '../api/use-server-events.ts';
 import { ComposeDraftProvider } from '../features/compose/index.ts';
 import { Sidebar } from './sidebar.tsx';
 import { SidebarCrash } from './sidebar-message.tsx';
@@ -11,9 +12,11 @@ import {
 /**
  * Frame of the app around every screen: the sidebar, then the screen itself. The sidebar takes a
  * share of the window; dragged narrower than its minimum, it folds to its icons. The new mail being
- * written lives here, so that moving between screens keeps it.
+ * written lives here, so that moving between screens keeps it, and so does listening to the
+ * server, so that every screen follows what changes.
  */
 export function Shell() {
+  useServerEvents();
   const sidebar = useColumnRef();
   const onSidebarResize = useCollapseOnNarrowWindow(sidebar);
   return (

@@ -14,6 +14,7 @@ import type {
   TotpEnrollment,
 } from '@mailbox/shared';
 import { vi } from 'vitest';
+import { FakeEventSource } from './fake-event-source.ts';
 import { personalMailbox } from './test-mailboxes.ts';
 
 export const testMailboxes: MailboxList = {
@@ -137,7 +138,8 @@ function findRoute(routes: Record<string, FakeRoute>, method: string, path: stri
 
 /**
  * Answers the app's requests to the api as the given functions say, and records them. A request
- * no route expects fails, naming it.
+ * no route expects fails, naming it. The events of the server are told by the test, through
+ * serverEvents().
  */
 export function fakeApi({
   threadPages = noThread,
@@ -203,6 +205,9 @@ export function fakeApi({
     return body instanceof Response ? body : Response.json(body);
   });
   vi.stubGlobal('fetch', fetchMock);
+  // The server's events too: a test tells them through serverEvents().
+  FakeEventSource.opened = [];
+  vi.stubGlobal('EventSource', FakeEventSource);
   return fetchMock;
 }
 

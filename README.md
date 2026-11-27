@@ -93,7 +93,8 @@ mails a minute: count two hours for 10,000 mails. The copy picks up where it sto
 restart, and the mails already copied can be read meanwhile.
 
 From then on, the worker asks Google every minute what changed in the mailbox: new mail, mail
-read, archived, filed or deleted there shows in MailBox within a minute or two. Google keeps about
+read, archived, filed or deleted there shows in MailBox within a minute or two, without reloading
+the page. Google keeps about
 a week of these changes: after a longer stop of the server, the mailbox is copied again from the
 start, which takes as long as the first time.
 
