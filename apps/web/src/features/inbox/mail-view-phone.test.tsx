@@ -1,43 +1,12 @@
-import type { Thread, ThreadSummary } from '@mailbox/shared';
 import { afterEach, describe, expect, test, vi } from 'vitest';
 import { page, userEvent } from 'vitest/browser';
-import { apiError, fakeApi, testThread } from '../../testing/fake-api.ts';
+import { fakeThreads } from '../../testing/fake-threads.ts';
 import { type AppScreen, renderApp } from '../../testing/render-app.tsx';
 
 afterEach(async () => {
   vi.unstubAllGlobals();
   await page.viewport(1440, 900);
 });
-
-function fullThread({ id, mailboxId, subject, sender }: ThreadSummary): Thread {
-  return {
-    id,
-    mailboxId,
-    subject,
-    messages: [
-      {
-        id: `${id}-message`,
-        from: sender,
-        to: [{ name: 'Alex', address: 'alex@example.com' }],
-        cc: [],
-        sentAt: '2026-11-08T08:00:00.000Z',
-        bodyText: `Corps de ${id}`,
-        attachments: [],
-      },
-    ],
-  };
-}
-
-function fakeThreads(count: number) {
-  const threads = Array.from({ length: count }, (_, index) => testThread(`thread-${index}`, false));
-  fakeApi({
-    threadPages: () => ({ threads, nextCursor: null }),
-    thread: (threadId) => {
-      const summary = threads.find((thread) => thread.id === threadId);
-      return summary === undefined ? apiError(404, 'THREAD_NOT_FOUND')() : fullThread(summary);
-    },
-  });
-}
 
 function listRegion(screen: AppScreen) {
   return screen.getByRole('region', { name: 'Liste des mails' });

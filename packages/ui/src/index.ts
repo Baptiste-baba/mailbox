@@ -13,6 +13,7 @@ export { Dialog, DialogActions, DialogConfirmation } from './components/dialog.t
 export { Divider } from './components/divider.tsx';
 export { FieldLine } from './components/field-line.tsx';
 export { FileChip } from './components/file-chip.tsx';
+export { FloatingButton } from './components/floating-button.tsx';
 export { IconButton } from './components/icon-button.tsx';
 export { Kbd } from './components/kbd.tsx';
 export { Meter } from './components/meter.tsx';

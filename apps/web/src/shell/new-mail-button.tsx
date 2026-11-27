@@ -1,4 +1,4 @@
-import { Button } from '@mailbox/ui';
+import { Button, FloatingButton } from '@mailbox/ui';
 import { PencilLineIcon } from 'lucide-react';
 import { useOpenComposer } from '../features/compose/index.ts';
 import { hint } from '../hint.ts';
@@ -20,5 +20,19 @@ export function NewMailButton() {
       <PencilLineIcon />
       <span className="@max-rail:sr-only">{fr.sidebar.newMail}</span>
     </Button>
+  );
+}
+
+/** "Nouveau", floating at the bottom right of the list on a phone, where the sidebar is in a menu. */
+export function NewMailFloatingButton() {
+  const openComposer = useOpenComposer();
+  return (
+    <FloatingButton
+      icon={<PencilLineIcon />}
+      aria-label={fr.sidebar.newMail}
+      onClick={openComposer}
+    >
+      {fr.sidebar.newMailShort}
+    </FloatingButton>
   );
 }

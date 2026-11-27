@@ -5,6 +5,7 @@ export const sidebar = {
   openMenu: 'Ouvrir le menu',
   closeMenu: 'Fermer le menu',
   newMail: 'Nouveau mail',
+  newMailShort: 'Nouveau',
   briefing: 'Briefing',
   inbox: 'Réception',
   conversations: 'Conversations',
