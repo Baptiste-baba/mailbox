@@ -8,6 +8,7 @@ const twoMailboxes: MailboxList = {
   mailboxes: [
     {
       id: 'mailbox-personal',
+      provider: 'gmail',
       name: 'Perso',
       address: 'alex@example.com',
       color: 'azur',
@@ -16,6 +17,7 @@ const twoMailboxes: MailboxList = {
     },
     {
       id: 'mailbox-work',
+      provider: 'gmail',
       name: 'Travail',
       address: 'alex@work.example',
       color: 'navy',
