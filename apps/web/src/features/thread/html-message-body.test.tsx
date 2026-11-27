@@ -1,6 +1,7 @@
 import { MAIL_FRAME_PATH, type Thread } from '@mailbox/shared';
-import { afterEach, describe, expect, test, vi } from 'vitest';
+import { afterEach, describe, expect, onTestFinished, test, vi } from 'vitest';
 import { apiError, fakeApi, testThread } from '../../testing/fake-api.ts';
+import { REMOTE_IMAGE_URL, serveRemoteImages } from '../../testing/remote-images.ts';
 import { type AppScreen, renderApp } from '../../testing/render-app.tsx';
 
 const nadia = { name: 'Nadia Benali', address: 'nadia@example.com' };
@@ -118,16 +119,28 @@ describe('the frame of a mail', () => {
 });
 
 describe('the HTML of a mail, and what it loads', () => {
-  // An image the test server holds, as a sender's server would.
-  test('shows its images as soon as it opens, from wherever they are', async () => {
+  test('shows its images as soon as it opens', async () => {
+    onTestFinished(await serveRemoteImages());
     const { screen } = await openMailWith(
-      `<p>Bonjour</p><img alt="logo" src="${window.location.origin}/icon-192.png">`,
+      `<p>Bonjour</p><img alt="logo" src="${REMOTE_IMAGE_URL}">`,
     );
 
     const image = (await mailPage(screen)).querySelector('img');
 
     await expect.poll(() => image?.complete).toBe(true);
     expect(image?.naturalWidth).toBeGreaterThan(0);
+  });
+
+  // An image the test server holds over plain http, as a box or a printer of the local network would.
+  test('loads no image over plain http, such as one of a device of the local network', async () => {
+    const { screen } = await openMailWith(
+      `<p>Bonjour</p><img alt="box" src="${window.location.origin}/icon-192.png">`,
+    );
+
+    const image = (await mailPage(screen)).querySelector('img');
+
+    await expect.poll(() => image?.complete).toBe(true);
+    expect(image?.naturalWidth).toBe(0);
   });
 });
 

@@ -106,7 +106,7 @@ describe('the page a mail is shown in', () => {
 
     expect(response.status).toBe(200);
     expect(response.headers.get('content-security-policy')).toBe(
-      "default-src 'none'; style-src 'unsafe-inline'; img-src data: http: https:; font-src data:; base-uri 'self'; form-action 'none'; frame-ancestors 'self'",
+      "default-src 'none'; style-src 'unsafe-inline'; img-src data: https:; font-src data:; base-uri 'self'; form-action 'none'; frame-ancestors 'self'",
     );
     expect(response.headers.get('referrer-policy')).toBe('no-referrer');
   });
