@@ -106,6 +106,10 @@ export class MailboxChangesService implements OnModuleInit, OnModuleDestroy {
   }
 
   private listenAgain(delayMs: number): void {
+    // An attempt under way as the api stops would otherwise try again, and keep the process alive.
+    if (this.stopped) {
+      return;
+    }
     this.retry = setTimeout(() => {
       this.listen().then(
         () => this.resyncs.next({ type: 'resync' }),
