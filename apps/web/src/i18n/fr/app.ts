@@ -12,6 +12,7 @@ export const common = {
   unknownSender: 'Expéditeur inconnu',
   unreadCount: (count: number) => `${count} non ${count >= 2 ? 'lus' : 'lu'}`,
   reconnect: 'Reconnecter',
+  syncInterrupted: 'Synchronisation interrompue',
   noMailbox: 'Aucune boîte connectée.',
   mailboxesError: 'Impossible de charger tes boîtes.',
 };

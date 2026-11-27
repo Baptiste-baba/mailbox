@@ -3,7 +3,20 @@ export const mailboxes = {
   title: 'Boîtes mail',
   intro: 'Les comptes dont MailBox lit les mails. Rien n’est modifié chez ton fournisseur.',
   none: 'Aucune boîte connectée pour l’instant.',
-  connected: 'Connectée',
+  upToDate: 'À jour',
+  checkedToday: (time: string) => `Vérifiée à ${time}`,
+  checkedOn: (day: string, time: string) => `Vérifiée ${day} à ${time}`,
+  copyStarting: 'Copie en cours',
+  copying: (copied: string, total: string) => `Copie en cours · ${copied} sur ${total}`,
+  copyProgress: 'Avancement de la copie',
+  interruptions: {
+    providerUnavailable: (duration: string) =>
+      `Google ne répond pas depuis ${duration}. MailBox réessaie chaque minute.`,
+    providerNotConfigured:
+      'Ce serveur n’a plus d’identifiants Google. Vérifie GOOGLE_CLIENT_ID et GOOGLE_CLIENT_SECRET dans sa configuration.',
+    unexpected: (duration: string) =>
+      `Une erreur empêche la synchronisation depuis ${duration}. Les journaux du worker en disent plus.`,
+  },
   reconnectRequired: 'Reconnexion nécessaire',
   add: 'Ajouter une boîte',
   notConfigured:

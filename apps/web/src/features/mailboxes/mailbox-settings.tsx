@@ -7,6 +7,7 @@ import { mailProvidersQuery } from '../../api/mail-providers-query.ts';
 import { mailboxesQuery } from '../../api/mailboxes-query.ts';
 import { fr } from '../../i18n/fr.ts';
 import { AddMailboxDialog } from './add-mailbox-dialog.tsx';
+import { MailboxSyncBadge, MailboxSyncDetail } from './mailbox-sync-status.tsx';
 import { ReconnectMailboxDialog } from './reconnect-mailbox-dialog.tsx';
 import { RemoveMailboxDialog } from './remove-mailbox-dialog.tsx';
 
@@ -73,12 +74,14 @@ function MailboxList({ onReconnect, onRemove }: MailboxListProps) {
   if (mailboxes.data.mailboxes.length === 0) {
     return <StateMessage message={fr.mailboxes.none} className="px-6 py-10" />;
   }
+  const now = new Date();
   return (
     <ul className="divide-y divide-line">
       {mailboxes.data.mailboxes.map((mailbox) => (
         <MailboxRow
           key={mailbox.id}
           mailbox={mailbox}
+          now={now}
           onReconnect={() => onReconnect(mailbox)}
           onRemove={() => onRemove(mailbox)}
         />
@@ -89,11 +92,12 @@ function MailboxList({ onReconnect, onRemove }: MailboxListProps) {
 
 interface MailboxRowProps {
   mailbox: MailboxSummary;
+  now: Date;
   onReconnect: () => void;
   onRemove: () => void;
 }
 
-function MailboxRow({ mailbox, onReconnect, onRemove }: MailboxRowProps) {
+function MailboxRow({ mailbox, now, onReconnect, onRemove }: MailboxRowProps) {
   return (
     <li className="flex items-center gap-4 py-4 pr-4 pl-6">
       <span className="grid size-4.5 flex-none place-items-center">
@@ -102,6 +106,7 @@ function MailboxRow({ mailbox, onReconnect, onRemove }: MailboxRowProps) {
       <div className="flex min-w-0 flex-1 flex-col">
         <span className="truncate text-base font-medium text-ink">{mailbox.name}</span>
         <span className="truncate text-small text-ink-2">{mailbox.address}</span>
+        {mailbox.status === 'connected' && <MailboxSyncDetail sync={mailbox.sync} now={now} />}
       </div>
       {mailbox.status === 'reconnectRequired' ? (
         <>
@@ -116,7 +121,7 @@ function MailboxRow({ mailbox, onReconnect, onRemove }: MailboxRowProps) {
           </Button>
         </>
       ) : (
-        <span className="flex-none text-small text-ink-2">{fr.mailboxes.connected}</span>
+        <MailboxSyncBadge sync={mailbox.sync} now={now} />
       )}
       <Button
         variant="text"
