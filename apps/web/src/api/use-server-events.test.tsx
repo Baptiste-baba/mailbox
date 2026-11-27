@@ -58,7 +58,9 @@ describe('following the server, without reading more than needed', () => {
 
     await expect.poll(() => threadRequests(fetchMock)).toBe(before + 1);
   });
+});
 
+describe('following the server, once its stream is lost', () => {
   test('reads everything again once the lost stream is back', async () => {
     let mailboxes: MailboxSummary[] = [];
     fakeApi({ mailboxes: () => ({ mailboxes }) });
@@ -67,6 +69,25 @@ describe('following the server, without reading more than needed', () => {
 
     mailboxes = [personalMailbox];
     serverEvents().reconnect();
+
+    await expect
+      .element(screen.getByRole('navigation').getByText(personalMailbox.address))
+      .toBeVisible();
+  });
+
+  // Regression: an answer that is no stream, such as the 502 of a proxy while the api restarted,
+  // made the browser give the stream up for good, and the app followed the server no more.
+  test('opens a new stream when the browser gives one up, then reads everything again', async () => {
+    let mailboxes: MailboxSummary[] = [];
+    fakeApi({ mailboxes: () => ({ mailboxes }) });
+    const { screen } = await renderApp('/inbox');
+    await expect.element(screen.getByText(/Connecte ta boîte mail/)).toBeVisible();
+    const givenUp = serverEvents();
+
+    mailboxes = [personalMailbox];
+    givenUp.giveUp();
+    await expect.poll(() => givenUp !== serverEvents(), { timeout: 3000 }).toBe(true);
+    serverEvents().open();
 
     await expect
       .element(screen.getByRole('navigation').getByText(personalMailbox.address))

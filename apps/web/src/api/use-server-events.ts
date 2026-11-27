@@ -31,29 +31,54 @@ async function follow(queryClient: QueryClient, event: ServerEvent): Promise<voi
   }
 }
 
+const FIRST_REOPENING_DELAY_MS = 1000;
+const LONGEST_REOPENING_DELAY_MS = 30_000;
+
 /**
- * Keeps what the app shows in line with the server as it changes: new mail, mail read or archived
- * elsewhere, the synchronisation of a mailbox. Only what is on screen is read again at once; the
- * rest, when it shows. The browser reconnects a lost stream by itself: everything is then read
- * again, as changes may have been missed meanwhile.
+ * Listens to the server events, on a stream opened again whenever it is lost; everything is then
+ * read again, as changes may have been missed meanwhile. Gives what stops listening.
  */
-export function useServerEvents(): void {
-  const queryClient = useQueryClient();
-  useEffect(() => {
-    const source = new EventSource(`/api${SERVER_EVENTS_PATH}`);
-    let lost = false;
-    source.onmessage = (message: MessageEvent<string>) => {
+function listenToServerEvents(queryClient: QueryClient): () => void {
+  let source: EventSource | undefined;
+  let reopening: ReturnType<typeof setTimeout> | undefined;
+  let delayMs = FIRST_REOPENING_DELAY_MS;
+  let lost = false;
+  const open = () => {
+    const opened = new EventSource(`/api${SERVER_EVENTS_PATH}`);
+    source = opened;
+    opened.onmessage = (message: MessageEvent<string>) => {
       void follow(queryClient, serverEventSchema.parse(JSON.parse(message.data)));
     };
-    source.onerror = () => {
+    // The browser opens a stream lost to the network again by itself, but gives up on an answer
+    // that is no stream, such as the 502 of a proxy while the api restarts: a new one then opens.
+    opened.onerror = () => {
       lost = true;
+      if (opened.readyState === EventSource.CLOSED) {
+        reopening = setTimeout(open, delayMs);
+        delayMs = Math.min(delayMs * 2, LONGEST_REOPENING_DELAY_MS);
+      }
     };
-    source.onopen = () => {
+    opened.onopen = () => {
+      delayMs = FIRST_REOPENING_DELAY_MS;
       if (lost) {
         lost = false;
         void queryClient.invalidateQueries();
       }
     };
-    return () => source.close();
-  }, [queryClient]);
+  };
+  open();
+  return () => {
+    clearTimeout(reopening);
+    source?.close();
+  };
+}
+
+/**
+ * Keeps what the app shows in line with the server as it changes: new mail, mail read or archived
+ * elsewhere, the synchronisation of a mailbox. Only what is on screen is read again at once; the
+ * rest, when it shows.
+ */
+export function useServerEvents(): void {
+  const queryClient = useQueryClient();
+  useEffect(() => listenToServerEvents(queryClient), [queryClient]);
 }
