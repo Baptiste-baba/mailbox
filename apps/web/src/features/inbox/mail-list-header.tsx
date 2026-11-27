@@ -24,7 +24,7 @@ export function MailListHeader({ filters }: { filters: ThreadFilters }) {
   const { title, unreadCount, place } = useViewSummary(filters);
   return (
     // Keeps the room of the list's scroll bar, so that tabs, search and cards share their edges.
-    <div className="flex-none overflow-hidden px-4 pt-5 [scrollbar-gutter:stable] compact:px-2">
+    <div className="flex-none overflow-hidden px-4 pt-5 [scrollbar-gutter:stable] compact:px-2 compact:pt-screen-5">
       <div className="flex items-center gap-3">
         <MenuButton />
         <h1 className="truncate text-title font-semibold text-heading">{title}</h1>

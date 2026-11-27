@@ -10,7 +10,7 @@ import { shortcuts } from '../../shortcuts.ts';
  */
 export function ComposeFooter({ onDiscard }: { onDiscard: () => void }) {
   return (
-    <div className="flex flex-none items-center gap-1 border-t border-line px-4 py-3.5">
+    <div className="flex flex-none items-center gap-1 border-t border-line px-4 py-3.5 compact:pb-screen-3.5">
       <IconButton label={fr.compose.attach} {...comingSoon(fr.compose.attach)}>
         <PaperclipIcon />
       </IconButton>

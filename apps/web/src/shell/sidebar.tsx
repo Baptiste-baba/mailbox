@@ -23,7 +23,7 @@ export function Sidebar() {
   return (
     // A container: once the sidebar is folded narrow, its items shrink to their icons.
     <div className="@container h-full">
-      <nav aria-label={fr.sidebar.label} className="flex h-full flex-col pt-5 pb-4">
+      <nav aria-label={fr.sidebar.label} className="flex h-full flex-col pt-screen-5 pb-screen-4">
         <div className="flex-none px-4 @max-rail:px-2">
           <Brand className="px-2 pt-1 pb-5 @max-rail:justify-center @max-rail:px-0" />
           {layout === 'desktop' && <NewMailButton />}

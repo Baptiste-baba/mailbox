@@ -9,7 +9,7 @@ export function SettingsPage() {
   const securityId = useId();
   return (
     <main className="h-full overflow-y-auto bg-page">
-      <div className="mx-auto flex w-full max-w-216 flex-col px-8 pt-5 pb-16">
+      <div className="mx-auto flex w-full max-w-216 flex-col px-8 pt-5 pb-16 compact:pt-screen-5">
         <h1 className="text-title font-semibold text-heading">{fr.settings.title}</h1>
         <section aria-labelledby={securityId} className="mt-8 flex flex-col gap-6">
           <h2 id={securityId} className="text-subject font-semibold text-heading">

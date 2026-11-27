@@ -98,8 +98,9 @@ function VirtualThreadList({
   return (
     <div
       ref={scrollRef}
-      // On a phone, room at the end for the last card to scroll clear of "Nouveau", floating over it.
-      className="min-h-0 flex-1 overflow-y-auto overscroll-none pb-3 [scrollbar-gutter:stable] compact:pb-24"
+      // On a phone, room at the end for the last card to scroll clear of "Nouveau", floating over it
+      // above the home bar.
+      className="min-h-0 flex-1 overflow-y-auto overscroll-none pb-3 [scrollbar-gutter:stable] compact:pb-[calc(--spacing(24)+var(--screen-bottom))]"
     >
       <ol className="relative" style={{ height: virtualizer.getTotalSize() }}>
         {rows.map((row) => {

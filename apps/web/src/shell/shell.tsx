@@ -27,7 +27,8 @@ export function Shell() {
         <DesktopFrame />
       ) : (
         <MenuProvider>
-          <div className="h-dvh bg-chrome">
+          {/* A phone turned sideways keeps the screen clear of its camera, on either side. */}
+          <div className="h-dvh bg-chrome pr-[env(safe-area-inset-right)] pl-[env(safe-area-inset-left)]">
             <Outlet />
           </div>
         </MenuProvider>
@@ -45,7 +46,8 @@ function DesktopFrame() {
   const onSidebarResize = useCollapseOnNarrowWindow(sidebar);
   return (
     // The columns take the height of their parent: the window, so that only the columns scroll.
-    <div className="h-dvh min-h-160 bg-chrome">
+    // Installed on an iPad, the app keeps clear of its status bar and home bar.
+    <div className="h-dvh min-h-160 bg-chrome pt-screen-0 pb-screen-0">
       <ResizableColumns id="shell">
         <ResizableColumn
           id="sidebar"

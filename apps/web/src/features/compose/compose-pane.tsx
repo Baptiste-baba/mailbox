@@ -26,7 +26,7 @@ export function ComposePane() {
   const { draft, change, discard } = useComposeDraft();
   return (
     <PaneCard>
-      <div className="flex flex-none items-center gap-3 border-b border-line py-3 pr-4 pl-6">
+      <div className="flex flex-none items-center gap-3 border-b border-line py-3 pr-4 pl-6 compact:pt-screen-3">
         <h2 className="min-w-0 flex-1 truncate text-body font-semibold text-heading">
           {fr.compose.title}
         </h2>

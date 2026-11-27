@@ -1,0 +1,20 @@
+/* The edges of the screen of a phone app installed on the home screen, where the page runs under
+   the status bar and the home bar. Zero in a browser tab and on a computer.
+
+   At the top, a screen's own controls stay clear of the status bar and of the blur iOS lays below
+   it, which cannot be turned off and reaches about half as far again as the bar. */
+:root {
+  --screen-top: calc(env(safe-area-inset-top, 0px) * 1.5);
+  --screen-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* The padding at the top of a screen's first row: its own, or the room the status bar and its
+   blur take, whichever is larger. `pt-screen-3` pads 12 px in a browser. */
+@utility pt-screen-* {
+  padding-top: max(calc(var(--spacing) * --value(number)), var(--screen-top));
+}
+
+/* The padding at the foot of a screen's last row: its own, or the room the home bar takes. */
+@utility pb-screen-* {
+  padding-bottom: max(calc(var(--spacing) * --value(number)), var(--screen-bottom));
+}

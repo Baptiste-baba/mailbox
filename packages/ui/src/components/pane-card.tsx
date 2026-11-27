@@ -28,7 +28,9 @@ interface PaneMessageProps {
 export function PaneMessage({ message, action, top }: PaneMessageProps) {
   return (
     <PaneCard>
-      {top !== undefined && <div className="flex flex-none px-4 pt-3 empty:hidden">{top}</div>}
+      {top !== undefined && (
+        <div className="flex flex-none px-4 pt-screen-3 empty:hidden">{top}</div>
+      )}
       <StateMessage message={message} action={action} className="flex-1 justify-center px-10" />
     </PaneCard>
   );

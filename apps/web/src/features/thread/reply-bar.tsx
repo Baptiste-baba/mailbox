@@ -15,7 +15,7 @@ interface ReplyBarProps {
 export function ReplyBar({ latestMessage, ownAddress }: ReplyBarProps) {
   const label = fr.thread.replyTo(replyRecipients(latestMessage, ownAddress));
   return (
-    <div className="flex flex-none gap-2.5 border-t border-line px-4 py-3.5">
+    <div className="flex flex-none gap-2.5 border-t border-line px-4 py-3.5 compact:pb-screen-3.5">
       <BarButton
         icon={<ReplyIcon />}
         {...comingSoon(label, shortcuts.reply.label)}

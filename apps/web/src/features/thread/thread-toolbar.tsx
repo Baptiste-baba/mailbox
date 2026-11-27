@@ -20,7 +20,7 @@ import { ThreadBackButton } from './thread-back-button.tsx';
 export function ThreadToolbar() {
   const layout = useLayout();
   return (
-    <div className="flex flex-none items-center gap-1 border-b border-line px-4 py-3 phone:py-2 phone:pr-2">
+    <div className="flex flex-none items-center gap-1 border-b border-line px-4 py-3 phone:py-2 phone:pr-2 compact:pt-screen-2">
       {layout === 'phone' ? <PhoneActions /> : <WideActions layout={layout} />}
     </div>
   );
