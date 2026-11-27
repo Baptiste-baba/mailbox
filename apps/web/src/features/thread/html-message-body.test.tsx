@@ -1,4 +1,4 @@
-import type { Thread } from '@mailbox/shared';
+import { MAIL_FRAME_PATH, type Thread } from '@mailbox/shared';
 import { afterEach, describe, expect, test, vi } from 'vitest';
 import { apiError, fakeApi, testThread } from '../../testing/fake-api.ts';
 import { type AppScreen, renderApp } from '../../testing/render-app.tsx';
@@ -49,9 +49,15 @@ async function mailPage(screen: AppScreen): Promise<Document> {
   if (!(frame instanceof HTMLIFrameElement)) {
     throw new Error('The mail is not in a frame');
   }
-  await expect.poll(() => frame.contentDocument?.body.childNodes.length ?? 0).toBeGreaterThan(0);
-  const page = frame.contentDocument;
-  if (page === null) {
+  const written = () => {
+    const page = frame.contentDocument;
+    return page?.location.pathname === MAIL_FRAME_PATH && page.body.childNodes.length > 0
+      ? page
+      : undefined;
+  };
+  await expect.poll(written).toBeDefined();
+  const page = written();
+  if (page === undefined) {
     throw new Error('The frame of the mail has no page');
   }
   return page;
@@ -90,6 +96,24 @@ describe('the HTML of a mail', () => {
 
     expect(link?.getAttribute('target')).toBe('_blank');
     expect(link?.getAttribute('rel')).toBe('noopener noreferrer');
+  });
+});
+
+describe('the frame of a mail', () => {
+  // Regression: the frame kept its first height, and a mail longer by then scrolled inside it.
+  test('follows the height of the mail as it changes, without scrolling inside', async () => {
+    const { screen } = await openMailWith('<p>Bonjour</p>');
+    const page = await mailPage(screen);
+    const frame = screen.getByTitle('Contenu du mail').element();
+    const fits = () => frame.clientHeight >= page.documentElement.scrollHeight;
+    await expect.poll(fits).toBe(true);
+
+    const longer = page.createElement('div');
+    longer.style.height = '1200px';
+    page.body.append(longer);
+
+    await expect.poll(() => frame.clientHeight).toBeGreaterThanOrEqual(1200);
+    expect(fits()).toBe(true);
   });
 });
 
