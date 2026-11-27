@@ -34,6 +34,8 @@ export class FakeProvider implements MailProvider {
   unreachableIds = new Set<string>();
   /** Ids of mails deleted right after a page listed them. */
   goneOnceListed = new Set<string>();
+  /** Runs before each mail is read: what happens meanwhile, at the provider or in the app. */
+  beforeRead: (() => Promise<void>) | undefined;
   /** Page tokens the provider no longer knows. */
   lostPages = new Set<string>();
   /** The provider no longer keeps what changed before this cursor. */
@@ -82,13 +84,13 @@ export class FakeProvider implements MailProvider {
     return Promise.resolve(page);
   }
 
-  readMessage(_accessToken: string, providerMessageId: string) {
+  async readMessage(_accessToken: string, providerMessageId: string) {
+    await this.beforeRead?.();
     this.readIds.push(providerMessageId);
     if (this.unreachableIds.has(providerMessageId)) {
-      return Promise.reject(new AppError('MAIL_PROVIDER_UNAVAILABLE', 'No answer'));
+      throw new AppError('MAIL_PROVIDER_UNAVAILABLE', 'No answer');
     }
-    const mail = this.mails.find((held) => held.providerMessageId === providerMessageId);
-    return Promise.resolve(mail ?? null);
+    return this.mails.find((held) => held.providerMessageId === providerMessageId) ?? null;
   }
 
   currentCursor() {

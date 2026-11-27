@@ -1,9 +1,10 @@
 import { setTimeout as wait } from 'node:timers/promises';
 import { type Database, mailbox, message } from '@mailbox/db';
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import type { PgBoss } from 'pg-boss';
 import { pino } from 'pino';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { createWorkerLogger } from '../../src/create-worker-logger.ts';
 import { createJobQueue } from '../../src/job-queue.ts';
 import { registerMailboxSyncJobs } from '../../src/sync/mailbox-sync-jobs.ts';
 import { FakeProvider } from './fake-provider.ts';
@@ -78,5 +79,34 @@ describe('the changes of the mailboxes, in the background', { timeout: 40_000 },
     await expect
       .poll(async () => (await database.select().from(message)).length, { timeout: COPY_WAIT_MS })
       .toBe(2);
+  });
+});
+
+describe('a mailbox job that fails, in the background', { timeout: 40_000 }, () => {
+  it('logs and keeps its error without the mail it was storing', async () => {
+    const subject = 'Sujet qui doit rester hors des journaux';
+    const provider = new FakeProvider();
+    provider.mails = [testMail('m1', { subject })];
+    await insertTestMailbox(database);
+    // The mailbox is removed while its copy reads a mail: storing that mail fails.
+    provider.beforeRead = () => resetMailTables(database);
+    const lines: string[] = [];
+    const logger = createWorkerLogger('error', { write: (line) => void lines.push(line) });
+
+    await registerMailboxSyncJobs(jobQueue, { ...testSyncContext(database, provider), logger });
+
+    await expect.poll(() => lines.length, { timeout: COPY_WAIT_MS }).toBe(1);
+    expect(lines[0]).toContain('Failed query: insert into');
+    expect(lines[0]).not.toContain(subject);
+    // The test database keeps the jobs of earlier runs: only the one that just failed counts.
+    const { jobId } = JSON.parse(lines[0] ?? '{}');
+    const failedJobOutput = async () => {
+      const { rows } = await database.execute<{ output: string | null }>(
+        sql`select output::text as output from pgboss.job where id = ${jobId}`,
+      );
+      return rows[0]?.output ?? '';
+    };
+    await expect.poll(failedJobOutput, { timeout: COPY_WAIT_MS }).toContain('insert into');
+    expect(await failedJobOutput()).not.toContain(subject);
   });
 });

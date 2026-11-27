@@ -1,11 +1,10 @@
-import { migrateDatabase } from '@mailbox/db';
+import { migrateDatabase, serializeError } from '@mailbox/db';
 import { pino } from 'pino';
 import * as z from 'zod';
 import { SetupService } from './auth/setup.service.ts';
 import { type ApiConfig, parseApiConfig } from './config/api-config.ts';
 import { createApp } from './create-app.ts';
 import { DATABASE } from './database/database.module.ts';
-import { serializeError } from './logging/serialize-error.ts';
 
 // The configured logger only exists once the app is up: this one reports why startup failed.
 const bootstrapLogger = pino({ serializers: { err: serializeError } });

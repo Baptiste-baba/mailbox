@@ -1,10 +1,9 @@
 import { inspect } from 'node:util';
-import { type Database, recoveryCode } from '@mailbox/db';
+import { type Database, recoveryCode, serializeError } from '@mailbox/db';
 import { pino } from 'pino';
 import { pinoHttp } from 'pino-http';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { createHttpLoggerOptions } from '../src/logging/logger-options.ts';
-import { serializeError } from '../src/logging/serialize-error.ts';
 import { openTestDatabase, resetAuthTables } from './test-database.ts';
 
 const STORED_VALUE = 'value-that-must-stay-out-of-the-logs';

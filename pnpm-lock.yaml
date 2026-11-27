@@ -455,6 +455,9 @@ importers:
       pg:
         specifier: 8.23.1
         version: 8.23.1
+      pino:
+        specifier: 'catalog:'
+        version: 10.4.0
     devDependencies:
       '@types/node':
         specifier: 'catalog:'

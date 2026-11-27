@@ -1,4 +1,4 @@
-import { mailbox } from '@mailbox/db';
+import { mailbox, withoutQueryValues } from '@mailbox/db';
 import { eq } from 'drizzle-orm';
 import type { Job, PgBoss } from 'pg-boss';
 import * as z from 'zod';
@@ -61,7 +61,8 @@ async function runFor(
       { err: error, queue: job.name, jobId: job.id, mailboxId, retryCount: job.retryCount },
       'Mailbox job failed',
     );
-    throw error;
+    // The queue keeps the error of a failed job in its table: without the mail it may carry.
+    throw withoutQueryValues(error);
   }
 }
 

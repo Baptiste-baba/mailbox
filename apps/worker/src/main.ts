@@ -1,12 +1,13 @@
 import { type Logger, pino } from 'pino';
 import * as z from 'zod';
 import { parseWorkerConfig } from './config/worker-config.ts';
+import { createWorkerLogger } from './create-worker-logger.ts';
 import { type RunningWorker, startWorker } from './start-worker.ts';
 
 const parsedConfig = parseWorkerConfig(process.env);
 
 if (parsedConfig.success) {
-  const logger = pino({ level: parsedConfig.data.logLevel });
+  const logger = createWorkerLogger(parsedConfig.data.logLevel);
   await startWorker(parsedConfig.data, logger).then(
     (worker) => {
       stopOnSignals(worker, logger);
