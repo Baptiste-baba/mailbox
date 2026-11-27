@@ -17,4 +17,6 @@ export const thread = {
   notFound: 'Ce mail n’existe plus. Il a peut-être été supprimé ou déplacé.',
   error: 'Impossible de charger ce mail. Vérifie que le serveur est joignable, puis réessaie.',
   crash: 'Ce mail n’a pas pu s’afficher.',
+  mailContent: 'Contenu du mail',
+  htmlError: 'La mise en forme de ce mail n’a pas pu être chargée.',
 };

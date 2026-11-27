@@ -4,6 +4,7 @@ import type {
   MailboxList,
   MailboxSummary,
   MailProviderList,
+  MessageBody,
   PasskeyCreationOptions,
   PasskeyList,
   PasskeyRequestOptions,
@@ -43,6 +44,8 @@ type Answer<Data = never> = Data | Response | Promise<Data | Response>;
 interface FakeApi {
   threadPages?: (url: URL) => Answer<ThreadPage>;
   thread?: (threadId: string) => Answer<Thread>;
+  /** The HTML body of a message, given its id. */
+  messageBody?: (messageId: string) => Answer<MessageBody>;
   mailboxes?: () => Answer<MailboxList>;
   /** The providers the server has a client for. */
   mailProviders?: () => Answer<MailProviderList>;
@@ -144,6 +147,7 @@ function findRoute(routes: Record<string, FakeRoute>, method: string, path: stri
 export function fakeApi({
   threadPages = noThread,
   thread = notFound,
+  messageBody = apiError(404, 'MESSAGE_NOT_FOUND'),
   mailboxes = () => testMailboxes,
   mailProviders = () => ({ providers: ['gmail'] }),
   startMailboxConnection = serverError,
@@ -170,6 +174,7 @@ export function fakeApi({
   const routes: Record<string, FakeRoute> = {
     'GET /api/threads': ({ url }) => threadPages(url),
     'GET /api/threads/:id': ({ id }) => thread(id),
+    'GET /api/messages/:id/body': ({ id }) => messageBody(id),
     'GET /api/mailboxes': () => mailboxes(),
     'GET /api/mail-providers': () => mailProviders(),
     'POST /api/mailboxes/connection': ({ sent }) => startMailboxConnection(sent),

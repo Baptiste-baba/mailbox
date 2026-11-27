@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="color-scheme" content="light" />
+    <!-- The policy the api also sends with this page: here, it holds wherever the page is served
+      from, the development server included. Nothing runs, nothing remote loads. -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; style-src 'unsafe-inline'; img-src data:; font-src data:; base-uri 'self'; form-action 'none'"
+    />
+    <!-- Every link of a mail opens outside the app. -->
+    <base target="_blank" />
+    <title>Mail</title>
+    <style>
+      /* The sheet a mail is shown on: white, as its sender designed it, whatever the theme of the app. */
+      html {
+        background: #fff;
+        color: #000;
+        color-scheme: light;
+      }
+      body {
+        margin: 0;
+        padding: 16px;
+        font: 15px/1.5 system-ui, sans-serif;
+        overflow-wrap: break-word;
+      }
+      img {
+        max-width: 100%;
+        height: auto;
+      }
+    </style>
+  </head>
+  <body></body>
+</html>
