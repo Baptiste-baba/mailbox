@@ -1,0 +1,2 @@
+ALTER TABLE "mailbox" ALTER COLUMN "initial_sync_started_at" SET DATA TYPE timestamp (3) with time zone;--> statement-breakpoint
+ALTER TABLE "mailbox" ALTER COLUMN "initial_sync_started_at" SET DEFAULT now();

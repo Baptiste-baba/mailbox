@@ -50,6 +50,13 @@
       "when": 1795793215862,
       "tag": "0006_add_sync_cursor",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1795801021004,
+      "tag": "0007_keep_copy_start_to_the_millisecond",
+      "breakpoints": true
     }
   ]
 }

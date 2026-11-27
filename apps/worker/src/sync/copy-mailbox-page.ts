@@ -70,15 +70,13 @@ async function removeMessagesNotFound(context: SyncContext, copied: CopiedMailbo
 
 /**
  * The mailbox, while the copy a page belongs to is still the one under way. Reading changes may
- * start the copy over meanwhile, which moves its start later: the progress of the page is then no
- * longer the copy's to write. Postgres keeps microseconds where a Date keeps milliseconds: a start
- * within the millisecond of the one loaded is that very start.
+ * start the copy over meanwhile, which moves its start: the progress of the page is then no longer
+ * the copy's to write.
  */
 function underSameCopy(copied: CopiedMailbox) {
-  const loadedStart = copied.initialSyncStartedAt.getTime();
   return and(
     eq(mailbox.id, copied.id),
-    lt(mailbox.initialSyncStartedAt, new Date(loadedStart + 1)),
+    eq(mailbox.initialSyncStartedAt, copied.initialSyncStartedAt),
   );
 }
 

@@ -23,9 +23,10 @@ export const mailbox = pgTable(
     /**
      * When the copy of the whole mailbox started: at its connection, or since, each time the
      * provider no longer told what had changed and the copy was started over. A mail stored
-     * before that date has not been seen by the current copy.
+     * before that date has not been seen by the current copy. Kept to the millisecond, as a Date
+     * keeps it: the date a job loaded compares exactly with the one stored.
      */
-    initialSyncStartedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+    initialSyncStartedAt: timestamp({ withTimezone: true, precision: 3 }).notNull().defaultNow(),
     /**
      * Where the copy of the mailbox resumes: what asks the provider for the next page of its
      * mails. Null before the first page, and once the last one was read.
