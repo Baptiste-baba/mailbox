@@ -1,0 +1,52 @@
+{
+  "id": "19a0000000001111",
+  "threadId": "19a0000000001111",
+  "labelIds": ["SENT"],
+  "snippet": "Xreu uitnvkn mcj osbcauppxwcel axbfqmykz jv Xfuuq.",
+  "historyId": "1000001",
+  "internalDate": "1795690675000",
+  "payload": {
+    "partId": "",
+    "mimeType": "text/plain",
+    "filename": "",
+    "headers": [
+      {
+        "name": "To",
+        "value": "contact-1@example.com"
+      },
+      {
+        "name": "From",
+        "value": "Rrpomobm Almldyq <alex.martin@example.com>"
+      },
+      {
+        "name": "Date",
+        "value": "Thu, 26 Nov 2026 02:57:55 -0800"
+      },
+      {
+        "name": "Subject",
+        "value": "eocjgxbbavs"
+      },
+      {
+        "name": "MIME-Version",
+        "value": "1.0"
+      },
+      {
+        "name": "Content-Type",
+        "value": "text/plain; charset=UTF-8"
+      },
+      {
+        "name": "Content-Transfer-Encoding",
+        "value": "7bit"
+      },
+      {
+        "name": "Content-Disposition",
+        "value": "inline"
+      }
+    ],
+    "body": {
+      "size": 52,
+      "data": "WWZ1ZSBiZmtwaWJ5IHZiYiBtdXhyb3BrdWJsc29mIHBwa2NwaGFveiBvYyBHcWFrcC4NCg=="
+    }
+  },
+  "sizeEstimate": 444
+}
