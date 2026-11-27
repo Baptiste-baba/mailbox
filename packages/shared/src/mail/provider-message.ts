@@ -45,6 +45,17 @@ export interface ProviderMessagePage {
   nextPageToken: string | null;
 }
 
+/** What changed in the mailbox of an account since a cursor was given. */
+export interface ProviderChanges {
+  /**
+   * The mails that arrived, left, or changed state or folder, by their id at the provider. A
+   * provider tells little more: each is read again to know what it became.
+   */
+  providerMessageIds: string[];
+  /** What asks for the changes that follow these. */
+  nextCursor: string;
+}
+
 /** A folder the user created at the provider, where it may be called a label. */
 export interface ProviderFolder {
   providerFolderId: string;

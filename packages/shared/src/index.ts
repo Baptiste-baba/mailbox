@@ -86,6 +86,7 @@ export {
 export { type PaletteColor, paletteColorSchema } from './mail/palette-color.ts';
 export type {
   ProviderAttachment,
+  ProviderChanges,
   ProviderFolder,
   ProviderMessage,
   ProviderMessagePage,

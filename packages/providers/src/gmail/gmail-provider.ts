@@ -1,8 +1,10 @@
 import type { MailProvider } from '@mailbox/shared';
 import type { OauthClient } from '../oauth-client.ts';
 import { googleAuthorizationUrl } from './google-authorization-url.ts';
+import { listGmailChanges } from './list-gmail-changes.ts';
 import { listGmailFolders } from './list-gmail-folders.ts';
 import { listGmailMessages } from './list-gmail-messages.ts';
+import { readGmailCursor } from './read-gmail-cursor.ts';
 import { readGmailMessage } from './read-gmail-message.ts';
 import { redeemGoogleCode } from './redeem-google-code.ts';
 import { renewGoogleAccess } from './renew-google-access.ts';
@@ -16,6 +18,8 @@ export function createGmailProvider(client: OauthClient): MailProvider {
     renewAccess: (refreshToken) => renewGoogleAccess(client, refreshToken),
     listMessages: listGmailMessages,
     readMessage: readGmailMessage,
+    currentCursor: readGmailCursor,
+    listChanges: listGmailChanges,
     listFolders: listGmailFolders,
     revoke: revokeGoogleToken,
   };

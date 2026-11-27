@@ -1,5 +1,10 @@
 import * as z from 'zod';
-import type { ProviderFolder, ProviderMessage, ProviderMessagePage } from './provider-message.ts';
+import type {
+  ProviderChanges,
+  ProviderFolder,
+  ProviderMessage,
+  ProviderMessagePage,
+} from './provider-message.ts';
 
 /** The mail services a mailbox can be connected from. */
 export const mailProviderNameSchema = z.enum(['gmail']);
@@ -82,10 +87,25 @@ export interface MailProvider {
   listMessages(accessToken: string, pageToken: string | null): Promise<ProviderMessagePage | null>;
 
   /**
-   * A mail of the account; null when the provider no longer has it, deleted since it was listed.
+   * A mail of the account worth mirroring; null when the provider no longer has it, or holds it
+   * as spam, deleted mail or a draft.
    * @throws AppError MAIL_PROVIDER_UNAVAILABLE when the provider cannot be reached or refuses.
    */
   readMessage(accessToken: string, providerMessageId: string): Promise<ProviderMessage | null>;
+
+  /**
+   * What asks, later, for everything that changes in the mailbox from now on.
+   * @throws AppError MAIL_PROVIDER_UNAVAILABLE when the provider cannot be reached or refuses.
+   */
+  currentCursor(accessToken: string): Promise<string>;
+
+  /**
+   * Some of what changed in the mailbox since a cursor, oldest changes first, and the cursor to
+   * ask for the rest with. Null when the provider no longer keeps what happened since that
+   * cursor: only copying the mailbox again tells what it holds.
+   * @throws AppError MAIL_PROVIDER_UNAVAILABLE when the provider cannot be reached or refuses.
+   */
+  listChanges(accessToken: string, cursor: string): Promise<ProviderChanges | null>;
 
   /**
    * The folders the user created at the provider.
