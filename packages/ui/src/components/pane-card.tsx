@@ -15,12 +15,15 @@ interface PaneMessageProps {
   message: string;
   /** What the user can do about it, such as trying again. */
   action?: { label: string; onClick: () => void } | undefined;
+  /** What stands at the top of the card, above the message, such as a way back. */
+  top?: ReactNode;
 }
 
 /** Why a pane shows nothing, centred in its card, with what to do about it. */
-export function PaneMessage({ message, action }: PaneMessageProps) {
+export function PaneMessage({ message, action, top }: PaneMessageProps) {
   return (
     <PaneCard>
+      {top !== undefined && <div className="flex flex-none px-4 pt-3 empty:hidden">{top}</div>}
       <StateMessage message={message} action={action} className="flex-1 justify-center px-10" />
     </PaneCard>
   );

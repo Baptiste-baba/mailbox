@@ -10,6 +10,14 @@ const sizeClassNames: Record<IconButtonSize, string> = {
   sm: 'size-8 [&>svg]:icon-16',
 };
 
+const plainClassNames =
+  // A toggle that is on takes the tint.
+  'rounded-md text-ink-2 available:not-aria-pressed:hover:bg-field available:not-aria-pressed:hover:text-ink aria-pressed:bg-tint aria-pressed:text-tint-ink';
+
+// A round button raised above the screen, at a finger's size whatever the pointer.
+const raisedClassNames =
+  'size-11 rounded-full border border-line bg-surface text-ink shadow-soft [&>svg]:icon-20 available:hover:bg-field';
+
 interface IconButtonProps extends Omit<ComponentProps<'button'>, 'aria-label' | 'aria-pressed'> {
   /** What the button does: its accessible name, also shown on hover unless `title` says more. */
   label: string;
@@ -18,6 +26,8 @@ interface IconButtonProps extends Omit<ComponentProps<'button'>, 'aria-label' | 
   /** Turns the button into a toggle, on or off. */
   pressed?: boolean;
   size?: IconButtonSize;
+  /** Round, bordered and lifted, standing alone at the top of a screen, such as a way back. */
+  raised?: boolean;
 }
 
 /** A button showing only an icon, given as its child. Its type defaults to `button`. */
@@ -26,6 +36,7 @@ export function IconButton({
   shortcut,
   pressed,
   size = 'md',
+  raised = false,
   title = shortcut === undefined ? label : `${label} (${shortcut})`,
   type = 'button',
   className,
@@ -38,11 +49,9 @@ export function IconButton({
       aria-pressed={pressed}
       title={title}
       className={joinClassNames(
-        'grid flex-none place-items-center rounded-md touch:size-11',
-        sizeClassNames[size],
+        'grid flex-none place-items-center touch:size-11',
+        raised ? raisedClassNames : [sizeClassNames[size], plainClassNames].join(' '),
         pressableClassNames,
-        // A toggle that is on takes the tint.
-        'text-ink-2 available:not-aria-pressed:hover:bg-field available:not-aria-pressed:hover:text-ink aria-pressed:bg-tint aria-pressed:text-tint-ink',
         className,
       )}
       {...props}

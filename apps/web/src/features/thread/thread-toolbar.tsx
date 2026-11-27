@@ -10,11 +10,13 @@ import {
 import { comingSoon } from '../../hint.ts';
 import { fr } from '../../i18n/fr.ts';
 import { shortcuts } from '../../shortcuts.ts';
+import { ThreadBackButton } from './thread-back-button.tsx';
 
 /** The actions on the open thread, shown before they exist: they keep their look but do nothing. */
 export function ThreadToolbar() {
   return (
     <div className="flex flex-none items-center gap-1 border-b border-line px-4 py-3">
+      <ThreadBackButton />
       <IconButton
         label={fr.thread.archive}
         {...comingSoon(fr.thread.archive, shortcuts.archive.label)}
