@@ -4,6 +4,7 @@ import { useNavigate } from '@tanstack/react-router';
 import { mailboxesQuery, selectInboxUnreadCount } from '../../api/mailboxes-query.ts';
 import type { ThreadFilters } from '../../api/thread-pages-query.ts';
 import { fr } from '../../i18n/fr.ts';
+import { MenuButton } from '../../shell/menu-button.tsx';
 import { useShortcut } from '../../use-shortcut.ts';
 import { MailSearchField } from './mail-search-field.tsx';
 
@@ -23,8 +24,9 @@ export function MailListHeader({ filters }: { filters: ThreadFilters }) {
   const { title, unreadCount, place } = useViewSummary(filters);
   return (
     // Keeps the room of the list's scroll bar, so that tabs, search and cards share their edges.
-    <div className="flex-none overflow-hidden px-4 pt-5 [scrollbar-gutter:stable]">
+    <div className="flex-none overflow-hidden px-4 pt-5 [scrollbar-gutter:stable] compact:px-2">
       <div className="flex items-center gap-3">
+        <MenuButton />
         <h1 className="truncate text-title font-semibold text-heading">{title}</h1>
         {unreadCount !== undefined && unreadCount > 0 && (
           <Chip tone="tint">{fr.common.unreadCount(unreadCount)}</Chip>

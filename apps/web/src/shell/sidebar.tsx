@@ -8,22 +8,25 @@ import { fr } from '../i18n/fr.ts';
 import { shortcuts } from '../shortcuts.ts';
 import { ComingSoonNavItem } from './coming-soon-nav-item.tsx';
 import { FolderNavGroup } from './folder-nav-group.tsx';
+import { useLayout } from './layout.ts';
 import { MailboxNavGroup } from './mailbox-nav-group.tsx';
 import { NewMailButton } from './new-mail-button.tsx';
 import { SidebarNavLink } from './sidebar-nav-link.tsx';
 
 /**
  * The sidebar: the logo and "Nouveau mail" at the top and the settings at the bottom stay in place;
- * the destinations between them scroll when the window is too short for all of them.
+ * the destinations between them scroll when the window is too short for all of them. In the menu
+ * of a phone, "Nouveau mail" is left out: the menu is for going somewhere.
  */
 export function Sidebar() {
+  const layout = useLayout();
   return (
     // A container: once the sidebar is folded narrow, its items shrink to their icons.
     <div className="@container h-full">
       <nav aria-label={fr.sidebar.label} className="flex h-full flex-col pt-5 pb-4">
         <div className="flex-none px-4 @max-rail:px-2">
           <Brand className="px-2 pt-1 pb-5 @max-rail:justify-center @max-rail:px-0" />
-          <NewMailButton />
+          {layout === 'desktop' && <NewMailButton />}
         </div>
         {/* Padded inside the scroll, so that the focus ring of an item is never cut off. */}
         <div className="min-h-0 flex-1 overflow-y-auto overscroll-none px-4 py-1 @max-rail:px-2">

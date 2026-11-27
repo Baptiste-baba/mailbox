@@ -73,6 +73,21 @@ describe('mail view on a phone', () => {
   });
 });
 
+describe('list on a phone', () => {
+  test('keeps the cards and the search close to the edges of the screen', async () => {
+    fakeThreads(3);
+    await page.viewport(390, 844);
+    const { screen } = await renderApp('/inbox');
+    const card = screen.getByRole('link', { name: /Sujet thread-0\b/ });
+    await expect.element(card).toBeVisible();
+
+    const cardLeft = card.element().getBoundingClientRect().left;
+    const search = screen.getByRole('searchbox').element().closest('label, div');
+    expect(cardLeft).toBe(8);
+    expect(search?.getBoundingClientRect().left).toBe(cardLeft);
+  });
+});
+
 describe('way back from a thread', () => {
   test('goes back to the list of a thread opened from its address alone', async () => {
     fakeThreads(3);

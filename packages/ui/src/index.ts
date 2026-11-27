@@ -33,6 +33,7 @@ export { RowLink } from './components/row-link.tsx';
 export { SearchField } from './components/search-field.tsx';
 export { SegmentedControl } from './components/segmented-control.tsx';
 export { Select } from './components/select.tsx';
+export { SidePanel } from './components/side-panel.tsx';
 export { Skeleton } from './components/skeleton.tsx';
 export { StateMessage } from './components/state-message.tsx';
 export { Stepper } from './components/stepper.tsx';

@@ -1,7 +1,9 @@
 import { ColumnResizeHandle, ResizableColumn, ResizableColumns, useColumnRef } from '@mailbox/ui';
 import { CatchBoundary, Outlet } from '@tanstack/react-router';
-import { ComposeDraftProvider } from '../features/compose/index.ts';
+import { ComposeDraftProvider, useOpenComposer } from '../features/compose/index.ts';
+import { useShortcut } from '../use-shortcut.ts';
 import { useLayout } from './layout.ts';
+import { MenuProvider } from './menu.tsx';
 import { Sidebar } from './sidebar.tsx';
 import { SidebarCrash } from './sidebar-message.tsx';
 import {
@@ -11,19 +13,24 @@ import {
 
 /**
  * Frame of the app around every screen: the sidebar beside the screen on a computer, the screen
- * alone on a phone, upright or turned. The new mail being written lives here, so that moving
- * between screens, or turning the phone, keeps it.
+ * alone on a phone, upright or turned, with the sidebar in a menu. The new mail being written lives
+ * here, so that moving between screens, or turning the phone, keeps it.
  */
 export function Shell() {
   const layout = useLayout();
+  const openComposer = useOpenComposer();
+  // Here rather than on the "Nouveau mail" button, which is not on screen in every layout.
+  useShortcut('newMail', openComposer);
   return (
     <ComposeDraftProvider>
       {layout === 'desktop' ? (
         <DesktopFrame />
       ) : (
-        <div className="h-dvh bg-chrome">
-          <Outlet />
-        </div>
+        <MenuProvider>
+          <div className="h-dvh bg-chrome">
+            <Outlet />
+          </div>
+        </MenuProvider>
       )}
     </ComposeDraftProvider>
   );

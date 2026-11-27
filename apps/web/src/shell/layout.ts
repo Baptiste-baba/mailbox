@@ -7,6 +7,8 @@ import { useSyncExternalStore } from 'react';
  */
 export type Layout = 'phone' | 'landscape' | 'desktop';
 
+// The `compact:` variant of packages/ui/src/variants.css stands for these two layouts: keep them
+// the same sizes.
 // Narrower than a tablet held upright.
 const PHONE_WINDOW = '(width < 768px)';
 // Too short for the sidebar and its columns, wide enough for the list and the mail side by side.

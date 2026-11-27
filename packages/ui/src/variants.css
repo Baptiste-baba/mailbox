@@ -3,3 +3,7 @@
 
 /* `available:` applies to a control that can be used now: neither disabled nor marked aria-disabled. */
 @custom-variant available (&:not(:disabled, [aria-disabled="true"]));
+
+/* `compact:` applies while the window is too small to keep the sidebar beside the screen: a phone,
+   upright or turned sideways. Same sizes as the layouts in apps/web/src/shell/layout.ts. */
+@custom-variant compact (@media (width < 768px), (height < 500px));
