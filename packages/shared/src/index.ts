@@ -87,6 +87,7 @@ export {
   mailboxListSchema,
   mailboxSummarySchema,
 } from './mail/mailbox-summary.ts';
+export { type MessageBody, messageBodySchema } from './mail/message-body.ts';
 export { type PaletteColor, paletteColorSchema } from './mail/palette-color.ts';
 export type {
   ProviderAttachment,
