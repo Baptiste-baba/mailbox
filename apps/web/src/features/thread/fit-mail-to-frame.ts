@@ -21,15 +21,17 @@ export function fitMailToFrame(page: Document): number {
   // Many mails give their page the height of the window (`html { height: 100% }`): here, the frame
   // would then keep whatever height it has, and cut the rest.
   root.style.setProperty('height', 'auto', 'important');
+  // Measured as the mail lays out in the frame, whatever an earlier fit made of it: measured as
+  // laid out by that fit, the mail would need a little more at each fit, and shrink without end.
+  root.style.removeProperty('width');
+  root.style.removeProperty('transform');
+  const frameWidth = root.clientWidth;
   const width = neededWidth(page);
-  // The width of the frame itself, whatever the width given to the page.
-  const scale = Math.min(1, root.clientWidth / width);
-  if (scale < 1) {
+  if (width > frameWidth) {
     root.style.setProperty('width', `${width}px`, 'important');
+    // Some parts overflow whatever the width, such as a full-width block with padding: counted too.
+    const scale = frameWidth / Math.max(width, neededWidth(page));
     root.style.setProperty('transform', `scale(${scale})`, 'important');
-  } else {
-    root.style.removeProperty('width');
-    root.style.removeProperty('transform');
   }
   // The page as laid out, then shrunk. Its scrolling height would never come under the height of
   // the frame, which could then grow but never shrink back.

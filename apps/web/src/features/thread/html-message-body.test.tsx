@@ -170,7 +170,32 @@ describe('a mail wider than the pane', () => {
     frame.style.width = '800px';
     await expect.poll(() => rightEdge(page, 'table')).toBeCloseTo(500, 0);
   });
+
+  // Regression: a part wider than the page whatever its width, such as a full-width block with
+  // padding, widened the page at each fit, and the mail shrank without end.
+  test('settles on a mail whose parts overflow whatever the width', async () => {
+    const { screen } = await openMailWith(
+      '<div id="padded" style="width: 100%; padding: 0 20px">Bonjour</div><hr id="rule" size="2" width="100%">',
+    );
+    const page = await mailPage(screen);
+    const frameWidth = page.documentElement.clientWidth;
+    const paddedWidth = () => page.getElementById('padded')?.getBoundingClientRect().width;
+    await expect.poll(() => rightEdge(page, 'padded')).toBeLessThanOrEqual(frameWidth + 1);
+    const settledWidth = paddedWidth();
+
+    await animationFrames(10);
+
+    expect(paddedWidth()).toBe(settledWidth);
+    expect(rightEdge(page, 'rule')).toBeLessThanOrEqual(frameWidth + 1);
+  });
 });
+
+/** Lets the given number of frames be drawn: enough for a fit that would go on to show it. */
+async function animationFrames(count: number): Promise<void> {
+  for (let drawn = 0; drawn < count; drawn += 1) {
+    await new Promise((resolve) => requestAnimationFrame(resolve));
+  }
+}
 
 describe('a mail narrower than the pane', () => {
   test('keeps its own size', async () => {
